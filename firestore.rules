@@ -1,0 +1,80 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── users collection ──────────────────────────────────────────────────────
+    // Mọi user đăng nhập đều đọc được (để tính Leaderboard), chỉ user tự ghi profile của chính mình
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ── community_posts collection ────────────────────────────────────────────
+    match /community_posts/{postId} {
+      // Mọi user đăng nhập đều đọc được
+      allow read: if request.auth != null;
+
+      // Chỉ user đăng nhập mới tạo bài
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.content is string
+        && request.resource.data.content.size() > 0
+        && request.resource.data.content.size() <= 2000;
+
+      // Cập nhật: 
+      // 1. Chủ bài được sửa mọi thứ trừ userId.
+      // 2. Người khác CHỈ được cập nhật likes, likedBy, comments (Tối ưu bằng diff).
+      allow update: if request.auth != null
+        && (
+          // Trường hợp 1: Là chủ bài (không được đổi userId sang người khác)
+          (resource.data.userId == request.auth.uid && request.resource.data.userId == resource.data.userId)
+          ||
+          // Trường hợp 2: Người khác tương tác, chỉ được thay đổi đúng 3 mảng/trường này
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes', 'likedBy', 'comments']))
+        );
+
+      // Chỉ chủ bài mới xóa được
+      allow delete: if request.auth != null
+        && resource.data.userId == request.auth.uid;
+    }
+
+    // ── SKKN docs collection (đã có) ─────────────────────────────────────────
+    match /skkn_docs/{docId} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null;
+      allow delete: if request.auth != null
+        && resource.data.uploadedBy == request.auth.uid;
+    }
+  // ── userProgress collection ───────────────────────────────────────────────
+  match /userProgress/{uid} {
+    // Only the authenticated owner can read/write his progress
+    allow read, write: if request.auth != null && request.auth.uid == uid;
+  }
+
+    // ── notifications collection ──────────────────────────────────────────────
+    match /notifications/{notificationId} {
+      allow read, update, delete: if request.auth != null && (resource.data.userId == request.auth.uid || resource.data.userId == 'all');
+      allow create: if request.auth != null;
+    }
+    // ── rooms collection for multiplayer games ────────────────────────────────────────
+    match /rooms/{roomId} {
+      // Room document: host can create, read, update, delete
+      allow create: if request.auth != null && request.resource.data.hostUid == request.auth.uid;
+      allow read: if request.auth != null && (resource.data.hostUid == request.auth.uid || ('players' in resource.data && resource.data.players.hasAny([request.auth.uid])));
+      allow update, delete: if request.auth != null && resource.data.hostUid == request.auth.uid;
+
+      // Subcollection players: each player can read/write their own player doc
+      match /players/{playerId} {
+        allow read, write: if request.auth != null && request.auth.uid == playerId;
+      }
+
+      // Subcollection state: game state (questions, scores, etc.) can be read by all participants, written only by host
+      match /state/{docId} {
+        allow read: if request.auth != null && (resource.data.hostUid == request.auth.uid || ('players' in resource.data && resource.data.players.hasAny([request.auth.uid])));
+        allow write: if request.auth != null && resource.data.hostUid == request.auth.uid;
+      }
+    }
+
+  }
+}

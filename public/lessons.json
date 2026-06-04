@@ -1,0 +1,14 @@
+[
+  {
+    "id": "lesson1",
+    "title": "Giới thiệu Khoa Học",
+    "content": "<p>Chào mừng bạn đến với khoa học!</p>",
+    "order": 1
+  },
+  {
+    "id": "lesson2",
+    "title": "Thí nghiệm Đèn LED",
+    "content": "<p>Hướng dẫn thí nghiệm đèn LED.</p>",
+    "order": 2
+  }
+]
