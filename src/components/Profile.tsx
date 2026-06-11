@@ -425,7 +425,7 @@ export function Profile({ onBack }: ProfileProps) {
 
           <div className="space-y-12">
             {[
-              { year: "2022 - NAY", title: "Giáo viên KHTN", place: "THCS Ngô Chí Quốc", desc: "Tiên phong trong việc số hóa học liệu và ứng dụng AI vào giảng dạy trực tiếp." },
+              { year: "2022 - NAY", title: "Giáo viên KHTN", place: "THCS Ngô Chí Quốc", desc: "Tích cực trong việc số hóa học liệu và ứng dụng AI vào giảng dạy trực tiếp." },
               { year: "2019 - 2022", title: "Giáo viên Hóa học", place: "PTNK Thể Thao Olympic", desc: "Giảng dạy bộ môn Hóa học và bồi dưỡng học sinh năng khiếu." },
               { year: "2015 - 2018", title: "Giáo viên Hóa học", place: "THPT Sông Đốc", desc: "Giảng dạy bộ môn Hóa học cấp trung học phổ thông." }
             ].map((item, idx) => (
@@ -485,11 +485,11 @@ export function Profile({ onBack }: ProfileProps) {
             <div className="bg-white/5 p-10 rounded-[3rem] border border-white/10 space-y-6">
                <div className="space-y-2">
                  <p className="text-xs font-black uppercase tracking-widest text-slate-500">Email Address</p>
-                 <p className="text-xl font-bold tracking-tight">linhtv.edu@gmail.com</p>
+                 <p className="text-xl font-bold tracking-tight">tranvanl55@gmail.com</p>
                </div>
                <div className="space-y-2">
                  <p className="text-xs font-black uppercase tracking-widest text-slate-500">Official Website</p>
-                 <p className="text-xl font-bold tracking-tight">www.linhtv.online</p>
+                 <p className="text-xl font-bold tracking-tight">giaovien40.com.vn</p>
                </div>
                <div className="pt-8">
                  <button className="w-full py-4 bg-yellow-400 text-black font-black uppercase italic tracking-widest hover:scale-105 transition-all shadow-xl shadow-yellow-400/20">

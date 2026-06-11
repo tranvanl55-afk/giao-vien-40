@@ -172,10 +172,10 @@ export function FloatingGuide() {
               <span className="absolute inset-4 rounded-full bg-cyan-300/20 animate-pulse -z-10" />
             </>
           )}
-          <img 
-            src="https://img.upanhnhanh.com/862b7917c7fb98d1147f8101d2f956de" 
-            alt="Guide icon" 
-            className="w-32 sm:w-40 h-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]" 
+          <img
+            src="https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fimg1.gif?alt=media&token=22c2ec59-d851-45c7-943d-7bc406be92f1"
+            alt="Trợ lý hướng dẫn"
+            className="w-32 sm:w-40 h-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
           />
         </motion.button>
       </div>

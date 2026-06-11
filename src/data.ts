@@ -39,7 +39,7 @@ export const categories: Category[] = [
     title: "Thí nghiệm mô phỏng",
     subtitle: "Phòng thực hành ảo 3D",
     icon: Flask,
-    logoUrl: "https://img.icons8.com/fluency/96/test-tube.png",
+    logoUrl: "/images/thi-nghiem-mo-phong-transparent.png",
     colorClass: "from-blue-400 via-cyan-500 to-indigo-600",
     subCategories: [
       { 
@@ -388,7 +388,7 @@ export const categories: Category[] = [
     title: "Ôn tập và kiểm tra",
     subtitle: "Ngân hàng câu hỏi & Đề thi",
     icon: ClipboardText,
-    logoUrl: "https://img.icons8.com/fluency/96/exam.png",
+    logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C3%B4n_t%E1%BA%ADp-removebg-preview.png?alt=media&token=d032eaa3-4aef-4290-ae19-a05eeee7b0f6",
     colorClass: "from-emerald-400 via-green-500 to-teal-600",
     subCategories: [
       { id: "test-gk", title: "Đề thi Giữa kì", description: "Bộ đề tham khảo Khối 6, 7, 8, 9 với ma trận chi tiết", colorClass: "hover:bg-emerald-500/20 hover:border-emerald-500/50", logoUrl: "https://img.icons8.com/fluency/96/test-passed.png" },
@@ -423,6 +423,22 @@ export const categories: Category[] = [
           }
         ]
       },
+      {
+        id: "giao-an-ai-tool",
+        title: "Nâng Cấp Giáo Án AI",
+        description: "Tích hợp Năng lực số & Năng lực AI tự động vào giáo án Word 📝",
+        colorClass: "hover:bg-blue-500/20 hover:border-blue-500/50",
+        logoUrl: "https://img.icons8.com/fluency/96/artificial-intelligence.png",
+        lessons: [
+          {
+            id: "giao-an-ai",
+            title: "Trợ lý Nâng cấp Giáo án",
+            description: "Hệ thống tự động đọc file Word (.docx), phân tích bài học bằng AI và chèn thêm 2 mục năng lực số và AI vào đúng chuẩn mà không làm hỏng định dạng.",
+            icon: Robot,
+            theme: "blue"
+          }
+        ]
+      },
     ]
   },
   {
@@ -430,7 +446,7 @@ export const categories: Category[] = [
     title: "E-learning",
     subtitle: "Bài giảng điện tử & Tài liệu số",
     icon: BookOpenText,
-    logoUrl: "https://img.icons8.com/fluency/96/books.png",
+    logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2FElearning-removebg-preview.png?alt=media&token=f0117924-7d35-4238-834f-1f912f40d756",
     colorClass: "from-violet-400 via-purple-500 to-fuchsia-600",
     subCategories: [
       { id: "bg-khtn", title: "Bài giảng KHTN", description: "Kho tàng bài giảng điện tử sinh động", colorClass: "hover:bg-violet-500/20 hover:border-violet-500/50", logoUrl: "https://img.icons8.com/fluency/96/presentation.png" },
@@ -442,7 +458,7 @@ export const categories: Category[] = [
     title: "Trò chơi học tập",
     subtitle: "Chơi để học, học để chơi",
     icon: GameController,
-    logoUrl: "https://img.icons8.com/fluency/96/controller.png",
+    logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fgame-removebg-preview.png?alt=media&token=2ed1f26a-a6ff-4e35-9772-d6727b29667f",
     colorClass: "from-pink-400 via-rose-500 to-red-600",
     subCategories: [
       { id: "game-hub", title: "Ngân hàng câu hỏi", description: "Lưu trữ câu hỏi cho các trò chơi — nhập thủ công hoặc quét ảnh bằng AI 📚", colorClass: "hover:bg-violet-500/20 hover:border-violet-500/50", logoUrl: "https://img.icons8.com/fluency/96/data-configuration.png" },
@@ -489,7 +505,7 @@ export const categories: Category[] = [
     title: "Công cụ AI",
     subtitle: "Trợ lý thông minh",
     icon: Robot,
-    logoUrl: "https://img.icons8.com/fluency/96/artificial-intelligence.png",
+    logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fai-removebg-preview.png?alt=media&token=75b34297-d1a8-4f5c-a879-c106e92c788f",
     colorClass: "from-orange-400 via-amber-500 to-yellow-600",
     subCategories: [
       // I. Trò chuyện, hỏi đáp
@@ -679,7 +695,7 @@ export const categories: Category[] = [
     title: "Sáng kiến kinh nghiệm",
     subtitle: "Kho tàng giải pháp giáo dục",
     icon: Lightbulb,
-    logoUrl: "https://img.icons8.com/fluency/96/light-on.png",
+    logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fskkn-removebg-preview.png?alt=media&token=2f5c09cb-fdf9-4ab5-a7a3-cda6c4dfc9c1",
     colorClass: "from-yellow-400 via-orange-400 to-red-500",
     subCategories: [
       { id: "skkn-2023", title: "SKKN Cấp trường", description: "Phương pháp dạy học theo định hướng dự án", logoUrl: "https://img.icons8.com/fluency/96/light-on.png" },
@@ -693,7 +709,7 @@ export const categories: Category[] = [
     title: "Nghiên cứu khoa học",
     subtitle: "Đề tài & Công trình nghiên cứu",
     icon: Atom,
-    logoUrl: "https://img.icons8.com/fluency/96/physics.png",
+    logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fnckh-removebg-preview.png?alt=media&token=94da70e4-aed2-49bd-b27b-198faa6f380b",
     colorClass: "from-indigo-400 via-blue-500 to-cyan-600",
     subCategories: [
       { id: "nc-sp", title: "Nghiên cứu Sư phạm", description: "Khảo sát tâm lý & Động lực học tập học sinh", logoUrl: "https://img.icons8.com/fluency/96/search.png" },
@@ -773,7 +789,7 @@ export const categories: Category[] = [
     title: "Dạy học STEAM",
     subtitle: "Dự án thực tế & Môi trường",
     icon: RocketLaunch,
-    logoUrl: "https://img.icons8.com/fluency/96/rocket.png",
+    logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fsteam-removebg-preview.png?alt=media&token=29aa2902-f6ca-4944-ad9c-a00e286e3614",
     colorClass: "from-teal-400 via-emerald-500 to-lime-600",
     subCategories: [
       { id: "steam-eco", title: "Dự án Tái chế", description: "Mô hình thùng rác thông minh phân loại tự động", logoUrl: "https://img.icons8.com/fluency/96/recycle-sign.png" },
@@ -785,7 +801,7 @@ export const categories: Category[] = [
     title: "Dạy học tích cực",
     subtitle: "Phương pháp & Công cụ tương tác",
     icon: Presentation,
-    logoUrl: "https://img.icons8.com/fluency/96/classroom.png",
+    logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2FDHTC-removebg-preview.png?alt=media&token=6b4c8759-0629-4a91-a85c-e2ad611979f8",
     colorClass: "from-sky-400 via-indigo-500 to-purple-600",
     subCategories: [
       {

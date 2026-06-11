@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, Play, BookOpen, Settings2, SkipForward, Maximize, Volume2, Trophy, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { soundClick, soundCorrect, soundWrong, soundStart, soundEnd, soundNextQuestion } from '../../hooks/useGameSounds';
 
 interface ActionQuizGameProps {
   initialQuestions?: QuestionDef[];
@@ -22,12 +23,20 @@ Câu 4: Nếu hàm lượng glucose trong máu thường xuyên ở mức cao (v
 
 const PRAISE_QUOTES = ["Tuyệt vời quá em ơi! 🎉", "Chúc mừng em, câu trả lời hoàn hảo! 🌟", "Thông minh xuất sắc luôn! 💎", "Quá chuẩn xác! Cố gắng phát huy nhé! 🚀", "Một câu trả lời không thể chuẩn hơn! 👏", "Rất tốt! Tự tin tiến lên câu tiếp theo nào! 💯"];
 
-const ACTION_ICONS = [
-  { label: 'Jumping Jacks\n(Nhảy vung tay)', imgUrl: 'https://img.upanhnhanh.com/02c4002f099f92b89a935a27be5978bb', emoji: '🤸', bgColor: 'from-pink-500 to-rose-600', shadow: 'shadow-pink-500/40' },
-  { label: 'Squat\n(Đứng lên ngồi xuống)', imgUrl: 'https://img.upanhnhanh.com/6e3584ec25e22cc979768c10f6835b69', emoji: '🏋️', bgColor: 'from-cyan-400 to-blue-600', shadow: 'shadow-blue-500/40' },
-  { label: 'Giơ tay trái', imgUrl: 'https://img.upanhnhanh.com/04579b5b471c650e01536f1546c838db', emoji: '🙋', bgColor: 'from-emerald-400 to-green-600', shadow: 'shadow-emerald-500/40' },
-  { label: 'Giơ tay phải', imgUrl: 'https://img.upanhnhanh.com/789ca5b92e831b0d58138f89a87bf4c6', emoji: '🙋‍♂️', bgColor: 'from-amber-400 to-orange-600', shadow: 'shadow-orange-500/40' },
+const ANSWER_IMAGES = [
+  'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2FA.png?alt=media&token=4d3e782d-9f73-4082-a638-91c04db4e375',
+  'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2FB.png?alt=media&token=78fd99f9-f577-46c5-b492-43d737fde8dd',
+  'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fc.png?alt=media&token=7c3427b7-7ce1-4fb6-8266-da1599b9ae82',
+  'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fd.png?alt=media&token=1afe00f8-66cf-4c08-a8ac-9f7474678c5e',
 ];
+
+const ACTION_ICONS = [
+  { label: 'Jumping Jacks\n(Nhảy vung tay)', emoji: '🤸', bgColor: 'from-pink-500 to-rose-600', shadow: 'shadow-pink-500/40' },
+  { label: 'Squat\n(Đứng lên ngồi xuống)', emoji: '🏋️', bgColor: 'from-cyan-400 to-blue-600', shadow: 'shadow-blue-500/40' },
+  { label: 'Giơ tay trái', emoji: '🙋', bgColor: 'from-emerald-400 to-green-600', shadow: 'shadow-emerald-500/40' },
+  { label: 'Giơ tay phải', emoji: '🙋‍♂️', bgColor: 'from-amber-400 to-orange-600', shadow: 'shadow-orange-500/40' },
+];
+
 
 export function ActionQuizGame({ initialQuestions, onBack }: ActionQuizGameProps) {
   const [phase, setPhase] = useState<'setup' | 'game' | 'end'>(
@@ -94,6 +103,7 @@ export function ActionQuizGame({ initialQuestions, onBack }: ActionQuizGameProps
       alert("Vui lòng nhập ít nhất 1 câu hỏi đúng định dạng!");
       return;
     }
+    soundStart();
     setQuestions(parsed);
     setPhase('game');
     setCurrentIdx(0);
@@ -122,6 +132,7 @@ export function ActionQuizGame({ initialQuestions, onBack }: ActionQuizGameProps
 
   const nextQuestion = () => {
     if (currentIdx < questions.length - 1) {
+      soundNextQuestion();
       setCurrentIdx(prev => prev + 1);
       setTimeLeft(15);
       setIsTimeUp(false);
@@ -129,6 +140,7 @@ export function ActionQuizGame({ initialQuestions, onBack }: ActionQuizGameProps
       setTeacherMood('cheer');
       setSelectedOption(null);
     } else {
+      soundEnd();
       setPhase('end');
       triggerConfetti();
     }
@@ -136,6 +148,9 @@ export function ActionQuizGame({ initialQuestions, onBack }: ActionQuizGameProps
 
   const handleOptionClick = (optIdx: number) => {
     if (isTimeUp) return;
+    const isCorrect = optIdx === questions[currentIdx]?.correctAnswer;
+    if (isCorrect) soundCorrect(); else soundWrong();
+    soundClick();
     setSelectedOption(optIdx);
     setIsTimeUp(true);
     setTeacherMood('celebrate');
@@ -323,15 +338,14 @@ export function ActionQuizGame({ initialQuestions, onBack }: ActionQuizGameProps
                       className={`flex flex-col items-center cursor-pointer transition-all duration-500 origin-bottom w-full ${!isTimeUp ? 'hover:-translate-y-1 active:scale-95' : ''} ${isCorrect ? 'scale-105 z-20 drop-shadow-2xl' : ''} ${isTimeUp && !isCorrect ? 'scale-95 opacity-40 grayscale saturate-50' : ''}`}
                       onClick={() => handleOptionClick(optIdx)}
                     >
-                      {/* Character Illustration Placeholder */}
+                      {/* Character Illustration */}
                       <div className="relative mb-0 shrink-0 z-10 -bottom-6 md:-bottom-8">
-                        <div className={`w-28 h-28 md:w-36 md:h-36 bg-white rounded-full border-4 border-slate-100 flex items-center justify-center text-5xl md:text-6xl shadow-xl overflow-hidden ${isCorrect ? 'animate-bounce border-emerald-400 ring-4 ring-emerald-400/50' : ''}`}>
-                          {ACTION_ICONS[optIdx].imgUrl ? (
-                            <img src={ACTION_ICONS[optIdx].imgUrl} alt={ACTION_ICONS[optIdx].label} className="w-full h-full object-cover mix-blend-multiply" />
-                          ) : (
-                            ACTION_ICONS[optIdx].emoji
-                          )}
-                        </div>
+                        <img
+                          src={ANSWER_IMAGES[optIdx]}
+                          alt={['A', 'B', 'C', 'D'][optIdx]}
+                          className={`w-36 h-36 md:w-44 md:h-44 object-contain drop-shadow-xl ${isCorrect ? 'animate-bounce drop-shadow-[0_0_16px_rgba(16,185,129,0.6)]' : ''}`}
+                          draggable={false}
+                        />
                       </div>
  
                       {/* Answer Box */}

@@ -23,7 +23,7 @@ export const HandTracker: React.FC<HandTrackerProps> = ({ onDetectedFingers }) =
     const initMediaPipe = async () => {
       try {
         const vision = await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm"
         );
         
         handLandmarker = await HandLandmarker.createFromOptions(vision, {

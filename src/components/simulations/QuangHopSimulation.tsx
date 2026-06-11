@@ -28,7 +28,6 @@ export function QuangHopSimulation({ onBack }: { onBack: () => void }) {
   const molsRef = useRef<Molecule[]>([]);
   const animRef = useRef<number>(0);
   const timeRef = useRef(0);
-  const leafImgRef = useRef<HTMLImageElement | null>(null);
   
   // State to store absorbed molecules for reactions
   const organellesRef = useRef<{
@@ -53,19 +52,7 @@ export function QuangHopSimulation({ onBack }: { onBack: () => void }) {
     const H = canvas.height;
     const ctx = canvas.getContext('2d')!;
 
-    // Initialize leaf image
-    if (!leafImgRef.current) {
-      const img = new Image();
-      // Removed crossOrigin to avoid CORS blocking since we don't need to read canvas pixels
-      img.src = 'https://img.upanhnhanh.com/e95d2d09ef272ee86adc2b076663efb4';
-      img.onload = () => {
-        leafImgRef.current = img;
-      };
-      img.onerror = () => {
-        console.error("Lỗi tải ảnh lá từ URL");
-      };
-    }
-
+    // Leaf image is no longer used — leaf is drawn with canvas paths below
     // Initialize molecules
     if (molsRef.current.length === 0) {
       for (let i = 0; i < 8; i++) {
@@ -154,23 +141,55 @@ export function QuangHopSimulation({ onBack }: { onBack: () => void }) {
       const leafH = H * 0.7;
 
       ctx.save();
-      if (leafImgRef.current) {
-        // Draw the leaf image
-        ctx.translate(leafCx, leafCy);
-        // The image might need rotation if it doesn't align with our horizontal flow
-        // ctx.rotate(-0.15); // Adjust this if the leaf image is tilted
-        ctx.drawImage(leafImgRef.current, -leafW / 2, -leafH / 2, leafW, leafH);
-      } else {
-        // Fallback loading state
-        ctx.fillStyle = 'rgba(22, 101, 52, 0.2)';
+      // Draw leaf using canvas paths (no external image needed)
+      ctx.translate(leafCx, leafCy);
+      ctx.rotate(-0.15);
+
+      // Leaf body — ellipse shape with gradient
+      const leafGrad = ctx.createRadialGradient(0, -leafH * 0.1, 0, 0, 0, leafW * 0.42);
+      leafGrad.addColorStop(0, `rgba(34, 197, 94, ${0.5 + rate * 0.4})`);
+      leafGrad.addColorStop(0.6, `rgba(22, 163, 74, ${0.5 + rate * 0.4})`);
+      leafGrad.addColorStop(1, `rgba(15, 118, 51, ${0.4 + rate * 0.3})`);
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, leafW * 0.42, leafH * 0.3, 0, 0, Math.PI * 2);
+      ctx.fillStyle = leafGrad;
+      ctx.fill();
+      ctx.strokeStyle = `rgba(21, 128, 61, 0.8)`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Midrib (central vein)
+      ctx.beginPath();
+      ctx.moveTo(-leafW * 0.4, 0);
+      ctx.lineTo(leafW * 0.42, 0);
+      ctx.strokeStyle = `rgba(16, 100, 45, 0.6)`;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // Lateral veins
+      ctx.strokeStyle = `rgba(16, 100, 45, 0.4)`;
+      ctx.lineWidth = 1.2;
+      for (let v = -3; v <= 3; v++) {
+        const vx = v * leafW * 0.1;
+        const vy = leafH * 0.25 * (v % 2 === 0 ? -1 : 1);
         ctx.beginPath();
-        ctx.ellipse(leafCx, leafCy, leafW / 2, leafH / 2, -0.15, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.fillText('Đang tải ảnh lá...', leafCx, leafCy);
+        ctx.moveTo(vx, 0);
+        ctx.quadraticCurveTo(vx + leafW * 0.05, vy * 0.5, vx + leafW * 0.03, vy);
+        ctx.stroke();
       }
+
+      // Stem (petiole)
+      ctx.beginPath();
+      ctx.moveTo(-leafW * 0.42, 0);
+      ctx.lineTo(-leafW * 0.55, leafH * 0.2);
+      ctx.strokeStyle = `rgba(120, 80, 30, 0.8)`;
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
       ctx.restore();
+
 
       // Initialize Organelles (Chloroplasts and Mitochondria) once
       if (organellesRef.current.chloroplasts.length === 0) {

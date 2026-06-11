@@ -14,7 +14,14 @@ import {
 // No mammoth / no Node.js Buffer needed
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function extractTextFromDocx(file: File): Promise<string> {
+interface ExtractedParagraph {
+  text: string;
+  isBold: boolean;
+  isItalic: boolean;
+  ilvl?: number;
+}
+
+async function extractTextFromDocx(file: File, options: { useDash: boolean } = { useDash: true }): Promise<ExtractedParagraph[]> {
   const { default: JSZip } = await import('jszip');
   const arrayBuffer = await file.arrayBuffer();
   const zip = await JSZip.loadAsync(arrayBuffer);
@@ -23,18 +30,153 @@ async function extractTextFromDocx(file: File): Promise<string> {
   const xmlText = await xmlFile.async('text');
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
-  // Extract text from <w:t> elements, preserving paragraph breaks
-  const paragraphs = xmlDoc.getElementsByTagNameNS('http://schemas.openxmlformats.org/wordprocessingml/2006/main', 'p');
-  const lines: string[] = [];
+  const NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+  
+  // Parse numbering.xml to flatten lists
+  const numberingFile = zip.file('word/numbering.xml');
+  const numberingMap: Record<number, Record<number, { format: string, text: string }>> = {};
+
+  if (numberingFile) {
+    const numText = await numberingFile.async('text');
+    const numDoc = parser.parseFromString(numText, 'application/xml');
+    const abstractNums = numDoc.getElementsByTagNameNS(NS, 'abstractNum');
+    const abstractMap: Record<string, Element> = {};
+    for (let i = 0; i < abstractNums.length; i++) {
+      const absId = abstractNums[i].getAttribute('w:abstractNumId');
+      if (absId) abstractMap[absId] = abstractNums[i];
+    }
+    const nums = numDoc.getElementsByTagNameNS(NS, 'num');
+    for (let i = 0; i < nums.length; i++) {
+      const numId = nums[i].getAttribute('w:numId');
+      const absRef = nums[i].getElementsByTagNameNS(NS, 'abstractNumId');
+      if (numId && absRef.length > 0) {
+        const absId = absRef[0].getAttribute('w:val');
+        if (absId && abstractMap[absId]) {
+          const lvls = abstractMap[absId].getElementsByTagNameNS(NS, 'lvl');
+          numberingMap[parseInt(numId, 10)] = {};
+          for (let j = 0; j < lvls.length; j++) {
+            const ilvl = lvls[j].getAttribute('w:ilvl');
+            const numFmtNode = lvls[j].getElementsByTagNameNS(NS, 'numFmt');
+            const lvlTextNode = lvls[j].getElementsByTagNameNS(NS, 'lvlText');
+            if (ilvl && numFmtNode.length > 0 && lvlTextNode.length > 0) {
+              const format = numFmtNode[0].getAttribute('w:val') || 'decimal';
+              const text = lvlTextNode[0].getAttribute('w:val') || '';
+              numberingMap[parseInt(numId, 10)][parseInt(ilvl, 10)] = { format, text };
+            }
+          }
+        }
+      }
+    }
+  }
+
+  const globalCounters: Record<number, number> = {};
+  const formatNumber = (val: number, fmt: string) => {
+    if (fmt === 'upperRoman') {
+      const lookup: Record<string,number> = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1};
+      let roman = '', n = val;
+      for (let i in lookup) { while (n >= lookup[i]) { roman += i; n -= lookup[i]; } }
+      return roman;
+    }
+    if (fmt === 'lowerLetter') {
+      let letter = '', n = val;
+      while (n > 0) { let t = (n - 1) % 26; letter = String.fromCharCode(97 + t) + letter; n = Math.floor((n - t)/26); }
+      return letter;
+    }
+    if (fmt === 'upperLetter') {
+      let letter = '', n = val;
+      while (n > 0) { let t = (n - 1) % 26; letter = String.fromCharCode(65 + t) + letter; n = Math.floor((n - t)/26); }
+      return letter;
+    }
+    if (fmt === 'bullet') return options.useDash ? '-' : '';
+    return val.toString();
+  };
+
+  const paragraphs = xmlDoc.getElementsByTagNameNS(NS, 'p');
+  const extracted: ExtractedParagraph[] = [];
+  
   for (let i = 0; i < paragraphs.length; i++) {
-    const runs = paragraphs[i].getElementsByTagNameNS('http://schemas.openxmlformats.org/wordprocessingml/2006/main', 't');
+    const p = paragraphs[i];
+    let isBold = false;
+    let isItalic = false;
+    let ilvl: number | undefined = undefined;
+    let numId: number | undefined = undefined;
+
+    // Check numbering (numPr -> ilvl)
+    const numPrs = p.getElementsByTagNameNS(NS, 'numPr');
+    if (numPrs.length > 0) {
+      const ilvlNodes = numPrs[0].getElementsByTagNameNS(NS, 'ilvl');
+      const numIdNodes = numPrs[0].getElementsByTagNameNS(NS, 'numId');
+      if (ilvlNodes.length > 0) ilvl = parseInt(ilvlNodes[0].getAttribute('w:val') || '0', 10);
+      else ilvl = 0;
+      if (numIdNodes.length > 0) numId = parseInt(numIdNodes[0].getAttribute('w:val') || '0', 10);
+    }
+
+    // Check paragraph properties for bold/italic
+    const pPrs = p.getElementsByTagNameNS(NS, 'pPr');
+    if (pPrs.length > 0) {
+      const rPrs = pPrs[0].getElementsByTagNameNS(NS, 'rPr');
+      if (rPrs.length > 0) {
+        if (rPrs[0].getElementsByTagNameNS(NS, 'b').length > 0) isBold = true;
+        if (rPrs[0].getElementsByTagNameNS(NS, 'i').length > 0) isItalic = true;
+      }
+    }
+
+    const runs = p.getElementsByTagNameNS(NS, 't');
     let text = '';
     for (let j = 0; j < runs.length; j++) {
       text += runs[j].textContent || '';
+      // Also check run properties
+      const runNode = runs[j].parentNode?.parentNode; // t -> r -> p
+      if (runNode && (runNode as Element).tagName.endsWith('r')) {
+        const rPrs = (runNode as Element).getElementsByTagNameNS(NS, 'rPr');
+        if (rPrs.length > 0) {
+          if (rPrs[0].getElementsByTagNameNS(NS, 'b').length > 0) isBold = true;
+          if (rPrs[0].getElementsByTagNameNS(NS, 'i').length > 0) isItalic = true;
+        }
+      }
     }
-    lines.push(text);
+    
+    const fullTextRaw = text.trim();
+
+    // Reset counters when encountering manual headings
+    if (/^(?:I|II|III|IV|V|VI|VII|VIII|IX|X)\.\s/i.test(fullTextRaw)) {
+      for (let l = 0; l < 9; l++) globalCounters[l] = 0;
+    } else if (/^\d+\.\s/.test(fullTextRaw)) {
+      for (let l = 1; l < 9; l++) globalCounters[l] = 0;
+    }
+
+    // Resolve auto-numbering string
+    let listPrefix = '';
+    if (numId !== undefined && ilvl !== undefined && numberingMap[numId] && numberingMap[numId][ilvl]) {
+      const lvlConfig = numberingMap[numId][ilvl];
+      const isBullet = lvlConfig.format === 'bullet';
+      
+      if (!isBullet) {
+        if (globalCounters[ilvl] === undefined) globalCounters[ilvl] = 0;
+        globalCounters[ilvl]++;
+        for (let l = ilvl + 1; l < 9; l++) globalCounters[l] = 0;
+      }
+      
+      if (isBullet) {
+        listPrefix = options.useDash ? '- ' : '';
+      } else {
+        listPrefix = lvlConfig.text.replace(/%(\d)/g, (match, p1) => {
+          const l = parseInt(p1, 10) - 1;
+          const val = globalCounters[l] || 1;
+          const lFmt = numberingMap[numId][l] ? numberingMap[numId][l].format : 'decimal';
+          return formatNumber(val, lFmt);
+        }) + ' ';
+      }
+    }
+
+    const fullText = listPrefix + text;
+    
+    // Always push if it has text or is a numbered item
+    if (fullText.trim() || ilvl !== undefined) {
+      extracted.push({ text: fullText.trim(), isBold, isItalic, ilvl });
+    }
   }
-  return lines.join('\n');
+  return extracted;
 }
 
 async function extractHtmlPreviewFromDocx(file: File): Promise<string> {
@@ -189,18 +331,50 @@ const ND30_RULES = [
 interface ParsedSection {
   type: 'heading1' | 'heading2' | 'heading3' | 'body' | 'italic' | 'numbered';
   text: string;
+  isBold: boolean;
+  isItalic: boolean;
+  ilvl?: number;
 }
 
-function parseRawText(rawText: string): ParsedSection[] {
-  const lines = rawText.split('\n').filter(l => l.trim());
-  return lines.map(line => {
-    const t = line.trim();
-    if (/^(PHẦN|CHƯƠNG)\s+[IVX]+/i.test(t)) return { type: 'heading1' as const, text: t.toUpperCase() };
-    if (/^(MỤC|TIỂU MỤC)\s+\d+/i.test(t))  return { type: 'heading2' as const, text: t.toUpperCase() };
-    if (/^Điều\s+\d+\./i.test(t))           return { type: 'heading3' as const, text: t };
-    if (/^Căn cứ/i.test(t))                return { type: 'italic'   as const, text: t };
-    if (/^\d+\.\s/.test(t) || /^[a-z]\)\s/i.test(t)) return { type: 'numbered' as const, text: t };
-    return { type: 'body' as const, text: t };
+function parseRawText(extracted: ExtractedParagraph[]): ParsedSection[] {
+  return extracted.map(para => {
+    const t = para.text;
+    
+    // Check hardcoded lists
+    // Tự động nhận diện cấp độ danh sách nếu chưa có ilvl
+    let ilvl = para.ilvl;
+    if (ilvl === undefined) {
+      if (/^(?:I|II|III|IV|V|VI|VII|VIII|IX|X)\.\s/i.test(t)) ilvl = 0;
+      else if (/^\d+\.\s/.test(t)) ilvl = 1;
+      else if (/^[a-z]\)\s/i.test(t)) ilvl = 2;
+      else if (/^[-+*]\s/.test(t)) ilvl = 3;
+    }
+
+    let type: ParsedSection['type'] = 'body';
+    if (/^(PHẦN|CHƯƠNG)\s+[IVX]+/i.test(t)) type = 'heading1';
+    else if (/^(MỤC|TIỂU MỤC)\s+\d+/i.test(t)) type = 'heading2';
+    else if (/^Điều\s+\d+\./i.test(t)) type = 'heading3';
+    else if (/^Căn cứ/i.test(t)) type = 'italic';
+    else if (ilvl !== undefined) type = 'numbered';
+
+    let isBold = para.isBold;
+    let isItalic = para.isItalic;
+
+    // Ép định dạng theo quy tắc người dùng yêu cầu
+    if (/^(?:I|II|III|IV|V|VI|VII|VIII|IX|X)\.\s/i.test(t)) {
+      isBold = true;
+    } else if (/^\d+\.\s/.test(t)) {
+      isBold = true;
+      isItalic = true;
+    }
+
+    return { 
+      type, 
+      text: t, 
+      isBold: isBold, 
+      isItalic: isItalic, 
+      ilvl 
+    };
   });
 }
 
@@ -242,13 +416,34 @@ async function generateFormattedDocx(sections: ParsedSection[], meta: DocumentMe
 
   // ── Body ──
   for (const s of sections) {
+    // Thụt lề sâu dần cho danh sách đánh số
+    let indentLeft: number | undefined = undefined;
+    let hanging: number | undefined = undefined;
+    let firstLine: number | undefined = undefined;
+    
+    if (s.ilvl !== undefined) {
+      // 0: I., 1: 1., 2: a), 3: -
+      const baseIndent = 0.2;
+      const step = 0.2;
+      indentLeft = convertInchesToTwip(baseIndent + (s.ilvl + 1) * step); 
+      hanging = convertInchesToTwip(step);
+    } else if (s.type === 'heading3' || s.isBold) {
+      firstLine = convertInchesToTwip(0.2); // Các đề mục hơi nhô ra ngoài
+    } else {
+      firstLine = convertInchesToTwip(0.39); // Nội dung thục vào trong
+    }
+    
+    const pOptions: ConstructorParameters<typeof Paragraph>[0] = {
+      spacing: { before: 60, after: 60 },
+      indent: s.ilvl !== undefined ? { left: indentLeft, hanging } : { firstLine },
+      children: [run({ text: s.text, font: TNR, size: 26, bold: s.isBold, italics: s.isItalic })]
+    };
+
     switch (s.type) {
-      case 'heading1': paras.push(p({ alignment: AlignmentType.CENTER, spacing: { before: 240, after: 120 }, children: [run({ text: s.text, font: TNR, size: 28, bold: true })] })); break;
-      case 'heading2': paras.push(p({ alignment: AlignmentType.CENTER, spacing: { before: 200, after: 100 }, children: [run({ text: s.text, font: TNR, size: 28, bold: true })] })); break;
-      case 'heading3': paras.push(p({ indent: { firstLine: convertInchesToTwip(0.5) }, spacing: { before: 120, after: 60 }, children: [run({ text: s.text, font: TNR, size: 26, bold: true })] })); break;
-      case 'italic':   paras.push(p({ indent: { firstLine: convertInchesToTwip(0.39) }, spacing: { before: 60, after: 60 }, children: [run({ text: s.text, font: TNR, size: 26, italics: true })] })); break;
-      case 'numbered': paras.push(p({ indent: { left: convertInchesToTwip(0.5) }, spacing: { before: 60, after: 60 }, children: [run({ text: s.text, font: TNR, size: 26 })] })); break;
-      default:         paras.push(p({ indent: { firstLine: convertInchesToTwip(0.39) }, alignment: AlignmentType.JUSTIFIED, spacing: { before: 60, after: 60 }, children: [run({ text: s.text, font: TNR, size: 26 })] }));
+      case 'heading1': paras.push(p({ ...pOptions, alignment: AlignmentType.CENTER, spacing: { before: 240, after: 120 } })); break;
+      case 'heading2': paras.push(p({ ...pOptions, alignment: AlignmentType.CENTER, spacing: { before: 200, after: 100 } })); break;
+      case 'italic':   paras.push(p({ ...pOptions, children: [run({ text: s.text, font: TNR, size: 26, italics: true, bold: s.isBold })] })); break;
+      default:         paras.push(p({ ...pOptions, alignment: AlignmentType.JUSTIFIED }));
     }
   }
 
@@ -326,6 +521,7 @@ export function ND30Formatter() {
   const [showPreview, setShowPreview]       = useState(false);
   const [downloadReady, setDownloadReady]   = useState(false);
   const [outputBlob, setOutputBlob]         = useState<Blob | null>(null);
+  const [useDash, setUseDash]               = useState(true);
   const [metadata, setMetadata] = useState<DocumentMetadata>({
     coQuan: '', soVanBan: '', kyHieu: '',
     diaDiem: 'Hà Nội', ngayBanHanh: new Date().toLocaleDateString('vi-VN'),
@@ -348,11 +544,11 @@ export function ND30Formatter() {
 
     try {
       setProcessingStep('Đang trích xuất nội dung từ DOCX...');
-      const [rawText, htmlPreview] = await Promise.all([
-        extractTextFromDocx(file),
+      const [extracted, htmlPreview] = await Promise.all([
+        extractTextFromDocx(file, { useDash }),
         extractHtmlPreviewFromDocx(file),
       ]);
-      const sections = parseRawText(rawText);
+      const sections = parseRawText(extracted);
       setParsedSections(sections);
       setPreviewHtml(htmlPreview);
       setProcessingStep(`✓ Phân tích xong ${sections.length} đoạn. Nhấn "Áp dụng ND30 & Xuất file" để tiếp tục.`);
@@ -512,6 +708,23 @@ export function ND30Formatter() {
                 <div className="col-span-2">
                   <label className={lc}>Nơi nhận (mỗi dòng một nơi)</label>
                   <textarea rows={3} placeholder={"Ban Giám hiệu;\nPhòng Giáo dục;\nLưu: VT."} value={metadata.noiNhan} onChange={meta('noiNhan')} className={`${ic} resize-none`} />
+                </div>
+                <div className="col-span-2 pt-2 border-t border-slate-800 flex items-center justify-between">
+                  <label className="text-xs font-medium text-slate-300 cursor-pointer flex items-center gap-2">
+                    <input 
+                      type="checkbox" 
+                      checked={useDash} 
+                      onChange={(e) => setUseDash(e.target.checked)} 
+                      className="w-4 h-4 rounded border-slate-700 text-yellow-500 focus:ring-yellow-500/20 bg-slate-900 cursor-pointer"
+                    />
+                    Tự động thêm dấu gạch ngang (-) cho danh sách liệt kê
+                  </label>
+                  {parsedSections.length > 0 && (
+                     <button onClick={() => uploadedFile && handleFileSelect(uploadedFile)}
+                       className="text-[10px] font-bold px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 transition-colors">
+                       Cập nhật lại
+                     </button>
+                  )}
                 </div>
               </div>
             </div>

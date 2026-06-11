@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Heart, RotateCcw, Play, Volume2, VolumeX, Shield, Award, HelpCircle, Flame, Star, Sparkles } from 'lucide-react';
 import { Question } from './GameHub';
 import confetti from 'canvas-confetti';
+import { soundClick, soundCorrect, soundWrong, soundStart, soundEnd, soundNextQuestion } from '../../hooks/useGameSounds';
 
 const OPTS = ['A', 'B', 'C', 'D'];
 const TIMER_SEC = 20;
@@ -53,40 +54,9 @@ export function GameQuiz({ questions, onBack }: { questions: Question[]; onBack:
   const currentQuestion = shuffledQuestions[currentIdx % (shuffledQuestions.length || 1)];
   const currentObstacle = OBSTACLES[currentIdx % OBSTACLES.length];
 
-  // Sounds (synthesized using Web Audio API to avoid external dependency issues)
-  const playTone = (freq: number, type: OscillatorType, duration: number) => {
-    if (isMuted) return;
-    try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      gain.gain.setValueAtTime(0.1, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + duration);
-    } catch (e) {
-      console.warn("Web Audio API not supported or blocked", e);
-    }
-  };
-
-  const playSuccessSound = () => {
-    playTone(523.25, 'triangle', 0.1); // C5
-    setTimeout(() => playTone(659.25, 'triangle', 0.1), 100); // E5
-    setTimeout(() => playTone(783.99, 'triangle', 0.2), 200); // G5
-  };
-
-  const playFailSound = () => {
-    playTone(220, 'sawtooth', 0.3); // A3
-    setTimeout(() => playTone(147, 'sawtooth', 0.4), 150); // D3
-  };
-
-  const playClickSound = () => {
-    playTone(440, 'sine', 0.05);
-  };
+  const playSuccessSound = () => soundCorrect();
+  const playFailSound = () => soundWrong();
+  const playClickSound = () => soundClick();
 
   // Timer loop
   useEffect(() => {
@@ -117,6 +87,7 @@ export function GameQuiz({ questions, onBack }: { questions: Question[]; onBack:
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
+          soundStart();
           setPhase('playing');
           setCharacterAnim('running');
           return 0;
@@ -160,9 +131,11 @@ export function GameQuiz({ questions, onBack }: { questions: Question[]; onBack:
       // Proceed to next level or Victory
       setTimeout(() => {
         if (currentIdx + 1 >= shuffledQuestions.length) {
+          soundEnd();
           setPhase('victory');
           triggerVictoryConfetti();
         } else {
+          soundNextQuestion();
           setFeedback(null);
           setSelectedOption(null);
           setCurrentIdx(prev => prev + 1);

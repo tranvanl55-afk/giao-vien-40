@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, RotateCcw, Zap } from 'lucide-react';
 import { Question } from './GameHub';
 import { motion, AnimatePresence } from 'motion/react';
+import { soundClick, soundCorrect, soundWrong, soundEnd } from '../../hooks/useGameSounds';
 
 const OPTS = ['A', 'B', 'C', 'D'];
 const WIN_SCORE = 10;
@@ -44,6 +45,7 @@ export function GameDoiKhangGame({ questions, onBack }: { questions: Question[];
 
   const handleBuzz = (ti: number) => {
     if (phase !== 'idle') return;
+    soundClick();
     setBuzzed(ti); setPhase('buzzed'); setTimeLeft(BUZZ_TIMER);
   };
 
@@ -54,12 +56,13 @@ export function GameDoiKhangGame({ questions, onBack }: { questions: Question[];
     const isCorrect = i === q?.answer;
     setPhase('reveal');
     if (isCorrect) {
+      soundCorrect();
       const ns = [...scores]; ns[buzzed!] += 1; setScores(ns);
-      if (ns[buzzed!] >= WIN_SCORE) { setTimeout(() => { setWinner(buzzed!); }, 800); return; }
+      if (ns[buzzed!] >= WIN_SCORE) { soundEnd(); setTimeout(() => { setWinner(buzzed!); }, 800); return; }
       setTimeout(nextQ, 1500);
     } else {
+      soundWrong();
       setMissed(true);
-      // Other team gets a chance (auto next after 2s — simplified: just move on)
       setTimeout(nextQ, 2000);
     }
   };

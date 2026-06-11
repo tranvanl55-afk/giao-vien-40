@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { ArrowLeft, Plus, Trash2, Play, RotateCcw } from 'lucide-react';
 import { motion, useAnimation, AnimatePresence } from 'motion/react';
+import { soundStart, soundEnd, soundClick } from '../../hooks/useGameSounds';
 
 const COLORS = ['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#6366f1','#10b981','#06b6d4'];
 
@@ -28,20 +29,21 @@ export function VongQuayGame({ onBack }: { onBack: () => void }) {
 
   const spin = async () => {
     if (spinning || names.length < 2) return;
+    soundStart();
     setWinner(null);
     setSpinning(true);
-    const extra = 1800 + Math.random() * 1800; // 5-10 full rotations
+    const extra = 1800 + Math.random() * 1800;
     const total = rotation + extra;
     setRotation(total);
     await controls.start({
       rotate: total,
       transition: { duration: 4 + Math.random() * 2, ease: [0.17, 0.67, 0.35, 1] },
     });
-    // Determine winner based on final angle
     const finalAngle = total % 360;
     const sliceAngle = 360 / names.length;
     const winnerIdx = Math.floor(((360 - finalAngle) % 360) / sliceAngle);
     setWinner(names[winnerIdx % names.length]);
+    soundEnd();
     setSpinning(false);
   };
 

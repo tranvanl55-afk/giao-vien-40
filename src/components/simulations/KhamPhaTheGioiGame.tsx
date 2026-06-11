@@ -35,7 +35,7 @@ const LEVEL_TEMPLATES: Record<LevelTheme, { name: string; bgClass: string; bgIma
   jungle: {
     name: 'Rừng Rậm Nhiệt Đới',
     bgClass: 'from-emerald-900 via-green-900 to-teal-950',
-    bgImage: 'https://img.upanhnhanh.com/ad24895f824b60eef76a5cfaba3e46c0',
+    bgImage: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1200&q=80',
     npcs: [
       { label: 'Khỉ', emoji: '🐒', pos: { x: 20, y: 30 } },
       { label: 'Hổ', emoji: '🐅', pos: { x: 70, y: 60 } },
@@ -45,7 +45,7 @@ const LEVEL_TEMPLATES: Record<LevelTheme, { name: string; bgClass: string; bgIma
   desert: {
     name: 'Sa Mạc Khô Nóng',
     bgClass: 'from-orange-950 via-amber-900 to-yellow-950',
-    bgImage: 'https://img.upanhnhanh.com/903afac780d1061ae85913487d5a0fc3',
+    bgImage: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1200&q=80',
     npcs: [
       { label: 'Lạc đà', emoji: '🐪', pos: { x: 30, y: 50 } },
       { label: 'Rắn', emoji: '🐍', pos: { x: 80, y: 70 } },
@@ -55,7 +55,7 @@ const LEVEL_TEMPLATES: Record<LevelTheme, { name: string; bgClass: string; bgIma
   mountain: {
     name: 'Núi Rừng Hùng Vĩ',
     bgClass: 'from-slate-900 via-slate-800 to-zinc-900',
-    bgImage: 'https://img.upanhnhanh.com/69ead15340321efd0dcfd1d0cc28b3de',
+    bgImage: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80',
     npcs: [
       { label: 'Đại bàng', emoji: '🦅', pos: { x: 50, y: 20 } },
       { label: 'Gấu', emoji: '🐻', pos: { x: 25, y: 75 } },
@@ -65,7 +65,7 @@ const LEVEL_TEMPLATES: Record<LevelTheme, { name: string; bgClass: string; bgIma
   plains: {
     name: 'Đồng Bằng Bát Ngát',
     bgClass: 'from-green-700 via-lime-800 to-emerald-900',
-    bgImage: 'https://img.upanhnhanh.com/fa1655409f1313367b5dd690647abce3',
+    bgImage: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80',
     npcs: [
       { label: 'Trâu', emoji: '🐃', pos: { x: 40, y: 60 } },
       { label: 'Cò', emoji: '🕊️', pos: { x: 75, y: 30 } },
@@ -75,7 +75,7 @@ const LEVEL_TEMPLATES: Record<LevelTheme, { name: string; bgClass: string; bgIma
   ocean: {
     name: 'Đại Dương Bao La',
     bgClass: 'from-blue-950 via-cyan-900 to-sky-950',
-    bgImage: 'https://img.upanhnhanh.com/d73f18637d15f0468c03e33a2e3b1839',
+    bgImage: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=1200&q=80',
     npcs: [
       { label: 'Cá mập', emoji: '🦈', pos: { x: 20, y: 40 } },
       { label: 'Rùa biển', emoji: '🐢', pos: { x: 70, y: 75 } },

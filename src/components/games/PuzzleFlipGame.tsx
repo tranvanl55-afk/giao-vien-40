@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { ArrowLeft, RotateCcw, Upload, Link, Play, X } from 'lucide-react';
 import { Question } from './GameHub';
 import { motion, AnimatePresence } from 'motion/react';
+import { soundClick, soundCorrect, soundWrong, soundStart, soundEnd } from '../../hooks/useGameSounds';
 
 const OPTS = ['A', 'B', 'C', 'D'];
 const GRID_COLS = 3;
@@ -34,23 +35,28 @@ export function PuzzleFlipGame({ questions, onBack }: { questions: Question[]; o
   };
 
   const startGame = () => {
+    soundStart();
     setRevealed([]); setQIdx(0); setSelected(null); setScore(0);
     setPhase('play');
   };
 
   const handleAnswer = (i: number) => {
     if (selected !== null || questions.length === 0) return;
+    soundClick();
     setSelected(i);
     const isCorrect = i === q.answer;
     if (isCorrect) {
+      soundCorrect();
       setScore(s => s + 1);
       const hidden = Array.from({ length: GRID }, (_, j) => j).filter(j => !revealed.includes(j));
       if (hidden.length > 0) {
         const toReveal = hidden[Math.floor(Math.random() * hidden.length)];
         const next = [...revealed, toReveal];
         setRevealed(next);
-        if (next.length >= GRID) { setTimeout(() => setPhase('result'), 1200); return; }
+        if (next.length >= GRID) { soundEnd(); setTimeout(() => setPhase('result'), 1200); return; }
       }
+    } else {
+      soundWrong();
     }
     setTimeout(() => { setSelected(null); setQIdx(n => n + 1); }, 1400);
   };
