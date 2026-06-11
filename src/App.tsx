@@ -92,6 +92,7 @@ const XuLyKhungHoangSimulation = lazyNamed(() => import('./components/simulation
 const KhoiNghiepCongDongSimulation = lazyNamed(() => import('./components/simulations/KhoiNghiepCongDongSimulation'), 'KhoiNghiepCongDongSimulation');
 const BaloSinhTonSimulation = lazyNamed(() => import('./components/simulations/BaloSinhTonSimulation'), 'BaloSinhTonSimulation');
 const ThietKeTuongLaiSimulation = lazyNamed(() => import('./components/simulations/ThietKeTuongLaiSimulation'), 'ThietKeTuongLaiSimulation');
+const GiaoAnAI = lazyNamed(() => import('./components/simulations/GiaoAnAI'), 'GiaoAnAI');
 
 // Giáo dục địa phương
 
@@ -332,6 +333,16 @@ const QUIZ_GAMES: Record<string, { title: string; description: string; rules: st
 
 export default function App() {
   const { currentUser, logout: firebaseLogout } = useAuth();
+  
+  // Trạng thái hiển thị màn hình chờ ban đầu
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialLoading(false);
+    }, 1500); // Hiển thị màn hình chờ 1.5s
+    return () => clearTimeout(timer);
+  }, []);
+
   // Compute total lessons for progress bar
   const totalLessons = useMemo(() => {
     let count = 0;
@@ -720,6 +731,11 @@ const path = location.pathname;
     }
   };
 
+  // Hiển thị màn hình chờ ban đầu
+  if (isInitialLoading) {
+    return <CatLoader />;
+  }
+
   return (
     <MultiplayerProvider>
     <div className="min-h-screen flex flex-col relative text-slate-100 font-sans selection:bg-cyan-500/30">
@@ -752,7 +768,7 @@ const path = location.pathname;
   {path.match(/^\/room\/[^/]+$/) && <Room />}
   {path.match(/^\/room\/([^/]+)\/play$/) && <StarRaceGame roomId={path.split('/')[2]} onBack={exitActiveGame} />}
 </Suspense>
-      {currentUser && <FloatingGuide />}
+      {currentUser && level === 1 && <FloatingGuide />}
       
       {/* AI Assistant for lessons/simulations */}
       {currentUser && level === 6 && (
@@ -921,6 +937,8 @@ const path = location.pathname;
         <DotBienGenSimulation onBack={() => { setActiveSimulationId(null); setLevel(3); }} />
       ) : level === 6 && activeSimulationId === 'dong-co-mot-chieu' ? (
         <DongCoMotChieuSimulation onBack={() => { setActiveSimulationId(null); setLevel(3); }} />
+      ) : level === 6 && activeSimulationId === 'giao-an-ai' ? (
+        <GiaoAnAI onBack={() => { setActiveSimulationId(null); setLevel(3); }} />
       ) : level === 6 ? (
         <GenericLessonView 
            onBack={() => { setActiveSimulationId(null); setLevel(3); }}
@@ -1052,17 +1070,24 @@ const path = location.pathname;
                       className="group relative flex flex-col items-center cursor-pointer transition-all duration-300 w-[70px] sm:w-[90px] md:w-[100px] shrink-0 snap-center z-10 hover:z-100"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
-                      {/* Circle icon container */}
-                      <div className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl md:rounded-4xl flex items-center justify-center bg-white/40 backdrop-blur-3xl border border-white/60 hover:border-orange-400 shadow-[0_4px_16px_rgba(0,0,0,0.05)] group-hover:shadow-[0_20px_40px_rgba(249,115,22,0.3)] group-hover:-translate-y-3 group-hover:scale-125 md:group-hover:scale-[1.25] transition-all duration-300 relative shrink-0`}>
-                        <div className={`absolute inset-0 rounded-2xl md:rounded-4xl opacity-20 group-hover:opacity-40 bg-linear-to-br ${cat.colorClass} transition-opacity duration-300`}></div>
-                        
-                        <div className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center bg-linear-to-br ${cat.colorClass} shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_16px_rgba(0,0,0,0.4),0_0_20px_rgba(255,255,255,0.15)] transition-transform duration-300 shrink-0 relative z-10 overflow-hidden`}>
-                          {cat.logoUrl ? (
-                            <img src={cat.logoUrl} alt={cat.title} className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" />
-                          ) : (
-                            <cat.icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
-                          )}
-                        </div>
+                      {/* Logo container */}
+                      <div className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center group-hover:-translate-y-3 group-hover:scale-110 md:group-hover:scale-[1.15] transition-all duration-300 relative shrink-0`}>
+                        {cat.logoUrl ? (
+                          <div className="relative z-10 w-full h-full flex items-center justify-center pointer-events-none">
+                            <img 
+                               src={cat.logoUrl} 
+                               alt={cat.title} 
+                               className="w-full h-full object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.2)] transition-transform duration-300"
+                            />
+                          </div>
+                        ) : (
+                          <div className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl md:rounded-4xl flex items-center justify-center bg-white/40 backdrop-blur-3xl border border-white/60 hover:border-orange-400 shadow-[0_4px_16px_rgba(0,0,0,0.05)] group-hover:shadow-[0_20px_40px_rgba(249,115,22,0.3)] relative overflow-hidden`}>
+                            <div className={`absolute inset-0 rounded-2xl md:rounded-4xl opacity-20 group-hover:opacity-40 bg-linear-to-br ${cat.colorClass} transition-opacity duration-300`}></div>
+                            <div className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center bg-linear-to-br ${cat.colorClass} shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_16px_rgba(0,0,0,0.4),0_0_20px_rgba(255,255,255,0.15)] transition-transform duration-300 shrink-0 relative z-10 overflow-hidden`}>
+                              <cat.icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Title text below (always visible) */}

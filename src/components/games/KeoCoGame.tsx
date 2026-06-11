@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { Question } from './GameHub';
 import { motion, AnimatePresence } from 'motion/react';
+import { soundClick, soundCorrect, soundWrong, soundStart, soundEnd, soundNextQuestion } from '../../hooks/useGameSounds';
 
 const OPTS = ['A', 'B', 'C', 'D'];
 const WIN_POS = 15; // percent per step
@@ -41,16 +42,19 @@ export function KeoCoGame({ questions, onBack }: { questions: Question[]; onBack
     });
     newPos = Math.max(0, Math.min(100, newPos));
     setRopePos(newPos);
-    if (newPos <= 10) { setTimeout(() => { setWinner(0); setPhase('result'); }, 1200); return; }
-    if (newPos >= 90) { setTimeout(() => { setWinner(1); setPhase('result'); }, 1200); return; }
-    setTimeout(() => { setTeamAnswers([null, null]); setQIdx(i => i + 1); setPhase('play'); }, 1500);
+    const anyCorrect = teamAnswers.some((ans, _ti) => ans !== null && ans >= 0 && ans === q?.answer);
+    if (anyCorrect) soundCorrect(); else soundWrong();
+    if (newPos <= 10) { setTimeout(() => { soundEnd(); setWinner(0); setPhase('result'); }, 1200); return; }
+    if (newPos >= 90) { setTimeout(() => { soundEnd(); setWinner(1); setPhase('result'); }, 1200); return; }
+    setTimeout(() => { soundNextQuestion(); setTeamAnswers([null, null]); setQIdx(i => i + 1); setPhase('play'); }, 1500);
   }, [teamAnswers, phase]);
 
   const handleAnswer = (ti: number, i: number) => {
     if (phase !== 'play' || teamAnswers[ti] !== null) return;
+    soundClick();
     setTeamAnswers(prev => { const n = [...prev]; n[ti] = i; return n; });
   };
-  const reset = () => { setRopePos(50); setTeamAnswers([null, null]); setPhase('play'); setQIdx(0); setWinner(null); };
+  const reset = () => { soundClick(); soundStart(); setRopePos(50); setTeamAnswers([null, null]); setPhase('play'); setQIdx(0); setWinner(null); };
 
   const TEAMS = [
     { name: 'Đội Đỏ', emoji: '🔴', grad: 'from-red-600 to-rose-500', bg: 'bg-red-950/60', border: 'border-red-500/30', btn: 'bg-red-600/20 hover:bg-red-500/40 border-red-500/40' },
@@ -89,30 +93,39 @@ export function KeoCoGame({ questions, onBack }: { questions: Question[]; onBack
           <span className={`text-xl font-black tabular-nums ${timeLeft <= 5 ? 'text-red-400 animate-pulse' : 'text-yellow-300'}`}>{timeLeft}s</span>
           <span className="text-xs text-slate-400">Câu {qIdx % shuffled.length + 1}/{shuffled.length}</span>
         </div>
-        {/* Rope */}
-        <div className="relative h-48 md:h-56 bg-amber-900/20 rounded-[3rem] border border-amber-700/30 overflow-hidden">
-          {/* Left team color */}
-          <div className="absolute left-0 top-0 h-full bg-linear-to-r from-red-600/60 to-transparent" style={{ width: `${100 - ropePos}%` }} />
-          {/* Right team color */}
-          <div className="absolute right-0 top-0 h-full bg-linear-to-l from-blue-600/60 to-transparent" style={{ width: `${ropePos}%` }} />
-          {/* Rope texture and Indicator knot moving in sync */}
-          <motion.div 
-            className="absolute inset-0 pointer-events-none"
-            animate={{ backgroundPosition: `${ropePos}% center` }}
+        {/* Rope / Tug of War Scene */}
+        <div className="relative h-56 md:h-64 rounded-[3rem] border border-white/10 bg-transparent" style={{ overflow: 'visible' }}>
+          {/* Subtle colored glow behind each team */}
+          <div className="absolute inset-0 rounded-[3rem] overflow-hidden">
+            <div className="absolute left-0 top-0 h-full bg-linear-to-r from-red-600/25 to-transparent transition-all duration-500" style={{ width: `${100 - ropePos}%` }} />
+            <div className="absolute right-0 top-0 h-full bg-linear-to-l from-blue-600/25 to-transparent transition-all duration-500" style={{ width: `${ropePos}%` }} />
+          </div>
+
+          {/* Tug of war illustration – shifts left/right, scaled up to fill frame */}
+          <motion.img
+            src="https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fk%C3%A9o%20co.png?alt=media&token=2487c2b5-e49e-4b6f-87c8-a6ae9648ed12"
+            alt="Kéo co"
+            className="absolute top-1/2 pointer-events-none"
+            style={{ width: '220%', height: '220%', objectFit: 'contain', y: '-50%', x: '-50%' }}
+            animate={{ left: `${ropePos}%` }}
+            transition={{ type: 'spring', bounce: 0.35 }}
+          />
+
+          {/* Center line */}
+          <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-0.5 bg-white/15 z-10" />
+
+          {/* Indicator knot */}
+          <motion.div
+            className="absolute top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-yellow-400 border-4 border-yellow-600 shadow-[0_0_20px_rgba(234,179,8,0.9)] z-20"
+            animate={{ left: `calc(${ropePos}% - 14px)` }}
             transition={{ type: 'spring', bounce: 0.4 }}
-            style={{ 
-              backgroundImage: 'url(https://img.upanhnhanh.com/3f6342ab8dbe31da1c1f2d4ec659420a)', 
-              backgroundSize: 'contain', 
-              backgroundRepeat: 'no-repeat', 
-            }}
-          >
-            {/* Indicator knot */}
-            <motion.div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-yellow-400 border-4 border-yellow-600 shadow-[0_0_20px_rgba(234,179,8,0.6)] z-10"
-              animate={{ left: `calc(${ropePos}% - 16px)` }} transition={{ type: 'spring', bounce: 0.4 }} />
-          </motion.div>
+          />
+
           {/* Danger zones */}
-          <div className="absolute left-0 top-0 h-full w-[10%] bg-red-500/20 border-r border-red-500/30" />
-          <div className="absolute right-0 top-0 h-full w-[10%] bg-blue-500/20 border-l border-blue-500/30" />
+          <div className="absolute inset-0 rounded-[3rem] overflow-hidden pointer-events-none">
+            <div className="absolute left-0 top-0 h-full w-[10%] bg-red-500/20 border-r border-red-500/30" />
+            <div className="absolute right-0 top-0 h-full w-[10%] bg-blue-500/20 border-l border-blue-500/30" />
+          </div>
         </div>
         <div className="flex justify-between text-xs mt-1 text-slate-500">
           <span>🔴 {Math.round(100 - ropePos)}%</span>

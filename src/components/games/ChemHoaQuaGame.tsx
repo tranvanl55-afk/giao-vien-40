@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, RotateCcw, Heart } from 'lucide-react';
 import { Question } from './GameHub';
 import { motion, AnimatePresence } from 'motion/react';
+import { soundClick, soundCorrect, soundWrong, soundStart, soundEnd } from '../../hooks/useGameSounds';
 
 const FRUITS = ['🍎', '🍊', '🍋', '🍇', '🍓', '🍑', '🍍', '🥝', '🍈', '🍒'];
 const MAX_LIVES = 3;
@@ -71,15 +72,17 @@ export function ChemHoaQuaGame({ questions, onBack }: { questions: Question[]; o
     if (isCorrect) {
       setFruits(prev => prev.map(f => f.id === fruit.id ? { ...f, slashed: true } : f));
       setScore(s => s + 1);
+      soundCorrect();
       setShowEffect('correct');
       setTimeout(() => { setShowEffect(null); nextQ(); }, 900);
     } else {
       setFruits(prev => prev.map(f => f.id === fruit.id ? { ...f, wrong: true } : f));
       setLives(l => {
         const nl = l - 1;
-        if (nl <= 0) setTimeout(() => setPhase('result'), 800);
+        if (nl <= 0) { soundEnd(); setTimeout(() => setPhase('result'), 800); }
         return nl;
       });
+      soundWrong();
       setShowEffect('wrong');
       setTimeout(() => { setShowEffect(null); if (lives > 1) nextQ(); }, 900);
     }
@@ -98,7 +101,7 @@ export function ChemHoaQuaGame({ questions, onBack }: { questions: Question[]; o
       <h2 className="text-4xl font-black text-yellow-300">{lives > 0 ? 'Xuất sắc!' : 'Trò chơi kết thúc!'}</h2>
       <p className="text-2xl font-bold text-slate-300">Điểm: <strong className="text-green-400">{score}</strong> / {shuffled.length}</p>
       <div className="flex gap-3">
-        <button onClick={() => { setQIdx(0); setLives(MAX_LIVES); setScore(0); setPhase('play'); setFruits([]); }}
+        <button onClick={() => { soundStart(); setQIdx(0); setLives(MAX_LIVES); setScore(0); setPhase('play'); setFruits([]); }}
           className="flex items-center gap-2 px-8 py-3 bg-green-500 hover:bg-green-400 rounded-2xl font-black text-slate-900">
           <RotateCcw className="w-5 h-5" /> Chơi lại
         </button>

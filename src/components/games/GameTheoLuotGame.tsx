@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { Question } from './GameHub';
 import { motion, AnimatePresence } from 'motion/react';
+import { soundClick, soundCorrect, soundWrong, soundStart, soundEnd } from '../../hooks/useGameSounds';
 
 const OPTS = ['A', 'B', 'C', 'D'];
 const BOARD_SIZE = 25;
@@ -62,7 +63,7 @@ export function GameTheoLuotGame({ questions, numPlayers = 2, onBack }: {
           setPositions([...newPositions]);
         } else {
           setPositions([...newPositions]);
-          if (newPos >= BOARD_SIZE) { setWinner(currentPlayer); setPhase('result'); return; }
+          if (newPos >= BOARD_SIZE) { soundEnd(); setWinner(currentPlayer); setPhase('result'); return; }
           // Trigger question
           setPhase('question');
           setSelected(null);
@@ -74,10 +75,11 @@ export function GameTheoLuotGame({ questions, numPlayers = 2, onBack }: {
 
   const handleAnswer = (i: number) => {
     if (selected !== null) return;
+    soundClick();
     setSelected(i);
     const isCorrect = i === q?.answer;
-    if (!isCorrect) {
-      // Go back 1 step
+    if (isCorrect) { soundCorrect(); } else {
+      soundWrong();
       const newPositions = [...positions];
       newPositions[currentPlayer] = Math.max(0, newPositions[currentPlayer] - 1);
       setTimeout(() => setPositions([...newPositions]), 800);
@@ -117,7 +119,7 @@ export function GameTheoLuotGame({ questions, numPlayers = 2, onBack }: {
           <p>🚀🌀 Ô đặc biệt: tiến/lùi thêm</p>
           <p>🏁 Đến ô 25 trước thắng!</p>
         </div>
-        <button onClick={() => { setSetupDone(true); setPositions(Array(numP).fill(0)); }}
+        <button onClick={() => { soundStart(); setSetupDone(true); setPositions(Array(numP).fill(0)); }}
           disabled={questions.length === 0}
           className="w-full py-3 bg-linear-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 rounded-2xl font-black text-xl text-slate-900 disabled:opacity-40">
           Bắt đầu!

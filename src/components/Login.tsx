@@ -6,7 +6,7 @@ const translations = {
   vi: {
     title: "GIÁO VIÊN 4.0",
     subtitle: "Trạm Vũ trụ Tri thức",
-    loginHeader: "Đăng nhập trạm",
+    loginHeader: "Đăng nhập",
     loginDesc: "Điền thông tin để tiếp nhận tín hiệu",
     emailPlaceholder: "Email của bạn",
     passwordPlaceholder: "Mật khẩu",
@@ -17,8 +17,8 @@ const translations = {
     regFail: "Đăng ký thất bại. Email có thể đã tồn tại hoặc mật khẩu quá ngắn!",
     invalidRef: "Mã giới thiệu không đúng!",
     rememberMe: "Ghi nhớ đăng nhập",
-    btnLogin: "🚀 Đăng nhập ngay",
-    btnReg: "✨ Đăng ký tham gia",
+    btnLogin: "ĐĂNG NHẬP",
+    btnReg: "ĐĂNG KÝ",
     regHeader: "Đăng ký tham gia",
     regDesc: "Trạm vũ trụ cập nhật thông tin",
     fullName: "Họ và tên",
@@ -31,12 +31,20 @@ const translations = {
     geminiReq: "Gemini API Key (Bắt buộc)",
     noAccount: "Chưa có tài khoản?",
     hasAccount: "Đã có tài khoản?",
-    langToggle: "English"
+    langToggle: "English",
+    // Overlay panel
+    welcomeBack: "Chào mừng trở lại!",
+    welcomeBackDesc: "Đăng nhập để tiếp tục hành trình khám phá tri thức cùng Giáo viên 4.0",
+    signInBtn: "ĐĂNG NHẬP",
+    helloFriend: "Xin chào bạn!",
+    helloFriendDesc: "Đăng ký tài khoản để bắt đầu hành trình học tập thú vị cùng chúng tôi",
+    signUpBtn: "ĐĂNG KÝ",
+    validationError: "Vui lòng điền đầy đủ tất cả các trường bắt buộc!",
   },
   en: {
     title: "TEACHER 4.0",
     subtitle: "Knowledge Space Station",
-    loginHeader: "Station Login",
+    loginHeader: "Sign In",
     loginDesc: "Enter details to receive signal",
     emailPlaceholder: "Your email",
     passwordPlaceholder: "Password",
@@ -47,8 +55,8 @@ const translations = {
     regFail: "Registration failed. Email may already exist or password is too short!",
     invalidRef: "Invalid referral code!",
     rememberMe: "Remember login",
-    btnLogin: "🚀 Login Now",
-    btnReg: "✨ Register to Join",
+    btnLogin: "SIGN IN",
+    btnReg: "SIGN UP",
     regHeader: "Register to Join",
     regDesc: "Space station updates info",
     fullName: "Full Name",
@@ -61,7 +69,14 @@ const translations = {
     geminiReq: "Gemini API Key (Required)",
     noAccount: "Don't have an account?",
     hasAccount: "Already have an account?",
-    langToggle: "Tiếng Việt"
+    langToggle: "Tiếng Việt",
+    welcomeBack: "Welcome Back!",
+    welcomeBackDesc: "Sign in to continue your knowledge journey with Teacher 4.0",
+    signInBtn: "SIGN IN",
+    helloFriend: "Hello, Friend!",
+    helloFriendDesc: "Register an account to start your amazing learning journey with us",
+    signUpBtn: "SIGN UP",
+    validationError: "Please fill in all required fields!",
   }
 };
 
@@ -71,12 +86,11 @@ export function Login() {
   const [errorStatus, setErrorStatus] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
-  
-  // Initialize lang from cookie if present
+
   const [lang, setLangState] = useState<'vi' | 'en'>(() => {
     return document.cookie.includes('googtrans=/vi/en') ? 'en' : 'vi';
   });
-  
+
   const setLang = (newLang: 'vi' | 'en') => {
     setLangState(newLang);
     if (newLang === 'en') {
@@ -86,27 +100,39 @@ export function Login() {
       document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=${location.hostname}; path=/;`;
     }
-    // Reload to apply translation
     window.location.reload();
   };
 
   const t = translations[lang];
 
-  // Auth state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [geminiApiKey, setGeminiApiKey] = useState("");
-
-  // Registration form state
   const [fullName, setFullName] = useState("");
   const [birthYear, setBirthYear] = useState("");
   const [role, setRole] = useState("Học sinh");
   const [referralCode, setReferralCode] = useState("");
 
+  const switchToRegister = () => {
+    setIsRegistering(true);
+    setErrorStatus("");
+  };
+
+  const switchToLogin = () => {
+    setIsRegistering(false);
+    setErrorStatus("");
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorStatus("");
-    
+
+    // Validate all required fields
+    if (!email.trim() || !password.trim()) {
+      setErrorStatus(t.validationError);
+      return;
+    }
+
     if (email.trim() !== "tranvanl55@gmail.com" && !geminiApiKey.trim()) {
       setErrorStatus(t.geminiReqLogin);
       return;
@@ -125,16 +151,23 @@ export function Login() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate all required fields
+    if (!fullName.trim() || !email.trim() || !password.trim() || !birthYear.trim() || !referralCode.trim()) {
+      setErrorStatus(t.validationError);
+      return;
+    }
+
+    if (email.trim() !== "tranvanl55@gmail.com" && !geminiApiKey.trim()) {
+      setErrorStatus(t.validationError);
+      return;
+    }
+
     if (referralCode !== "29010912") {
       setErrorStatus(t.invalidRef);
       return;
     }
 
-    if (email.trim() !== "tranvanl55@gmail.com" && !geminiApiKey.trim()) {
-      setErrorStatus(t.geminiReqReg);
-      return;
-    }
-    
     setErrorStatus("");
     try {
       await registerWithEmail(email, password, fullName, {
@@ -150,251 +183,345 @@ export function Login() {
     }
   };
 
-  return (
-    <div 
-      className="min-h-screen flex flex-col items-center justify-center p-4 relative z-10 w-full animate-in fade-in duration-500 overflow-hidden bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: 'url(https://img.upanhnhanh.com/2bded7feeacd8904b3be05666ecd7c3e)' }}
-    >
-      {/* Background overlay to ensure text readability */}
-      <div className="absolute inset-0 bg-black/30 -z-10"></div>
+  const needsGeminiLogin = email.trim() && email.trim() !== "tranvanl55@gmail.com";
+  const needsGeminiReg = email.trim() && email.trim() !== "tranvanl55@gmail.com";
 
-      {/* Background Glows */}
-      <div className="absolute top-1/4 -left-20 w-120 h-120 bg-cyan-400/40 rounded-full blur-[120px] animate-pulse -z-10"></div>
-      <div className="absolute bottom-1/4 -right-20 w-120 h-120 bg-fuchsia-500/40 rounded-full blur-[120px] animate-pulse delay-700 -z-10"></div>
-      
-      {/* Title section */}
-      <div className="text-center w-full flex flex-col items-center mb-4 md:mb-6 px-2 relative z-10 shrink-0">
-        <div className="mb-1 md:mb-2 max-w-full">
-          <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter bg-clip-text text-transparent bg-linear-to-r from-cyan-300 via-blue-400 to-fuchsia-500 uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] whitespace-nowrap italic py-1 md:py-2 pr-2">
-            {t.title}
-          </h1>
-        </div>
-        <p className="text-cyan-300 font-bold text-xs sm:text-sm md:text-base tracking-[0.2em] md:tracking-[0.3em] uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">{t.subtitle}</p>
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative bg-[#0a0520]">
+      {/* Tiled background: nhiều hàng chồng nhau để che đường tím */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute left-0 right-0"
+            style={{
+              top: `${i * 290}px`,
+              height: '340px',
+              backgroundImage: 'url(https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fimg11.gif?alt=media&token=dcb79c5d-ad0a-4333-ad1e-fd0147adbe21)',
+              backgroundRepeat: 'repeat-x',
+              backgroundSize: 'auto 340px',
+              backgroundPosition: 'top left',
+              zIndex: i,          /* hàng dưới đè lên hàng trên */
+            }}
+          />
+        ))}
       </div>
 
-      <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 w-full max-w-[900px] relative z-10 px-4">
-        {/* Left side: Login Form */}
-        <div className="w-full max-w-[400px] shrink-0 space-y-4 md:space-y-6">
-          <div className="bg-white/3 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.37)] backdrop-blur-2xl rounded-4xl p-6 md:p-8 transition-all duration-300 flex flex-col items-center border-t-white/20 relative">
-          
-          {/* Language Toggle */}
-          <button 
-            onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}
-            className="absolute top-4 right-4 flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-2 py-1 rounded-lg border border-white/10"
-          >
-            <Globe className="w-3.5 h-3.5" />
-            {t.langToggle}
-          </button>
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/40" style={{ zIndex: 20 }} />
 
-          {errorStatus && (
-            <div className="w-full mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-sm text-center font-bold mt-4">
+      {/* Background Glows */}
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-cyan-400/20 rounded-full blur-[120px] animate-pulse" style={{ zIndex: 21 }} />
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-violet-500/20 rounded-full blur-[120px] animate-pulse delay-700" style={{ zIndex: 21 }} />
+
+
+      {/* Language Toggle */}
+      <button
+        onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}
+        className="absolute top-5 right-5 z-50 flex items-center gap-1.5 text-xs font-semibold text-white/80 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full border border-white/20 backdrop-blur-sm"
+      >
+        <Globe className="w-3.5 h-3.5" />
+        {t.langToggle}
+      </button>
+
+      {/* Title */}
+      <div className="relative z-30 text-center mb-6">
+        <h1 className="font-heading text-4xl sm:text-5xl font-black tracking-tighter bg-clip-text text-transparent bg-linear-to-r from-cyan-300 via-blue-400 to-fuchsia-500 uppercase italic drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+          {t.title}
+        </h1>
+        <p className="text-cyan-300 font-bold text-xs tracking-[0.3em] uppercase mt-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+          {t.subtitle}
+        </p>
+      </div>
+
+      {/* Sliding Container */}
+      <div className="relative z-30 w-full max-w-[800px] min-h-[540px] bg-white rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.5)] overflow-hidden flex">
+
+        {/* ===== SIGN IN FORM (left side) ===== */}
+        <div
+          className="absolute top-0 left-0 w-1/2 h-full flex flex-col items-center justify-center px-8 py-10 transition-all duration-700 ease-in-out"
+          style={{
+            transform: isRegistering ? 'translateX(-100%)' : 'translateX(0)',
+            opacity: isRegistering ? 0 : 1,
+            pointerEvents: isRegistering ? 'none' : 'auto',
+            zIndex: isRegistering ? 1 : 5,
+          }}
+        >
+          <h2 className="text-2xl font-black text-slate-800 mb-1">{t.loginHeader}</h2>
+          <p className="text-slate-400 text-xs mb-5 text-center">{t.loginDesc}</p>
+
+          {errorStatus && !isRegistering && (
+            <div className="w-full mb-3 p-2.5 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs text-center font-semibold">
               {errorStatus}
             </div>
           )}
 
-          {!isRegistering ? (
-             <form onSubmit={handleLogin} className={`w-full animate-in fade-in duration-300 space-y-4 ${errorStatus ? '' : 'mt-4'}`}>
-                <div className="mb-4 text-center">
-                  <h2 className="text-xl font-bold text-white mb-1">{t.loginHeader}</h2>
-                  <p className="text-slate-400 text-xs text-center">{t.loginDesc}</p>
-                </div>
+          <form onSubmit={handleLogin} className="w-full space-y-3" noValidate>
+            <div className="relative">
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t.emailPlaceholder}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400/50 focus:border-violet-400 transition-all"
+              />
+            </div>
 
+            <div className="relative">
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t.passwordPlaceholder}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-10 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400/50 focus:border-violet-400 transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+
+            {needsGeminiLogin && (
+              <div className="space-y-1">
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 md:w-5 md:h-5" />
-                  <input 
-                    type="email" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder={t.emailPlaceholder}
-                    className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl py-3 pl-10 md:pl-12 pr-4 text-sm md:text-base text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all font-medium"
-                    required
+                  <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                  <input
+                    type="password"
+                    value={geminiApiKey}
+                    onChange={(e) => setGeminiApiKey(e.target.value)}
+                    placeholder={t.geminiPlaceholder}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400/50 focus:border-violet-400 transition-all"
                   />
                 </div>
-
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 md:w-5 md:h-5" />
-                  <input 
-                    type={showPassword ? "text" : "password"} 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={t.passwordPlaceholder}
-                    className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl py-3 pl-10 md:pl-12 pr-12 text-sm md:text-base text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all font-medium"
-                    required
-                  />
-                  <button 
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-
-                {email.trim() && email.trim() !== "tranvanl55@gmail.com" && (
-                  <div className="relative animate-in slide-in-from-top-2 duration-300">
-                    <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 md:w-5 md:h-5" />
-                    <input 
-                      type="password" 
-                      value={geminiApiKey}
-                      onChange={(e) => setGeminiApiKey(e.target.value)}
-                      placeholder={t.geminiPlaceholder}
-                      className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl py-3 pl-10 md:pl-12 pr-4 text-sm md:text-base text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all font-medium"
-                      required
-                    />
-                    <div className="text-right mt-1.5">
-                      <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-[10px] md:text-xs text-cyan-400 hover:text-cyan-300 underline font-medium">
-                        {lang === 'vi' ? 'Hướng dẫn lấy API Key miễn phí' : 'How to get free API Key'}
-                      </a>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between text-sm">
-                  <label className="flex items-center space-x-2 text-slate-300 cursor-pointer group">
-                    <input 
-                      type="checkbox" 
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="rounded border-slate-700/50 bg-slate-900/50 text-cyan-500 focus:ring-cyan-500/50" 
-                    />
-                    <span className="group-hover:text-cyan-400 transition-colors">{t.rememberMe}</span>
-                  </label>
-                </div>
-
-                <button 
-                  type="submit"
-                  className="w-full bg-linear-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-xl py-3 px-4 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:-translate-y-0.5 transition-all outline-none focus:ring-2 focus:ring-cyan-500"
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block text-right text-[10px] text-violet-500 hover:text-violet-700 underline"
                 >
-                  {t.btnLogin}
-                </button>
-             </form>
-          ) : (
-            <form onSubmit={handleRegister} className={`space-y-4 w-full animate-in fade-in duration-300 ${errorStatus ? '' : 'mt-4'}`}>
-              <div className="mb-6 text-center">
-                <h2 className="text-2xl font-bold text-white mb-2">{t.regHeader}</h2>
-                <p className="text-slate-400 text-sm">{t.regDesc}</p>
+                  {lang === 'vi' ? 'Hướng dẫn lấy API Key miễn phí' : 'How to get free API Key'}
+                </a>
               </div>
+            )}
 
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                <input 
-                  type="text" 
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder={t.fullName}
-                  className="w-full bg-slate-900/50 border border-slate-700/50 rounded-2xl py-3 pl-12 pr-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all font-medium"
-                  required
-                />
-              </div>
+            <label className="flex items-center gap-2 text-xs text-slate-500 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="rounded border-slate-300 text-violet-500 focus:ring-violet-400"
+              />
+              {t.rememberMe}
+            </label>
 
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                <input 
-                  type="email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email"
-                  className="w-full bg-slate-900/50 border border-slate-700/50 rounded-2xl py-3 pl-12 pr-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all font-medium"
-                  required
-                />
-              </div>
+            <button
+              type="submit"
+              className="w-full bg-linear-to-r from-violet-600 to-indigo-600 text-white font-black text-sm rounded-xl py-3 shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 hover:-translate-y-0.5 transition-all tracking-widest mt-1"
+            >
+              {t.btnLogin}
+            </button>
+          </form>
 
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                <input 
-                  type={showPassword ? "text" : "password"} 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={t.passwordReq}
-                  className="w-full bg-slate-900/50 border border-slate-700/50 rounded-2xl py-3 pl-12 pr-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all font-medium"
-                  required
-                />
-              </div>
+          {/* Mobile switch */}
+          <p className="mt-5 text-xs text-slate-500 md:hidden">
+            {t.noAccount}{' '}
+            <button onClick={switchToRegister} className="text-violet-600 font-bold hover:underline">
+              {t.regHeader}
+            </button>
+          </p>
+        </div>
 
-              {email.trim() && email.trim() !== "tranvanl55@gmail.com" && (
-                <div className="relative animate-in slide-in-from-top-2 duration-300">
-                  <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                  <input 
-                    type="password" 
+        {/* ===== SIGN UP FORM (right side, hidden by default) ===== */}
+        <div
+          className="absolute top-0 right-0 w-1/2 h-full flex flex-col items-center justify-center px-8 py-6 overflow-y-auto transition-all duration-700 ease-in-out"
+          style={{
+            transform: isRegistering ? 'translateX(0)' : 'translateX(100%)',
+            opacity: isRegistering ? 1 : 0,
+            pointerEvents: isRegistering ? 'auto' : 'none',
+            zIndex: isRegistering ? 5 : 1,
+          }}
+        >
+          <h2 className="text-2xl font-black text-slate-800 mb-1">{t.regHeader}</h2>
+          <p className="text-slate-400 text-xs mb-4 text-center">{t.regDesc}</p>
+
+          {errorStatus && isRegistering && (
+            <div className="w-full mb-3 p-2.5 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs text-center font-semibold">
+              {errorStatus}
+            </div>
+          )}
+
+          <form onSubmit={handleRegister} className="w-full space-y-2.5" noValidate>
+            <div className="relative">
+              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder={t.fullName}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400/50 focus:border-violet-400 transition-all"
+              />
+            </div>
+
+            <div className="relative">
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400/50 focus:border-violet-400 transition-all"
+              />
+            </div>
+
+            <div className="relative">
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t.passwordReq}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400/50 focus:border-violet-400 transition-all"
+              />
+            </div>
+
+            {needsGeminiReg && (
+              <div className="space-y-1">
+                <div className="relative">
+                  <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                  <input
+                    type="password"
                     value={geminiApiKey}
                     onChange={(e) => setGeminiApiKey(e.target.value)}
                     placeholder={t.geminiReq}
-                    className="w-full bg-slate-900/50 border border-slate-700/50 rounded-2xl py-3 pl-12 pr-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all font-medium"
-                    required
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400/50 focus:border-violet-400 transition-all"
                   />
-                  <div className="text-right mt-1.5">
-                    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-[10px] md:text-xs text-cyan-400 hover:text-cyan-300 underline font-medium">
-                      {lang === 'vi' ? 'Hướng dẫn lấy API Key miễn phí' : 'How to get free API Key'}
-                    </a>
-                  </div>
                 </div>
-              )}
-
-              <div className="relative">
-                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                <input 
-                  type="number" 
-                  value={birthYear}
-                  onChange={(e) => setBirthYear(e.target.value)}
-                  placeholder={t.birthYear}
-                  className="w-full bg-slate-900/50 border border-slate-700/50 rounded-2xl py-3 pl-12 pr-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all font-medium"
-                  required
-                />
-              </div>
-
-              <div className="relative">
-                <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 z-10" />
-                <select 
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="w-full bg-slate-900/50 border border-slate-700/50 rounded-2xl py-3 pl-12 pr-4 text-slate-100 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all font-medium appearance-none cursor-pointer"
-                  required
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block text-right text-[10px] text-violet-500 hover:text-violet-700 underline"
                 >
-                  <option value="Học sinh" className="bg-slate-800">{t.roleStudent}</option>
-                  <option value="Giáo viên" className="bg-slate-800">{t.roleTeacher}</option>
-                  <option value="Phụ huynh" className="bg-slate-800">{t.roleParent}</option>
-                </select>
+                  {lang === 'vi' ? 'Hướng dẫn lấy API Key miễn phí' : 'How to get free API Key'}
+                </a>
               </div>
+            )}
 
-              <div className="relative">
-                <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                <input 
-                  type="text" 
-                  value={referralCode}
-                  onChange={(e) => setReferralCode(e.target.value)}
-                  placeholder={t.refCode}
-                  className="w-full bg-slate-900/50 border border-slate-700/50 rounded-2xl py-3 pl-12 pr-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all font-medium"
-                  required
-                />
-              </div>
+            <div className="relative">
+              <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <input
+                type="number"
+                value={birthYear}
+                onChange={(e) => setBirthYear(e.target.value)}
+                placeholder={t.birthYear}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400/50 focus:border-violet-400 transition-all"
+              />
+            </div>
 
-              <button 
-                type="submit"
-                className="w-full bg-linear-to-r from-purple-500 to-indigo-500 text-white font-bold rounded-2xl p-3.5 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all outline-none focus:ring-2 focus:ring-indigo-500 mt-2"
+            <div className="relative">
+              <Briefcase className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 z-10" />
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-400/50 focus:border-violet-400 transition-all appearance-none cursor-pointer"
               >
-                {t.btnReg}
-              </button>
-            </form>
-          )}
+                <option value="Học sinh">{t.roleStudent}</option>
+                <option value="Giáo viên">{t.roleTeacher}</option>
+                <option value="Phụ huynh">{t.roleParent}</option>
+              </select>
+            </div>
 
-          <div className="mt-8 text-center text-slate-400 text-sm">
+            <div className="relative">
+              <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <input
+                type="text"
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value)}
+                placeholder={t.refCode}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400/50 focus:border-violet-400 transition-all"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-linear-to-r from-violet-600 to-indigo-600 text-white font-black text-sm rounded-xl py-3 shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 hover:-translate-y-0.5 transition-all tracking-widest mt-1"
+            >
+              {t.btnReg}
+            </button>
+          </form>
+
+          {/* Mobile switch */}
+          <p className="mt-4 text-xs text-slate-500 md:hidden">
+            {t.hasAccount}{' '}
+            <button onClick={switchToLogin} className="text-violet-600 font-bold hover:underline">
+              {t.btnLogin}
+            </button>
+          </p>
+        </div>
+
+        {/* ===== OVERLAY PANEL (sliding violet panel) ===== */}
+        <div
+          className="hidden md:block absolute top-0 w-1/2 h-full transition-all duration-700 ease-in-out z-10"
+          style={{
+            left: isRegistering ? '0%' : '50%',
+          }}
+        >
+          {/* Violet gradient background */}
+          <div className="absolute inset-0 bg-linear-to-br from-violet-700 via-purple-600 to-indigo-700 rounded-none">
+            {/* Decorative circles */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10" />
+            <div className="absolute -bottom-10 -left-10 w-56 h-56 rounded-full bg-white/10" />
+            <div className="absolute top-1/3 left-1/4 w-24 h-24 rounded-full bg-white/5" />
+          </div>
+
+          {/* Panel content */}
+          <div className="relative h-full flex flex-col items-center justify-center px-10 text-white text-center z-10">
             {!isRegistering ? (
-              <>{t.noAccount} <button onClick={() => { setIsRegistering(true); setErrorStatus(""); }} className="text-cyan-400 font-bold hover:underline">{t.regHeader}</button></>
+              /* Showing on right → prompt to Register */
+              <div className="space-y-5 animate-in fade-in duration-500">
+                <img
+                  src="https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fimg17.gif?alt=media&token=1dc73ed3-0e3e-46f9-909a-568a963d118c"
+                  alt=""
+                  className="w-36 h-36 object-contain mx-auto drop-shadow-[0_8px_24px_rgba(255,255,255,0.3)]"
+                />
+                <h3 className="text-2xl font-black leading-tight">{t.helloFriend}</h3>
+                <p className="text-white/80 text-sm leading-relaxed">{t.helloFriendDesc}</p>
+                <button
+                  onClick={switchToRegister}
+                  className="mt-2 px-10 py-2.5 rounded-full border-2 border-white text-white font-black text-sm tracking-widest hover:bg-white hover:text-violet-700 transition-all duration-300"
+                >
+                  {t.signUpBtn}
+                </button>
+              </div>
             ) : (
-              <>{t.hasAccount} <button onClick={() => { setIsRegistering(false); setErrorStatus(""); }} className="text-cyan-400 font-bold hover:underline">{t.btnLogin.replace('🚀', '').trim()}</button></>
+              /* Showing on left → prompt to Sign In */
+              <div className="space-y-5 animate-in fade-in duration-500">
+                <img
+                  src="https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fimg17.gif?alt=media&token=1dc73ed3-0e3e-46f9-909a-568a963d118c"
+                  alt=""
+                  className="w-36 h-36 object-contain mx-auto drop-shadow-[0_8px_24px_rgba(255,255,255,0.3)]"
+                />
+                <h3 className="text-2xl font-black leading-tight">{t.welcomeBack}</h3>
+                <p className="text-white/80 text-sm leading-relaxed">{t.welcomeBackDesc}</p>
+                <button
+                  onClick={switchToLogin}
+                  className="mt-2 px-10 py-2.5 rounded-full border-2 border-white text-white font-black text-sm tracking-widest hover:bg-white hover:text-violet-700 transition-all duration-300"
+                >
+                  {t.signInBtn}
+                </button>
+              </div>
             )}
           </div>
         </div>
-        </div>
 
-        {/* Right side: Illustration Image */}
-        <div className="hidden md:flex flex-1 justify-center items-center w-full max-w-[450px] p-6">
-          <img 
-            src="https://img.upanhnhanh.com/00afa9d589729f2306a7bef9535464af" 
-            alt="Giáo viên 4.0 illustration" 
-            className="w-full h-auto max-h-[80vh] object-contain drop-shadow-[0_0_30px_rgba(34,211,238,0.3)] animate-in zoom-in duration-700 hover:scale-105 transition-transform" 
-          />
-        </div>
+        {/* Placeholder divs to set min-height on both halves */}
+        <div className="w-1/2 min-h-[540px] invisible" aria-hidden="true" />
+        <div className="w-1/2 min-h-[540px] invisible" aria-hidden="true" />
       </div>
     </div>
   );

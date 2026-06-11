@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Star, RotateCcw } from 'lucide-react';
 import { Question } from './GameHub';
 import { motion, AnimatePresence } from 'motion/react';
+import { soundClick, soundCorrect, soundWrong, soundStart, soundEnd, soundNextQuestion } from '../../hooks/useGameSounds';
 
 const OPTS = ['A', 'B', 'C', 'D'];
 const TRACK_LENGTH = 10;
@@ -32,7 +33,7 @@ export function StarRaceGame({ questions, onBack }: { questions: Question[]; onB
   // Countdown before game starts
   useEffect(() => {
     if (phase !== 'countdown') return;
-    if (countdown <= 0) { setPhase('answering'); return; }
+    if (countdown <= 0) { soundStart(); setPhase('answering'); return; }
     const t = setTimeout(() => setCountdown(c => c - 1), 1000);
     return () => clearTimeout(t);
   }, [phase, countdown]);
@@ -72,9 +73,18 @@ export function StarRaceGame({ questions, onBack }: { questions: Question[]; onB
       }
     });
     setScores(ns);
-    if (won >= 0) { setWinner(won); setTimeout(() => setPhase('result'), REVEAL_MS); return; }
+    setTimeout(() => {
+      const correctTeams = [];
+      teamAnswers.forEach((ans, ti) => {
+        if (ans !== null && ans >= 0 && ans === q?.answer) correctTeams.push(ti);
+      });
+      if (correctTeams.length > 0) soundCorrect(); else soundWrong();
+    }, 100);
+
+    if (won >= 0) { setWinner(won); setTimeout(() => { soundEnd(); setPhase('result'); }, REVEAL_MS); return; }
 
     setTimeout(() => {
+      soundNextQuestion();
       setTeamAnswers([null, null]);
       setQIdx(i => i + 1);
       setPhase('answering');
@@ -83,10 +93,12 @@ export function StarRaceGame({ questions, onBack }: { questions: Question[]; onB
 
   const handleAnswer = (teamIdx: number, optIdx: number) => {
     if (phase !== 'answering' || teamAnswers[teamIdx] !== null) return;
+    soundClick();
     setTeamAnswers(prev => { const n = [...prev]; n[teamIdx] = optIdx; return n; });
   };
 
   const reset = () => {
+    soundClick();
     setScores([0, 0]); setQIdx(0); setTeamAnswers([null, null]);
     setPhase('countdown'); setCountdown(3); setWinner(null);
   };

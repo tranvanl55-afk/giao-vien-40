@@ -10,7 +10,7 @@ export function CatLoader() {
       <div className="relative flex flex-col items-center mt-10">
         {/* Bouncing Cat Image */}
         <img 
-          src="https://img.upanhnhanh.com/cc6f1b695c1e567b361d2c43164212e9" 
+          src="https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2FGemini_Generated_Image_jlkmwjlkmwjlkmwj-removebg-preview.png?alt=media&token=ad3842e6-cf01-4b77-a46f-48e9e0864925"
           alt="Loading Cat" 
           className="w-48 h-48 object-contain drop-shadow-2xl animate-bounce"
           style={{ animationDuration: '0.8s' }}
