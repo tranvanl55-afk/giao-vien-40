@@ -4,7 +4,8 @@ import { useTheme } from '../../context/ThemeContext';
 import { useUserProgress } from '../../context/UserProgressContext';
 import { 
   Sun, Moon, Bell, Check, Trash2, Award, UserCircle, LogOut, Star,
-  FlaskConical, ClipboardCheck, Gamepad2, BookOpen, Sparkles, ChevronRight
+  FlaskConical, ClipboardCheck, Gamepad2, BookOpen, Sparkles, ChevronRight,
+  Home, Users, Info, Map
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
@@ -210,150 +211,152 @@ export function Header({
         </div>
 
         {/* Nav (Desktop) */}
-        <nav className="hidden md:flex items-center gap-1.5 relative h-10 px-1.5 bg-white/20 border border-indigo-200/50 rounded-full shadow-inner">
-          <button
-            onClick={onHomeClick}
-            className={`flex items-center justify-center text-xs font-extrabold whitespace-nowrap px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-              path === '/' 
-                ? 'bg-orange-500/15 text-orange-600 border border-orange-500/10' 
-                : 'text-indigo-900 hover:text-orange-600 hover:bg-white/45'
-            }`}
-          >
-            Trang chủ
-          </button>
+        <nav className="hidden md:flex items-center relative h-14 px-1 bg-white/40 border border-indigo-200/50 rounded-full shadow-inner magic-nav overflow-visible mt-2">
+          <ul className="flex items-center relative">
+            {/* The Indicator */}
+            {(() => {
+              const navItems = [
+                { path: '/', show: true },
+                { path: '/community', show: !!onCommunityClick },
+                { path: '/leaderboard', show: !!onLeaderboardClick },
+                { path: '/about', show: true },
+                { path: '/tour', show: !!onTourClick },
+              ].filter(item => item.show);
+              const activeIndex = navItems.findIndex(item => item.path === path);
+              
+              if (activeIndex === -1) return null;
+              // indicator offset calculation: 60px width per item + 6px offset to center the 48px pill
+              const leftPos = activeIndex * 60 + 6;
+              
+              return (
+                <div 
+                  className="magic-indicator" 
+                  style={{ transform: `translateX(${leftPos}px)` }}
+                ></div>
+              );
+            })()}
 
-          {onCommunityClick && (
-            <button
-              onClick={onCommunityClick}
-              className={`flex items-center justify-center text-xs font-extrabold whitespace-nowrap px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                path === '/community'
-                  ? 'bg-orange-500/15 text-orange-600 border border-orange-500/10' 
-                  : 'text-indigo-900 hover:text-orange-600 hover:bg-white/45'
-              }`}
-            >
-              Cộng đồng
-            </button>
-          )}
+            {/* Items */}
+            <li className={path === '/' ? 'active' : ''}>
+              <a onClick={onHomeClick} title="Trang chủ">
+                <span className="icon"><Home className={`w-5 h-5 icon-shadow transition-colors duration-500 ${path === '/' ? 'text-white' : 'text-indigo-900 hover:text-orange-600'}`} /></span>
+              </a>
+            </li>
 
-          {onLeaderboardClick && (
-            <button
-              onClick={onLeaderboardClick}
-              className={`flex items-center justify-center text-xs font-extrabold whitespace-nowrap px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                path === '/leaderboard'
-                  ? 'bg-orange-500/15 text-orange-600 border border-orange-500/10' 
-                  : 'text-indigo-900 hover:text-orange-600 hover:bg-white/45'
-              }`}
-            >
-              Xếp hạng
-            </button>
-          )}
+            {onCommunityClick && (
+              <li className={path === '/community' ? 'active' : ''}>
+                <a onClick={onCommunityClick} title="Cộng đồng">
+                  <span className="icon"><Users className={`w-5 h-5 icon-shadow transition-colors duration-500 ${path === '/community' ? 'text-white' : 'text-indigo-900 hover:text-orange-600'}`} /></span>
+                </a>
+              </li>
+            )}
 
-          <button
-            onClick={onAboutClick}
-            className={`flex items-center justify-center text-xs font-extrabold whitespace-nowrap px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-              path === '/about'
-                ? 'bg-orange-500/15 text-orange-600 border border-orange-500/10' 
-                : 'text-indigo-900 hover:text-orange-600 hover:bg-white/45'
-            }`}
-          >
-            Giới thiệu
-          </button>
+            {onLeaderboardClick && (
+              <li className={path === '/leaderboard' ? 'active' : ''}>
+                <a onClick={onLeaderboardClick} title="Xếp hạng">
+                  <span className="icon"><Award className={`w-5 h-5 icon-shadow transition-colors duration-500 ${path === '/leaderboard' ? 'text-white' : 'text-indigo-900 hover:text-orange-600'}`} /></span>
+                </a>
+              </li>
+            )}
 
-          {onTourClick && (
-            <button
-              onClick={onTourClick}
-              className={`flex items-center justify-center text-xs font-extrabold whitespace-nowrap px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                path === '/tour'
-                  ? 'bg-orange-500/15 text-orange-600 border border-orange-500/10' 
-                  : 'text-indigo-900 hover:text-orange-600 hover:bg-white/45'
-              }`}
-            >
-              Hướng dẫn
-            </button>
-          )}
+            <li className={path === '/about' ? 'active' : ''}>
+              <a onClick={onAboutClick} title="Giới thiệu">
+                <span className="icon"><Info className={`w-5 h-5 icon-shadow transition-colors duration-500 ${path === '/about' ? 'text-white' : 'text-indigo-900 hover:text-orange-600'}`} /></span>
+              </a>
+            </li>
+
+            {onTourClick && (
+              <li className={path === '/tour' ? 'active' : ''}>
+                <a onClick={onTourClick} title="Hướng dẫn">
+                  <span className="icon"><Map className={`w-5 h-5 icon-shadow transition-colors duration-500 ${path === '/tour' ? 'text-white' : 'text-indigo-900 hover:text-orange-600'}`} /></span>
+                </a>
+              </li>
+            )}
+
+            {/* Divider */}
+            <div className="w-px h-8 bg-indigo-200/40 mx-2"></div>
+
+            {/* Action Items */}
+            <li className="flex justify-center items-center w-[60px] h-[56px]">
+              <a onClick={onReviewClick} title="Đánh giá" className="cursor-pointer">
+                <span className="icon"><Star className="w-5 h-5 icon-shadow text-indigo-900 hover:text-orange-600 transition-colors duration-500" /></span>
+              </a>
+            </li>
+
+            {currentUser && (
+              <li className="flex justify-center items-center w-[60px] h-[56px] relative">
+                <a onClick={() => setShowNotifDropdown(!showNotifDropdown)} title="Thông báo" className="cursor-pointer relative">
+                  <span className="icon"><Bell className="w-5 h-5 icon-shadow text-indigo-900 hover:text-orange-600 transition-colors duration-500" /></span>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center border border-white z-20">
+                      {unreadCount}
+                    </span>
+                  )}
+                </a>
+                {showNotifDropdown && (
+                  <div className="absolute right-0 top-14 w-80 bg-slate-900/95 border border-white/10 rounded-2xl shadow-2xl p-4 z-50 text-white backdrop-blur-2xl animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="flex justify-between items-center border-b border-white/10 pb-2 mb-3">
+                      <h4 className="font-extrabold text-xs tracking-wider uppercase text-cyan-400">
+                        Thông báo ({unreadCount})
+                      </h4>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={markAllAsRead}
+                          className="text-[10px] text-slate-400 hover:text-white font-bold flex items-center gap-1 cursor-pointer"
+                        >
+                          <Check className="w-3 h-3" /> Đọc tất cả
+                        </button>
+                      )}
+                    </div>
+                    <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar pr-1">
+                      {notifications.length === 0 ? (
+                        <p className="text-center py-6 text-xs text-slate-550 font-bold">Không có thông báo mới</p>
+                      ) : (
+                        notifications.map((item) => (
+                          <div
+                            key={item.id}
+                            className={`p-2.5 rounded-xl border flex gap-3 transition-colors relative group ${item.read ? 'bg-slate-950/20 border-white/5' : 'bg-indigo-500/10 border-indigo-500/20'}`}
+                          >
+                            <img
+                              src={item.senderAvatar}
+                              className="w-8 h-8 rounded-full border border-white/10 shrink-0 object-cover"
+                              alt=""
+                            />
+                            <div className="flex-1 min-w-0 pr-4">
+                              <p className="text-[11.5px] font-medium leading-tight text-slate-200">
+                                {item.message}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => deleteNotification(item.id)}
+                              className="absolute right-2 top-2 p-1 rounded-md bg-white/5 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-all cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </li>
+            )}
+
+            {currentUser && (
+              <li className="flex justify-center items-center w-[60px] h-[56px]">
+                <a onClick={toggleTheme} title="Giao diện" className="cursor-pointer">
+                  <span className="icon">
+                    {theme === 'dark' ? <Sun className="w-5 h-5 icon-shadow text-indigo-900 hover:text-orange-600 transition-colors duration-500" /> : <Moon className="w-5 h-5 icon-shadow text-indigo-900 hover:text-orange-600 transition-colors duration-500" />}
+                  </span>
+                </a>
+              </li>
+            )}
+
+          </ul>
         </nav>
 
-        {/* User profile & actions */}
-        <div className="flex items-center space-x-4">
-          {/* Review button */}
-          <button
-            onClick={onReviewClick}
-            className="user-action-item p-1.5 rounded-full bg-white/40 hover:bg-white/60 border border-white/60 text-indigo-900 hover:text-orange-600 transition-all cursor-pointer"
-            aria-label="Open review modal"
-          >
-            <Star className="w-4 h-4" />
-          </button>
-          {/* Notifications */}
-          {currentUser && (
-            <div className="user-action-item relative">
-              <button
-                onClick={() => setShowNotifDropdown(!showNotifDropdown)}
-                className="p-1.5 rounded-full bg-white/40 hover:bg-white/60 border border-white/60 text-indigo-900 hover:text-orange-600 transition-all relative cursor-pointer"
-                aria-label="Notifications"
-              >
-                <Bell className="w-4 h-4" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center border border-white">
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
-              {/* Theme toggle placed next to notifications */}
-              <button
-                onClick={toggleTheme}
-                className="p-1.5 rounded-full bg-white/40 hover:bg-white/60 border border-white/60 text-indigo-900 hover:text-orange-600 transition-all cursor-pointer ml-2"
-                aria-label="Toggle theme"
-              >
-                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
-              {showNotifDropdown && (
-                <div className="absolute right-0 mt-3 w-80 bg-slate-900/95 border border-white/10 rounded-2xl shadow-2xl p-4 z-50 text-white backdrop-blur-2xl animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="flex justify-between items-center border-b border-white/10 pb-2 mb-3">
-                    <h4 className="font-extrabold text-xs tracking-wider uppercase text-cyan-400">
-                      Thông báo ({unreadCount})
-                    </h4>
-                    {unreadCount > 0 && (
-                      <button
-                        onClick={markAllAsRead}
-                        className="text-[10px] text-slate-400 hover:text-white font-bold flex items-center gap-1 cursor-pointer"
-                      >
-                        <Check className="w-3 h-3" /> Đọc tất cả
-                      </button>
-                    )}
-                  </div>
-                  <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar pr-1">
-                    {notifications.length === 0 ? (
-                      <p className="text-center py-6 text-xs text-slate-550 font-bold">Không có thông báo mới</p>
-                    ) : (
-                      notifications.map((item) => (
-                        <div
-                          key={item.id}
-                          className={`p-2.5 rounded-xl border flex gap-3 transition-colors relative group ${item.read ? 'bg-slate-950/20 border-white/5' : 'bg-indigo-500/10 border-indigo-500/20'}`}
-                        >
-                          <img
-                            src={item.senderAvatar}
-                            className="w-8 h-8 rounded-full border border-white/10 shrink-0 object-cover"
-                            alt=""
-                          />
-                          <div className="flex-1 min-w-0 pr-4">
-                            <p className="text-[11.5px] font-medium leading-tight text-slate-200">
-                              {item.message}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => deleteNotification(item.id)}
-                            className="absolute right-2 top-2 p-1 rounded-md bg-white/5 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-all cursor-pointer"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+        {/* User profile */}
+        <div className="flex items-center space-x-3">
 
           {/* User avatar & points with dropdown */}
           <div 

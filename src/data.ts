@@ -18,6 +18,7 @@ export interface SubCategory {
     title: string;
     description: string;
     icon: any; // Lucide icon
+    logoUrl?: string; // For 3D icons
     theme: "blue" | "orange" | "purple" | "green" | "red";
   }[];
   group?: string; // category group for filtering
@@ -47,13 +48,14 @@ export const categories: Category[] = [
         title: "Khoa học tự nhiên 6", 
         description: "Thực hành ảo Vật lý, Hóa học, Sinh học lớp 6", 
         colorClass: "hover:bg-blue-500/20 hover:border-blue-500/50", 
-        logoUrl: "https://img.icons8.com/fluency/96/microscope.png",
+        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2FKHTN_6-removebg-preview.png?alt=media&token=0caabd3c-3353-475e-966d-e316da281e70",
         lessons: [
           {
             id: "te-bao",
             title: "Mô Phỏng Tế Bào 3D",
             description: "Khám phá và tương tác cấu tạo của tế bào động vật, tế bào thực vật, và tế bào nhân sơ.",
             icon: Hexagon,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Ft%E1%BA%BF_b%C3%A0o-removebg-preview.png?alt=media&token=4cb4429b-c29e-44d3-84ec-0bf227417149",
             theme: "green"
           },
           {
@@ -61,6 +63,7 @@ export const categories: Category[] = [
             title: "Mô Phỏng Hình Dạng Vi Khuẩn",
             description: "Tìm hiểu các loại hình dạng phổ biến của vi khuẩn trong tự nhiên qua mô hình 3D tương tác.",
             icon: Atom,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fvi_khu%E1%BA%A9n-removebg-preview.png?alt=media&token=4ae8827b-2d26-4a62-94ab-09cb85933d26",
             theme: "blue"
           },
           {
@@ -68,6 +71,7 @@ export const categories: Category[] = [
             title: "Mô Phỏng Virus 3D",
             description: "Tìm hiểu các dạng hình học của virus trong tự nhiên và giải phẫu cấu trúc phân tử của virus Corona.",
             icon: Atom,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fvirus-removebg-preview.png?alt=media&token=6a67f47d-9fb5-4c38-b4e9-b9e865e1c9f2",
             theme: "red"
           },
           {
@@ -75,6 +79,7 @@ export const categories: Category[] = [
             title: "Mô Phỏng Nguyên Sinh Vật",
             description: "Quan sát cấu trúc chuỗi tảo lam tự dưỡng và tập tính săn mồi của trùng cỏ Didinium đơn bào.",
             icon: Atom,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fngueyen_sinh_v%E1%BA%ADt-removebg-preview.png?alt=media&token=59c9dc24-d4a8-4069-b1ad-c105859cad4f",
             theme: "purple"
           },
           {
@@ -82,6 +87,7 @@ export const categories: Category[] = [
             title: "Mô Phỏng Biểu Diễn Lực",
             description: "Thực hành từng bước biểu diễn lực: chọn loại lực, độ lớn lực và vẽ mũi tên biểu diễn theo tỉ xích.",
             icon: Scales,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fbi%E1%BB%83u_di%E1%BB%85n_l%E1%BB%B1c-removebg-preview.png?alt=media&token=8b21498a-18f0-4634-83e1-755720cb6dbc",
             theme: "orange"
           },
           {
@@ -89,6 +95,7 @@ export const categories: Category[] = [
             title: "Sự Chuyển Thể Của Chất",
             description: "Quan sát trực tiếp ở mức độ phân tử: từ thể rắn (băng) → lỏng (nước) → khí (hơi nước) khi thay đổi nhiệt độ từ -50°C đến 150°C.",
             icon: Atom,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fchueyenr%20th%E1%BB%83%20rmg.png?alt=media&token=f4ee1c33-ae73-49fa-b7c2-89635b1e212c",
             theme: "blue"
           },
           {
@@ -96,6 +103,7 @@ export const categories: Category[] = [
             title: "Hệ Mặt Trời 3D",
             description: "Khám phá hệ Mặt Trời 3D tương tác: xem quỹ đạo 8 hành tinh, tăng tốc thời gian và tìm hiểu thông tin từng hành tinh.",
             icon: Sun,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fh%E1%BB%87%20m%E1%BA%B7t%20tr%E1%BB%9Di%20rmg.png?alt=media&token=22792d5c-32b2-4e74-9947-269a114a2476",
             theme: "orange"
           },
           {
@@ -103,6 +111,7 @@ export const categories: Category[] = [
             title: "Phân Tách Hỗn Hợp",
             description: "Chọn đúng dụng cụ thực hành (giấy lọc, phễu chiết, nam châm, bay hơi) để tách 4 loại hỗn hợp khác nhau.",
             icon: Drop,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Ft%C3%A1ch-removebg-preview.png?alt=media&token=06be9f5c-d19d-4c46-9fbf-cc508ec07ba7",
             theme: "green"
           }
         ]
@@ -112,13 +121,14 @@ export const categories: Category[] = [
         title: "Khoa học tự nhiên 7", 
         description: "Thực hành ảo Vật lý, Hóa học, Sinh học lớp 7", 
         colorClass: "hover:bg-cyan-500/20 hover:border-cyan-500/50",
-        logoUrl: "https://img.icons8.com/fluency/96/test-tube.png",
+        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2FKHTN%207.png?alt=media&token=77f9ba10-9436-4eda-b88f-4c7ebb03267a",
         lessons: [
           {
             id: "bang-tuan-hoan",
             title: "Bảng Tuần Hoàn Thông Minh",
             description: "Khám phá bảng tuần hoàn hóa học tương tác với chi tiết từng nguyên tố.",
             icon: Hexagon,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2FB%E1%BA%A3ng_tu%E1%BA%A7n_ho%C3%A0n-removebg-preview.png?alt=media&token=bd88a3a1-21c1-4e05-8bfd-3ffd3209ab4c",
             theme: "green"
           },
           {
@@ -126,6 +136,7 @@ export const categories: Category[] = [
             title: "Liên Kết Ion 3D",
             description: "Mô phỏng tương tác quá trình hình thành liên kết ion (NaCl, MgO).",
             icon: Target,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fion-removebg-preview.png?alt=media&token=7459a940-6811-48ce-ad0f-1988e45aed21",
             theme: "orange"
           },
           {
@@ -133,6 +144,7 @@ export const categories: Category[] = [
             title: "Liên Kết Cộng Hóa Trị",
             description: "Mô phỏng quá trình dùng chung electron tạo liên kết cộng hóa trị.",
             icon: Target,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fc%E1%BB%99ng_h%C3%B3a_tr%E1%BB%8B-removebg-preview.png?alt=media&token=b182fb54-d377-46f0-8f64-5c4317683759",
             theme: "blue"
           },
           {
@@ -140,6 +152,7 @@ export const categories: Category[] = [
             title: "Đồ Thị Quãng Đường",
             description: "Thực hành từng bước vẽ đồ thị quãng đường - thời gian từ bảng số liệu.",
             icon: Target,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91%E1%BB%93_th%E1%BB%8B-removebg-preview.png?alt=media&token=d7b0ef59-9c0d-4999-888b-83d53a89d9bb",
             theme: "purple"
           },
           {
@@ -147,6 +160,7 @@ export const categories: Category[] = [
             title: "Bóng Tối & Bóng Nửa Tối",
             description: "Mô phỏng sự hình thành bóng tối và bóng nửa tối đằng sau vật cản sáng.",
             icon: Sun,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fb%C3%B3ng_t%E1%BB%91i-removebg-preview.png?alt=media&token=6e4aec24-3d11-4cc3-8fd5-d778653c5773",
             theme: "orange"
           },
           {
@@ -154,6 +168,7 @@ export const categories: Category[] = [
             title: "Kiến Tạo Nguyên Tử",
             description: "Tự tay lắp ráp Proton, Neutron và Electron để xây dựng nguyên tử. Mô hình Bohr tự động cập nhật theo số hạt được thêm vào.",
             icon: Atom,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fki%E1%BA%BFn%20t%E1%BA%A1o%20rmg.png?alt=media&token=034345ea-d2b1-4595-973a-917855f3c642",
             theme: "purple"
           },
           {
@@ -161,13 +176,15 @@ export const categories: Category[] = [
             title: "Phản Xạ Ánh Sáng",
             description: "Điều chỉnh góc gương và hướng laser để quan sát tia phản xạ. Kiểm chứng Định luật phản xạ ánh sáng: góc tới = góc phản xạ.",
             icon: Lightning,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fph%E1%BA%A3n_x%E1%BA%A1-removebg-preview.png?alt=media&token=0abe9394-c287-4a30-a066-5b7576a521fd",
             theme: "orange"
           },
           {
             id: "quang-hop",
-            title: "Nhà Máy Quang Hợp",
+            title: "Quang Hợp & Hô Hấp",
             description: "Điều chỉnh cường độ ánh sáng, lượng CO₂ và nước để quan sát tốc độ quang hợp thay đổi theo thời gian thực trên mô phỏng lá cây.",
             icon: Leaf,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fquang_h%C6%A1pk-removebg-preview.png?alt=media&token=dc0e7437-ac7c-49db-8e66-1bbb98a6ca98",
             theme: "green"
           }
         ]
@@ -177,13 +194,14 @@ export const categories: Category[] = [
         title: "Khoa học tự nhiên 8", 
         description: "Thực hành ảo Vật lý, Hóa học, Sinh học lớp 8", 
         colorClass: "hover:bg-indigo-500/20 hover:border-indigo-500/50", 
-        logoUrl: "https://img.icons8.com/fluency/96/physics.png",
+        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fkhtn8-removebg-preview.png?alt=media&token=d14c2b32-d682-450a-9dfb-2d7b8c5fcf68",
         lessons: [
           {
             id: "cac-he-co-quan",
             title: "Các Hệ Cơ Quan Trong Cơ Thể Người",
             description: "Khám phá cấu tạo tích hợp của các hệ cơ quan (Hệ tuần hoàn, hệ hô hấp, hệ tiêu hóa, hệ thần kinh...) qua mô hình giải phẫu 3D.",
             icon: Atom,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fc%C6%A1_th%E1%BB%83_ng%C6%B0%E1%BB%9Di-removebg-preview.png?alt=media&token=9568b511-2d33-44dc-a31c-5a4567379639",
             theme: "purple"
           },
           {
@@ -191,6 +209,7 @@ export const categories: Category[] = [
             title: "Môi trường trong cơ thể",
             description: "Mô phỏng sự trao đổi chất qua dịch mô, mao mạch máu và bạch huyết.",
             icon: Drop,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fmoi_tr%C6%B0%E1%BB%9Dng_trong-removebg-preview.png?alt=media&token=af0b780e-71ff-4c85-ba27-13154bd74926",
             theme: "red"
           },
           {
@@ -198,6 +217,7 @@ export const categories: Category[] = [
             title: "Hệ Hô Hấp",
             description: "Khám phá cấu tạo, chức năng và các bệnh lý hệ hô hấp cùng Bác sĩ Nhí AI.",
             icon: Wind,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fh%E1%BB%87_h%C3%B4_h%E1%BA%A5p-removebg-preview.png?alt=media&token=81555987-8264-4b7c-8365-1c7e69a50c85",
             theme: "blue"
           },
           {
@@ -205,6 +225,7 @@ export const categories: Category[] = [
             title: "Hệ Vận Động",
             description: "Khám phá hệ cơ và xương người qua mô hình 3D sinh động.",
             icon: PersonSimpleRun,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fh%E1%BB%87_v%E1%BA%ADn_%C4%91%C3%B4ng-removebg-preview.png?alt=media&token=e306ad6e-5ba1-4b43-9e2c-7c107a021761",
             theme: "green"
           },
           {
@@ -212,6 +233,7 @@ export const categories: Category[] = [
             title: "Hệ Tiêu Hóa",
             description: "Tìm hiểu quá trình biến đổi thức ăn và hấp thụ dinh dưỡng.",
             icon: BowlFood,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fh%E1%BB%87_ti%C3%AAu_h%C3%B3a-removebg-preview.png?alt=media&token=f2a37f28-bb39-494a-abf0-976d3be2bd03",
             theme: "orange"
           },
           {
@@ -219,6 +241,7 @@ export const categories: Category[] = [
             title: "Sơ Đồ Mạch Điện Ảo",
             description: "Thực hành kéo thả lắp ráp mạch điện ảo, tự động giải mạch điện theo định luật Ôm thời gian thực.",
             icon: Lightning,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fs%C6%A1_%C4%91%E1%BB%93_m%E1%BA%A1ch_%C4%91i%E1%BB%87n-removebg-preview.png?alt=media&token=0289a52f-0be3-4c28-a477-70425735e081",
             theme: "blue"
           },
           {
@@ -226,6 +249,7 @@ export const categories: Category[] = [
             title: "Định Luật Bảo Toàn Khối Lượng 3D",
             description: "Thực hành ảo cân đo đong đếm các phản ứng hóa học hệ kín và hệ hở để hiểu sâu về Định luật bảo toàn khối lượng.",
             icon: Scales,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91%E1%BB%8Bnh_lu%E1%BA%ADt-removebg-preview.png?alt=media&token=c749ff6e-c321-41ff-a19d-15dc04b44719",
             theme: "purple"
           },
           {
@@ -233,6 +257,7 @@ export const categories: Category[] = [
             title: "Lực Đẩy Archimedes",
             description: "Thả các vật liệu vào chất lỏng khác nhau và quan sát lực nổi. Dùng lực kế ảo đo lực đẩy Archimedes để kiểm chứng định luật.",
             icon: Drop,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fl%E1%BB%B1c_%C4%91%E1%BA%A9y-removebg-preview.png?alt=media&token=672a3380-cf01-431a-aa77-0c7f55e3b1b1",
             theme: "blue"
           },
           {
@@ -240,6 +265,7 @@ export const categories: Category[] = [
             title: "Đòn Bẩy & Ròng Rọc",
             description: "Mô phỏng đòn bẩy bập bênh (di chuyển điểm tựa) và hệ thống ròng rọc cố định/động để khám phá nguyên lý lợi lực cơ học.",
             icon: Scales,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91%C3%B2n_b%E1%BA%A9y-removebg-preview.png?alt=media&token=dbe4d0e2-35e1-4876-9862-53706eeaf90d",
             theme: "orange"
           },
           {
@@ -247,6 +273,7 @@ export const categories: Category[] = [
             title: "Cơ - Xương - Khớp",
             description: "Click vào cơ nhị đầu và tam đầu để xem hoạt động co/duỗi cơ, chuyển động xương và nguyên lý cơ đối kháng trong cánh tay người.",
             icon: PersonSimpleRun,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fc%C6%A1_x%C6%B0%C6%A1ng_kh%E1%BB%9Bp-removebg-preview.png?alt=media&token=80d57e1a-7522-44e0-b1aa-36754a0aeaf1",
             theme: "red"
           }
         ]
@@ -256,13 +283,14 @@ export const categories: Category[] = [
         title: "Khoa học tự nhiên 9", 
         description: "Thực hành ảo Vật lý, Hóa học, Sinh học lớp 9", 
         colorClass: "hover:bg-purple-500/20 hover:border-purple-500/50",
-        logoUrl: "https://img.icons8.com/color/96/round-bottom-flask.png",
+        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fkhtn9-rmg.png?alt=media&token=1c8a9a2a-9a44-45c5-992f-5f6aac95e2f0",
         lessons: [
           {
             id: "co-nang",
             title: "Cơ Năng",
             description: "Khám phá sự chuyển hóa giữa Động năng và Thế năng trong chuyển động rơi tự do.",
             icon: ArrowDown,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fc%C6%A1_n%C4%83ng-removebg-preview.png?alt=media&token=cc5d37b2-9526-4caf-9176-73a6de82b232",
             theme: "blue"
           },
           {
@@ -270,6 +298,7 @@ export const categories: Category[] = [
             title: "Công & Công Suất",
             description: "Tìm hiểu khái niệm Công cơ học và Công suất thông qua mô phỏng vận hành cần cẩu.",
             icon: Wrench,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fc%C3%B4ng-removebg-preview.png?alt=media&token=63e3a497-2cf6-439e-94d9-fc821ea2491e",
             theme: "orange"
           },
           {
@@ -277,12 +306,14 @@ export const categories: Category[] = [
             title: "Khúc Xạ Ánh Sáng",
             description: "Mô phỏng đường đi của tia sáng qua các môi trường và hiện tượng Phản xạ toàn phần.",
             icon: Sun,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fkh%C3%BAc_x%E1%BA%A1-removebg-preview.png?alt=media&token=013f6996-144a-4225-afb1-1aba9cd8ccbb",
             theme: "purple"
           },
           {
             id: "dong-dien",
             title: "Dòng Điện Không Đổi",
             description: "Lắp ráp mạch điện nối tiếp, song song và đo đạc các thông số U, I, R trực quan.",
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fd%C3%B2ng_%C4%91i%E1%BB%87n-removebg-preview%20(1).png?alt=media&token=b90e56da-ffe8-4a9d-a843-d489b525c611",
             icon: Lightning,
             theme: "green"
           },
@@ -290,6 +321,7 @@ export const categories: Category[] = [
             id: "cam-ung",
             title: "Cảm Ứng Điện Từ",
             description: "Khám phá hiện tượng sinh ra dòng điện xoay chiều khi thay đổi từ thông qua cuộn dây.",
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fc%E1%BA%A3m_%E1%BB%A9ng-removebg-preview.png?alt=media&token=f7fa4d8e-af77-4525-8480-e7f442d7bd00",
             icon: Lightning,
             theme: "red"
           },
@@ -298,6 +330,7 @@ export const categories: Category[] = [
             title: "Dãy Hoạt Động Hóa Học",
             description: "Thí nghiệm phản ứng của các kim loại khác nhau với nước, axit và muối.",
             icon: Atom,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fd%C3%A3y_h%C4%91-removebg-preview.png?alt=media&token=0bda26c4-f5b6-4496-8298-da2257b46771",
             theme: "orange"
           },
           {
@@ -305,12 +338,14 @@ export const categories: Category[] = [
             title: "Cấu Tạo Hợp Chất Hữu Cơ",
             description: "Thí nghiệm mô phỏng và lắp ráp cấu tạo các hợp chất hữu cơ.",
             icon: Hexagon,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fctct-removebg-preview.png?alt=media&token=6d9b9819-a39a-4f29-8a7e-68d966154fe9",
             theme: "green"
           },
           {
             id: "thau-kinh",
             title: "Thấu Kính Quang Học",
             description: "Kéo vật thật qua tiêu điểm F của thấu kính hội tụ và phân kỳ để quan sát sự tạo ảnh thật/ảo theo công thức 1/f = 1/d + 1/d'.",
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fth%E1%BA%A5u_k%C3%ADnh-removebg-preview.png?alt=media&token=291215d3-c6ef-40bf-8baa-af97f9deed2c",
             icon: Sun,
             theme: "purple"
           },
@@ -318,6 +353,7 @@ export const categories: Category[] = [
             id: "dot-bien-gen",
             title: "Đột Biến Gen",
             description: "Chủ động gây đột biến mất, thêm hoặc thay thế cặp nucleotide trên mạch ADN và quan sát hậu quả lên chuỗi mARN và Protein.",
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91%E1%BB%99t_bi%E1%BA%BFn-removebg-preview%20(1).png?alt=media&token=8237491f-5ace-4459-89da-328c9664c65b",
             icon: Hexagon,
             theme: "red"
           },
@@ -335,13 +371,14 @@ export const categories: Category[] = [
         title: "Hoạt động trải nghiệm - Hướng nghiệp", 
         description: "Các bài mô phỏng hoạt động trải nghiệm và định hướng nghề nghiệp", 
         colorClass: "hover:bg-rose-500/20 hover:border-rose-500/50",
-        logoUrl: "https://img.icons8.com/color/96/compass--v1.png",
+        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fhdtn-removebg-preview.png?alt=media&token=12e82f80-b9d8-4a9f-b3c7-43ccc64add63",
         lessons: [
           {
             id: "dinh-huong-nghe-nghiep",
             title: "Hệ thống Đánh giá Năng lực",
             description: "Trắc nghiệm tương tác xác định nhóm nghề nghiệp phù hợp dựa trên mô hình Holland.",
             icon: Target,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91%C3%A1nh_gi%C3%A1_n%C4%83ng_l%E1%BB%B1c-removebg-preview.png?alt=media&token=8d025c61-0c2d-488a-aacf-6101a1154d8e",
             theme: "purple"
           },
           {
@@ -349,12 +386,14 @@ export const categories: Category[] = [
             title: "Thước đo Cảm xúc Gia đình",
             description: "Trò chơi nhập vai rèn luyện kỹ năng quản lý cảm xúc và giải quyết xung đột gia đình.",
             icon: Brain,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fth%C6%B0%E1%BB%9Bc_%C4%91o_c%E1%BA%A3m_x%C3%BAc-removebg-preview.png?alt=media&token=0b05d5cd-e8b6-4465-8e0b-217973d34a9b",
             theme: "red"
           },
           {
             id: "xu-ly-khung-hoang",
             title: "Xử lý Khủng hoảng Học đường",
             description: "Trò chuyện xử lý tình huống bạo lực mạng và xây dựng môi trường học đường tôn trọng.",
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fx%E1%BB%AD_l%C3%BD_khrung_ho%E1%BA%A3ng-removebg-preview.png?alt=media&token=36c56760-8d48-461c-8de0-a5157736e4d5",
             icon: Robot,
             theme: "blue"
           },
@@ -362,6 +401,7 @@ export const categories: Category[] = [
             id: "khoi-nghiep-cong-dong",
             title: "Khởi nghiệp vì Cộng đồng",
             description: "Quản trị ngân sách, định giá và marketing cho một dự án kinh doanh tái chế bảo vệ môi trường.",
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fkh%E1%BB%9Fi_nghi%E1%BB%87p-removebg-preview.png?alt=media&token=de766bed-58da-4f6b-8b9d-be340a081d3d",
             icon: Network,
             theme: "green"
           },
@@ -369,6 +409,7 @@ export const categories: Category[] = [
             id: "balo-sinh-ton",
             title: "Balo Sinh Tồn Trước Bão",
             description: "Thử thách chọn nhanh đồ dùng thiết yếu vào balo trong vòng 60 giây khi có cảnh báo thiên tai.",
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fbalo-removebg-preview.png?alt=media&token=3ecc9c8b-c6c4-4a5b-9da2-71313c7a7e47",
             icon: Leaf,
             theme: "orange"
           },
@@ -376,6 +417,7 @@ export const categories: Category[] = [
             id: "thiet-ke-tuong-lai",
             title: "Thiết kế Lộ trình Tương lai",
             description: "Xây dựng kế hoạch học tập chi tiết, sắp xếp nhiệm vụ cân đối để chinh phục ước mơ nghề nghiệp.",
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fl%E1%BB%99_tr%C3%ACnh_t%C6%B0%C6%A1ng_l%E1%BA%A1i-removebg-preview.png?alt=media&token=7869ecb8-e039-4020-8885-49b88b13fd63",
             icon: Presentation,
             theme: "purple"
           }
@@ -391,28 +433,28 @@ export const categories: Category[] = [
     logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C3%B4n_t%E1%BA%ADp-removebg-preview.png?alt=media&token=d032eaa3-4aef-4290-ae19-a05eeee7b0f6",
     colorClass: "from-emerald-400 via-green-500 to-teal-600",
     subCategories: [
-      { id: "test-gk", title: "Đề thi Giữa kì", description: "Bộ đề tham khảo Khối 6, 7, 8, 9 với ma trận chi tiết", colorClass: "hover:bg-emerald-500/20 hover:border-emerald-500/50", logoUrl: "https://img.icons8.com/fluency/96/test-passed.png" },
-      { id: "test-ck", title: "Đề thi Cuối kì", description: "Luyện đề trắc nghiệm online chấm điểm tức thì", colorClass: "hover:bg-teal-500/20 hover:border-teal-500/50", logoUrl: "https://img.icons8.com/fluency/96/certificate.png" },
+      { id: "test-gk", title: "Đề thi Giữa kì", description: "Bộ đề tham khảo Khối 6, 7, 8, 9 với ma trận chi tiết", colorClass: "hover:bg-emerald-500/20 hover:border-emerald-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91%E1%BB%81_thi-removebg-preview.png?alt=media&token=2481e720-6fac-4189-b5dd-286b35dc301e" },
+      { id: "test-ck", title: "Đề thi Cuối kì", description: "Luyện đề trắc nghiệm online chấm điểm tức thì", colorClass: "hover:bg-teal-500/20 hover:border-teal-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91%E1%BB%81_thi-removebg-preview.png?alt=media&token=2481e720-6fac-4189-b5dd-286b35dc301e" },
       { 
         id: "phieu-bai-hoc", 
         title: "Tạo Phiếu Bài Học (Sketchnote)", 
         description: "Dùng AI chuyển sách giáo khoa thành Sketchnote sinh động 🎨", 
         colorClass: "hover:bg-indigo-500/20 hover:border-indigo-500/50",
-        logoUrl: "https://img.icons8.com/fluency/96/notebook.png",
+        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fsketch-removebg-preview.png?alt=media&token=1e7abce3-68df-49f6-8bb1-7b7435b50e69",
       },
       { 
         id: "mindmap-app", 
         title: "Tạo Sơ Đồ Tư Duy Bằng AI", 
         description: "Phân tích ảnh tài liệu thành Sơ đồ tư duy dạng nhánh trực quan 🧠", 
         colorClass: "hover:bg-cyan-500/20 hover:border-cyan-500/50",
-        logoUrl: "https://img.icons8.com/fluency/96/mind-map.png",
+        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fs%C6%A1_%C4%91%E1%BB%93_t%C6%B0_duy-removebg-preview.png?alt=media&token=9fd04832-a5a0-4d34-86fd-c85f9afdb2ae",
       },
       { 
         id: "app-tao-de", 
         title: "Tạo Đề Thi Bằng AI", 
         description: "Ôn tập vui 🚀 - Nền tảng tạo đề thi tự động từ ảnh", 
         colorClass: "hover:bg-purple-500/20 hover:border-purple-500/50",
-        logoUrl: "https://img.icons8.com/fluency/96/artificial-intelligence.png",
+        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Ft%E1%BA%A1o_%C4%91%E1%BB%81_thi-removebg-preview.png?alt=media&token=a0b6c963-edc9-4777-b42c-7fb10a05ae62",
         lessons: [
           {
             id: "tao-de-kiem-tra",
@@ -422,23 +464,7 @@ export const categories: Category[] = [
             theme: "purple"
           }
         ]
-      },
-      {
-        id: "giao-an-ai-tool",
-        title: "Nâng Cấp Giáo Án AI",
-        description: "Tích hợp Năng lực số & Năng lực AI tự động vào giáo án Word 📝",
-        colorClass: "hover:bg-blue-500/20 hover:border-blue-500/50",
-        logoUrl: "https://img.icons8.com/fluency/96/artificial-intelligence.png",
-        lessons: [
-          {
-            id: "giao-an-ai",
-            title: "Trợ lý Nâng cấp Giáo án",
-            description: "Hệ thống tự động đọc file Word (.docx), phân tích bài học bằng AI và chèn thêm 2 mục năng lực số và AI vào đúng chuẩn mà không làm hỏng định dạng.",
-            icon: Robot,
-            theme: "blue"
-          }
-        ]
-      },
+      }
     ]
   },
   {
@@ -461,19 +487,20 @@ export const categories: Category[] = [
     logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fgame-removebg-preview.png?alt=media&token=2ed1f26a-a6ff-4e35-9772-d6727b29667f",
     colorClass: "from-pink-400 via-rose-500 to-red-600",
     subCategories: [
-      { id: "game-hub", title: "Ngân hàng câu hỏi", description: "Lưu trữ câu hỏi cho các trò chơi — nhập thủ công hoặc quét ảnh bằng AI 📚", colorClass: "hover:bg-violet-500/20 hover:border-violet-500/50", logoUrl: "https://img.icons8.com/fluency/96/data-configuration.png" },
-      { id: "game-action-quiz", title: "Cùng nhau vận động", description: "Bật tung kiến thức - Trò chơi hành động trả lời câu hỏi", colorClass: "hover:bg-red-500/20 hover:border-red-500/50", logoUrl: "https://img.icons8.com/fluency/96/exercise.png",
+      { id: "game-hub", title: "Ngân hàng câu hỏi", description: "Lưu trữ câu hỏi cho các trò chơi — nhập thủ công hoặc quét ảnh bằng AI 📚", colorClass: "hover:bg-violet-500/20 hover:border-violet-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fng%C3%A2n_h%C3%A0ng_c%C3%A2u_h%E1%BB%8Fi-removebg-preview.png?alt=media&token=ac5107bb-4aab-41f8-83eb-386233738c11" },
+      { id: "game-action-quiz", title: "Cùng nhau vận động", description: "Bật tung kiến thức - Trò chơi hành động trả lời câu hỏi", colorClass: "hover:bg-red-500/20 hover:border-red-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fc%C3%B9ng_nhau_v%E1%BA%ADn_%C4%91%E1%BB%99ng-removebg-preview.png?alt=media&token=40ce99ab-98ec-44cf-9c22-6a636bc4f98b",
         lessons: [
           {
             id: "action-quiz-game",
             title: "Cùng nhau vận động",
             description: "Chinh phục điểm số và tránh bẫy bằng cách trả lời thuật toán.",
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fc%C3%B9ng_nhau_v%E1%BA%ADn_%C4%91%E1%BB%99ng-removebg-preview.png?alt=media&token=40ce99ab-98ec-44cf-9c22-6a636bc4f98b",
             icon: RocketLaunch,
             theme: "orange"
           }
         ]
       },
-      { id: "game-world-explorer", title: "Khám Phá Thế Giới", description: "Trò chơi trắc nghiệm vượt ải theo chủ đề tự nhiên", colorClass: "hover:bg-green-500/20 hover:border-green-500/50", logoUrl: "https://img.icons8.com/fluency/96/map.png",
+      { id: "game-world-explorer", title: "Khám Phá Thế Giới", description: "Trò chơi trắc nghiệm vượt ải theo chủ đề tự nhiên", colorClass: "hover:bg-green-500/20 hover:border-green-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fkh%C3%A1m_ph%C3%A1_th%E1%BA%BF_gi%E1%BB%9Bi-removebg-preview.png?alt=media&token=348022b3-50b9-4900-a811-cc2be4764b95",
         lessons: [
           {
             id: "world-explorer-game",
@@ -484,21 +511,47 @@ export const categories: Category[] = [
           }
         ]
       },
-      { id: "game-duck-race", title: "Đua Vịt Gọi Tên", description: "Trả lời câu hỏi KHTN để vịt của bạn về đích trước 3 đối thủ! 🦆", colorClass: "hover:bg-yellow-500/20 hover:border-yellow-500/50", logoUrl: "https://img.icons8.com/fluency/96/duck.png" },
-      { id: "game-star-race", title: "Cuộc Đua Ngôi Sao", description: "2 đội cùng trả lời câu hỏi đồng thời trên 2 nửa màn hình — đội giành 10 ⭐ trước thắng!", colorClass: "hover:bg-yellow-500/20 hover:border-yellow-500/50", logoUrl: "https://img.icons8.com/fluency/96/star.png" },
-      { id: "game-puzzle-flip", title: "Lật Mảnh Ghép", description: "Giáo viên cài ảnh bí ẩn, học sinh trả lời đúng để lật từng mảnh và đoán nội dung 🧩", colorClass: "hover:bg-fuchsia-500/20 hover:border-fuchsia-500/50", logoUrl: "https://img.icons8.com/fluency/96/puzzle.png" },
-      { id: "game-spin-wheel", title: "Vòng Quay Gọi Tên", description: "Quay vòng quay ngẫu nhiên để chọn học sinh — nhập danh sách tên và bắt đầu! 🎡", colorClass: "hover:bg-teal-500/20 hover:border-teal-500/50", logoUrl: "https://img.icons8.com/fluency/96/spinning-top-toy.png" },
-      { id: "game-keo-co", title: "Kéo Co Kiến Thức", description: "2 đội kéo dây bằng cách trả lời câu hỏi — đội nào kéo sợi dây về phía mình trước thắng! ⚔️", colorClass: "hover:bg-red-500/20 hover:border-red-500/50", logoUrl: "https://img.icons8.com/fluency/96/rope.png" },
-      { id: "game-doi-khang", title: "Game Đối Kháng", description: "Buzzer 1v1 — ai nhấn trước được trả lời, đội đạt 10 điểm trước chiến thắng! ⚡", colorClass: "hover:bg-pink-500/20 hover:border-pink-500/50", logoUrl: "https://img.icons8.com/fluency/96/lightning-bolt.png" },
-      { id: "game-chem-hoa-qua", title: "Chém Hoa Quả", description: "Click vào quả cây mang đáp án đúng để ghi điểm — sai mất tim! 🍎", colorClass: "hover:bg-green-500/20 hover:border-green-500/50", logoUrl: "https://img.icons8.com/fluency/96/fruit.png" },
-      { id: "game-theo-luot", title: "Game Theo Lượt", description: "Tung xúc xắc, di chuyển trên bàn cờ 25 ô, trả lời câu hỏi để giữ vị trí — 2–4 người chơi! 🎲", colorClass: "hover:bg-amber-500/20 hover:border-amber-500/50", logoUrl: "https://img.icons8.com/fluency/96/dice.png" },
-      { id: "game-quiz", title: "Đố Vui Khoa Học", description: "Trả lời câu hỏi khoa học để kích hoạt siêu năng lực vượt chướng ngại vật! Chọn avatar, 3 mạng, giới hạn thời gian cực kịch tính! 🏆", colorClass: "hover:bg-orange-500/20 hover:border-orange-500/50", logoUrl: "https://img.icons8.com/fluency/96/question-mark.png" },
-      { id: "game-crossword", title: "Ô Chữ Khoa Học", description: "Giáo viên thiết kế ô chữ, học sinh giải câu hỏi để tìm từ khóa bí ẩn! 🧩", colorClass: "hover:bg-violet-500/20 hover:border-violet-500/50", logoUrl: "https://img.icons8.com/fluency/96/crossword.png" },
-      { id: "game-giai-ma-buc-tranh", title: "Giải Mã Bức Tranh", description: "Trả lời đúng câu hỏi để mở khóa từng mảnh ghép và khám phá bức tranh bí ẩn đằng sau! 🖼️", colorClass: "hover:bg-cyan-500/20 hover:border-cyan-500/50", logoUrl: "https://img.icons8.com/fluency/96/picture.png" },
-      { id: "game-dai-duong-ma-thuat", title: "Đại Dương Ma Thuật", description: "Quản lý lớp học sinh động với những chú sứa phát sáng. Gọi tên ngẫu nhiên bằng cách giơ ngón tay trước màn hình! 🪼", colorClass: "hover:bg-blue-500/20 hover:border-blue-500/50", logoUrl: "https://img.icons8.com/fluency/96/jellyfish.png" },
-      { id: "game-ai-la-trieu-phu", title: "Ai Là Triệu Phú", description: "Vượt qua 15 câu hỏi trắc nghiệm hóc búa với sự trợ giúp của khán giả, người thân để giành giải thưởng 150 triệu! 💰", colorClass: "hover:bg-amber-500/20 hover:border-amber-500/50", logoUrl: "https://img.icons8.com/fluency/96/money-bag.png" },
+      { id: "game-duck-race", title: "Đua Vịt Gọi Tên", description: "Trả lời câu hỏi KHTN để vịt của bạn về đích trước 3 đối thủ! 🦆", colorClass: "hover:bg-yellow-500/20 hover:border-yellow-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91ua_v%E1%BB%8Bt-removebg-preview.png?alt=media&token=1a850b85-12b2-4631-93db-b865918bbcd6" },
+      { id: "game-star-race", title: "Cuộc Đua Ngôi Sao", description: "2 đội cùng trả lời câu hỏi đồng thời trên 2 nửa màn hình — đội giành 10 ⭐ trước thắng!", colorClass: "hover:bg-yellow-500/20 hover:border-yellow-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fcu%E1%BB%99c_%C4%91ua_ng%C3%B4i_sao-removebg-preview.png?alt=media&token=166600dd-d3f0-47c2-8349-f25708f26bc8" },
+      { id: "game-puzzle-flip", title: "Lật Mảnh Ghép", description: "Giáo viên cài ảnh bí ẩn, học sinh trả lời đúng để lật từng mảnh và đoán nội dung 🧩", colorClass: "hover:bg-fuchsia-500/20 hover:border-fuchsia-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fl%E1%BA%ADt_m%E1%BA%A3nh_gh%C3%A9p-removebg-preview.png?alt=media&token=00b1a2e0-bad6-4e40-b15a-6f50de9b14c2" },
+      { id: "game-spin-wheel", title: "Vòng Quay Gọi Tên", description: "Quay vòng quay ngẫu nhiên để chọn học sinh — nhập danh sách tên và bắt đầu! 🎡", colorClass: "hover:bg-teal-500/20 hover:border-teal-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fv%C3%B2ng_quay-removebg-preview.png?alt=media&token=cb957052-3341-459f-8665-11e65b541418" },
+      { id: "game-keo-co", title: "Kéo Co Kiến Thức", description: "2 đội kéo dây bằng cách trả lời câu hỏi — đội nào kéo sợi dây về phía mình trước thắng! ⚔️", colorClass: "hover:bg-red-500/20 hover:border-red-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fk%C3%A9o_co-removebg-preview.png?alt=media&token=8c7a6aa3-fc3a-4d4e-bf6d-d0d0afc3d70e" },
+      { id: "game-doi-khang", title: "Game Đối Kháng", description: "Buzzer 1v1 — ai nhấn trước được trả lời, đội đạt 10 điểm trước chiến thắng! ⚡", colorClass: "hover:bg-pink-500/20 hover:border-pink-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91%E1%BB%91i%20kh%C3%A1ng%20rmg.png?alt=media&token=ce2db996-1841-40f8-8246-2e5d6e69190b" },
+      { id: "game-chem-hoa-qua", title: "Chém Hoa Quả", description: "Click vào quả cây mang đáp án đúng để ghi điểm — sai mất tim! 🍎", colorClass: "hover:bg-green-500/20 hover:border-green-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fch%C3%A9m_tr%C3%A1i_c%C3%A2y-removebg-preview.png?alt=media&token=ff9140ef-3447-402e-9dba-8bd54ca491f1" },
+      { id: "game-theo-luot", title: "Game Theo Lượt", description: "Tung xúc xắc, di chuyển trên bàn cờ 25 ô, trả lời câu hỏi để giữ vị trí — 2–4 người chơi! 🎲", colorClass: "hover:bg-amber-500/20 hover:border-amber-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fgame_theo_l%C6%B0%E1%BB%A3t-removebg-preview.png?alt=media&token=58315c4b-9201-4371-b197-82d5b7c43a8a" },
+      { id: "game-quiz", title: "Đố Vui Khoa Học", description: "Trả lời câu hỏi khoa học để kích hoạt siêu năng lực vượt chướng ngại vật! Chọn avatar, 3 mạng, giới hạn thời gian cực kịch tính! 🏆", colorClass: "hover:bg-orange-500/20 hover:border-orange-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91%E1%BB%91_vui-removebg-preview.png?alt=media&token=b096c8f7-0557-466f-b0bc-162ba3e0c632" },
+      { id: "game-crossword", title: "Ô Chữ Khoa Học", description: "Giáo viên thiết kế ô chữ, học sinh giải câu hỏi để tìm từ khóa bí ẩn! 🧩", colorClass: "hover:bg-violet-500/20 hover:border-violet-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C3%B4_ch%E1%BB%AF_khoa_h%E1%BB%8Dc-removebg-preview.png?alt=media&token=f0cb135b-84bb-48e9-b8aa-fdc15afdf13a" },
+      { id: "game-giai-ma-buc-tranh", title: "Giải Mã Bức Tranh", description: "Trả lời đúng câu hỏi để mở khóa từng mảnh ghép và khám phá bức tranh bí ẩn đằng sau! 🖼️", colorClass: "hover:bg-cyan-500/20 hover:border-cyan-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fgi%E1%BA%A3i_m%C3%A3_b%E1%BB%A9c_tranh-removebg-preview.png?alt=media&token=a86d2ca7-531a-4e98-8a39-ba05acc73494" },
+      { id: "game-dai-duong-ma-thuat", title: "Đại Dương Ma Thuật", description: "Quản lý lớp học sinh động với những chú sứa phát sáng. Gọi tên ngẫu nhiên bằng cách giơ ngón tay trước màn hình! 🪼", colorClass: "hover:bg-blue-500/20 hover:border-blue-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91%E1%BA%A1i_d%C6%B0%C6%A1ng_ma_thu%E1%BA%ADt-removebg-preview.png?alt=media&token=9efe7408-bfd0-4df1-a2c2-b95256ae0ced" },
+      { id: "game-ai-la-trieu-phu", title: "Ai Là Triệu Phú", description: "Vượt qua 15 câu hỏi trắc nghiệm hóc búa với sự trợ giúp của khán giả, người thân để giành giải thưởng 150 triệu! 💰", colorClass: "hover:bg-amber-500/20 hover:border-amber-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fai_l%C3%A0_tri%E1%BB%87u_ph%C3%BA-removebg-preview.png?alt=media&token=9fa001c0-9d5d-4b96-a721-0799ed5c96a8" },
     ]
-
+  },
+  {
+    id: "van-ban-thong-minh",
+    title: "Văn bản thông minh",
+    subtitle: "Trợ lý văn bản tự động",
+    icon: ClipboardText,
+    logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fvbtm-removebg-preview.png?alt=media&token=7dac9928-30c7-469c-a003-5b88379495fa",
+    colorClass: "from-blue-400 via-cyan-500 to-teal-600",
+    subCategories: [
+      { id: "skkn-nd30", title: "Định dạng văn bản ND30", description: "Tải lên tệp Word và tự động định dạng chuẩn Nghị định 30/2020/NĐ-CP về công tác văn thư — phông chữ, định lề, số ký hiệu, tiêu đề đúng quy chuẩn.", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91%E1%BB%8Bnh_d%E1%BA%A1ng_v%C4%83n_b%E1%BA%A3n-removebg-preview.png?alt=media&token=5f1e391c-fab2-4cb6-8e95-572c48274b50", colorClass: "hover:bg-red-500/20 hover:border-red-500/50" },
+      {
+        id: "giao-an-ai-tool",
+        title: "Nâng Cấp Giáo Án AI",
+        description: "Tích hợp Năng lực số & Năng lực AI tự động vào giáo án Word 📝",
+        colorClass: "hover:bg-blue-500/20 hover:border-blue-500/50",
+        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fgi%C3%A1o_%C3%A1n-removebg-preview.png?alt=media&token=64d8584c-6e57-43ae-a27e-d47662baa0d5",
+        lessons: [
+          {
+            id: "giao-an-ai",
+            title: "Trợ lý Nâng cấp Giáo án",
+            description: "Hệ thống tự động đọc file Word (.docx), phân tích bài học bằng AI và chèn thêm 2 mục năng lực số và AI vào đúng chuẩn mà không làm hỏng định dạng.",
+            icon: Robot,
+            theme: "blue"
+          }
+        ]
+      }
+    ]
   },
   {
     id: "ai-tool",
@@ -700,8 +753,7 @@ export const categories: Category[] = [
     subCategories: [
       { id: "skkn-2023", title: "SKKN Cấp trường", description: "Phương pháp dạy học theo định hướng dự án", logoUrl: "https://img.icons8.com/fluency/96/light-on.png" },
       { id: "skkn-2024", title: "SKKN Cấp Quận", description: "Ứng dụng AI và sơ đồ tư duy trong soạn giảng", logoUrl: "https://img.icons8.com/fluency/96/innovation.png" },
-      { id: "skkn-upload", title: "Kho lưu trữ cá nhân", description: "Tải lên, quản lý và lưu trữ tài liệu PDF sáng kiến kinh nghiệm cá nhân", logoUrl: "https://img.icons8.com/fluency/96/upload-to-cloud.png" },
-      { id: "skkn-nd30", title: "Định dạng văn bản ND30", description: "Tải lên tệp Word và tự động định dạng chuẩn Nghị định 30/2020/NĐ-CP về công tác văn thư — phông chữ, định lề, số ký hiệu, tiêu đề đúng quy chuẩn.", logoUrl: "https://img.icons8.com/fluency/96/microsoft-word-2019.png", colorClass: "hover:bg-red-500/20 hover:border-red-500/50" },
+      { id: "skkn-upload", title: "Kho lưu trữ cá nhân", description: "Tải lên, quản lý và lưu trữ tài liệu PDF sáng kiến kinh nghiệm cá nhân", logoUrl: "https://img.icons8.com/fluency/96/upload-to-cloud.png" }
     ]
   },
   {
