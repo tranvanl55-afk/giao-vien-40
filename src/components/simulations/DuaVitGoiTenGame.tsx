@@ -101,33 +101,16 @@ function Duck({ id, path, trackIndex }: { id: number; path: string[]; trackIndex
             className="relative flex items-center justify-center drop-shadow-xl z-10"
             style={{ width: `${duckPx}px`, height: `${duckPx}px`, marginTop: `-${duckNeg}px`, marginBottom: `-${duckNeg}px` }}
           >
-            <svg
-              viewBox="0 0 100 100"
-              xmlns="http://www.w3.org/2000/svg"
+            <img
+              src="https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fv%E1%BB%8Bt%202.png?alt=media&token=13aae11c-ff09-4015-af47-137e8a6c4b28"
+              alt="Duck"
               className={clsx(
                 'absolute inset-0 w-full h-full object-contain transition-all duration-1000',
                 isWinner && status === 'finished'
                   ? 'drop-shadow-[0_0_25px_rgba(250,204,21,0.8)] scale-110 z-20'
                   : 'drop-shadow-[0_0_5px_rgba(20,184,166,0.5)]',
               )}
-            >
-              {/* Body */}
-              <ellipse cx="50" cy="62" rx="28" ry="22" fill="#f5c842" />
-              {/* Head */}
-              <circle cx="74" cy="44" r="16" fill="#f5c842" />
-              {/* Eye */}
-              <circle cx="81" cy="40" r="3" fill="#1a1a1a" />
-              <circle cx="82" cy="39" r="1" fill="white" />
-              {/* Beak */}
-              <ellipse cx="93" cy="46" rx="8" ry="4" fill="#e07b20" />
-              {/* Wing */}
-              <ellipse cx="42" cy="60" rx="14" ry="10" fill="#d4a820" transform="rotate(-10 42 60)" />
-              {/* Water ripple / tail */}
-              <ellipse cx="27" cy="70" rx="10" ry="5" fill="#d4a820" />
-              {/* Feet */}
-              <ellipse cx="44" cy="82" rx="9" ry="4" fill="#e07b20" />
-              <ellipse cx="58" cy="84" rx="9" ry="4" fill="#e07b20" />
-            </svg>
+            />
             {/* Number badge */}
             <div
               className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none"
