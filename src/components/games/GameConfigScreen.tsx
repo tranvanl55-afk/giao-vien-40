@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Play, Database, FileText, ExternalLink, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Play, Database, FileText, ExternalLink, AlertTriangle, CheckSquare, Square } from 'lucide-react';
 import { QuestionType } from './GameHub';
 import { DEFAULT_GAME_QUESTIONS } from '../../data/defaultGameQuestions';
 
@@ -39,7 +39,25 @@ export function GameConfigScreen({
     }
   };
 
-  const bankQs = getBankQuestions();
+  const [bankQs] = useState<QuestionType[]>(getBankQuestions);
+  const [selectedBankIds, setSelectedBankIds] = useState<Set<string>>(() => new Set(bankQs.map(q => q.id)));
+
+  const toggleQuestion = (id: string) => {
+    setSelectedBankIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    if (selectedBankIds.size === bankQs.length) {
+      setSelectedBankIds(new Set());
+    } else {
+      setSelectedBankIds(new Set(bankQs.map(q => q.id)));
+    }
+  };
 
   const parseManualQuestions = (text: string): QuestionType[] => {
     const lines = text.split('\n').filter(l => l.trim().length > 0);
@@ -70,11 +88,12 @@ export function GameConfigScreen({
 
   const handleStart = () => {
     if (method === 'bank') {
-      if (bankQs.length === 0) {
-        setErrorMsg('Ngân hàng câu hỏi trống. Vui lòng thêm câu hỏi hoặc chọn nhập thủ công.');
+      const selected = bankQs.filter(q => selectedBankIds.has(q.id));
+      if (selected.length === 0) {
+        setErrorMsg('Vui lòng chọn ít nhất 1 câu hỏi từ kho.');
         return;
       }
-      onStart(bankQs);
+      onStart(selected);
     } else {
       const parsed = parseManualQuestions(manualText);
       if (parsed.length === 0) {
@@ -189,30 +208,46 @@ export function GameConfigScreen({
                 <div className="flex justify-between items-center pb-3 border-b border-white/10">
                   <div>
                     <h4 className="font-bold text-white text-base">Kho câu hỏi hiện tại</h4>
-                    <p className="text-xs text-slate-400 mt-0.5">Hiện đang có {bankQs.length} câu hỏi sẵn sàng.</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Đã chọn {selectedBankIds.size}/{bankQs.length} câu hỏi.</p>
                   </div>
-                  <button
-                    onClick={onGoToBank}
-                    className="flex items-center gap-1 text-xs font-bold text-cyan-400 hover:text-cyan-300 bg-cyan-400/10 hover:bg-cyan-400/20 px-3 py-1.5 rounded-lg border border-cyan-400/20 transition-all"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" /> Quản lý kho
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={toggleAll}
+                      className="flex items-center gap-1 text-xs font-bold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 transition-all cursor-pointer"
+                    >
+                      {selectedBankIds.size === bankQs.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
+                    </button>
+                    <button
+                      onClick={onGoToBank}
+                      className="flex items-center gap-1 text-xs font-bold text-cyan-400 hover:text-cyan-300 bg-cyan-400/10 hover:bg-cyan-400/20 px-3 py-1.5 rounded-lg border border-cyan-400/20 transition-all cursor-pointer"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" /> Quản lý kho
+                    </button>
+                  </div>
                 </div>
 
-                <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-2.5 pr-2">
-                  {bankQs.slice(0, 10).map((q, idx) => (
-                    <div key={q.id} className="bg-white/5 rounded-xl p-3 border border-white/5 text-sm flex gap-3">
-                      <span className="w-5 h-5 bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 rounded-full flex items-center justify-center shrink-0 text-xs font-black">
-                        {idx + 1}
-                      </span>
-                      <div className="min-w-0">
-                        <p className="font-bold text-slate-200 truncate">{q.text}</p>
-                        <p className="text-xs text-slate-500 mt-1">Đáp án đúng: {['A', 'B', 'C', 'D'][q.answer]}</p>
-                      </div>
-                    </div>
-                  ))}
-                  {bankQs.length > 10 && (
-                    <p className="text-xs text-slate-500 text-center italic pt-2">...và {bankQs.length - 10} câu hỏi khác</p>
+                <div className="max-h-[300px] overflow-y-auto custom-scrollbar space-y-2 pr-2">
+                  {bankQs.length === 0 ? (
+                     <p className="text-sm text-slate-400 text-center py-4">Ngân hàng câu hỏi trống. Vui lòng vào Quản lý kho để thêm.</p>
+                  ) : (
+                    bankQs.map((q, idx) => {
+                      const isSelected = selectedBankIds.has(q.id);
+                      return (
+                        <div 
+                          key={q.id} 
+                          onClick={() => toggleQuestion(q.id)}
+                          className={`rounded-xl p-3 border text-sm flex gap-3 cursor-pointer transition-all ${isSelected ? 'bg-cyan-500/10 border-cyan-500/30' : 'bg-white/5 border-white/5 hover:bg-white/10'}`}
+                        >
+                          <div className="pt-0.5 shrink-0">
+                            {isSelected ? <CheckSquare className="w-5 h-5 text-cyan-400" /> : <Square className="w-5 h-5 text-slate-500" />}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className={`font-bold truncate ${isSelected ? 'text-slate-100' : 'text-slate-400'}`}>{q.text}</p>
+                            <p className={`text-xs mt-1 ${isSelected ? 'text-cyan-200/70' : 'text-slate-500'}`}>Đáp án đúng: {['A', 'B', 'C', 'D'][q.answer]}</p>
+                          </div>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </div>

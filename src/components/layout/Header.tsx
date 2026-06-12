@@ -10,6 +10,7 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 
+import { categories } from '../../data';
 import { db } from '../../firebase';
 import {
   collection,
@@ -378,107 +379,72 @@ export function Header({
             <div
               ref={userDropdownRef}
               style={{ display: 'none' }}
-              className="absolute right-0 mt-2.5 w-64 bg-white/95 dark:bg-slate-900/95 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-2xl backdrop-blur-xl z-50 overflow-hidden py-1.5"
+              className="absolute right-0 mt-2.5 w-64 bg-white/95 dark:bg-slate-900/95 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-2xl backdrop-blur-xl z-50 overflow-visible py-1.5"
             >
-              <button
-                onClick={() => handleItemClick(() => navigate('/category/thi-nghiem'))}
-                className="dropdown-item w-full text-left flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200 border-b border-slate-100 dark:border-slate-800/40 group/item cursor-pointer"
-              >
-                <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 group-hover/item:bg-blue-500/10 transition-colors">
-                    <FlaskConical className="w-4.5 h-4.5" />
+              {categories.map((cat, index) => {
+                const isLast = index === categories.length - 1;
+                const getColors = (id: string) => {
+                  switch (id) {
+                    case 'thi-nghiem': return { bg: 'bg-blue-50 dark:bg-blue-950/30', text: 'text-blue-600 dark:text-blue-400', hoverBg: 'group-hover/navitem:bg-blue-500/10', hoverText: 'group-hover/navitem:text-blue-600 dark:group-hover/navitem:text-blue-400', hoverIcon: 'group-hover/navitem:text-blue-500' };
+                    case 'on-tap': return { bg: 'bg-emerald-50 dark:bg-emerald-950/30', text: 'text-emerald-600 dark:text-emerald-400', hoverBg: 'group-hover/navitem:bg-emerald-500/10', hoverText: 'group-hover/navitem:text-emerald-600 dark:group-hover/navitem:text-emerald-400', hoverIcon: 'group-hover/navitem:text-emerald-500' };
+                    case 'tro-choi': return { bg: 'bg-rose-50 dark:bg-rose-950/30', text: 'text-rose-600 dark:text-rose-400', hoverBg: 'group-hover/navitem:bg-rose-500/10', hoverText: 'group-hover/navitem:text-rose-600 dark:group-hover/navitem:text-rose-400', hoverIcon: 'group-hover/navitem:text-rose-500' };
+                    case 'e-learning': return { bg: 'bg-purple-50 dark:bg-purple-950/30', text: 'text-purple-600 dark:text-purple-400', hoverBg: 'group-hover/navitem:bg-purple-500/10', hoverText: 'group-hover/navitem:text-purple-600 dark:group-hover/navitem:text-purple-400', hoverIcon: 'group-hover/navitem:text-purple-500' };
+                    case 'van-ban-thong-minh': return { bg: 'bg-cyan-50 dark:bg-cyan-950/30', text: 'text-cyan-600 dark:text-cyan-400', hoverBg: 'group-hover/navitem:bg-cyan-500/10', hoverText: 'group-hover/navitem:text-cyan-600 dark:group-hover/navitem:text-cyan-400', hoverIcon: 'group-hover/navitem:text-cyan-500' };
+                    case 'ai-tool': return { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-600 dark:text-amber-400', hoverBg: 'group-hover/navitem:bg-amber-500/10', hoverText: 'group-hover/navitem:text-amber-600 dark:group-hover/navitem:text-amber-400', hoverIcon: 'group-hover/navitem:text-amber-500' };
+                    default: return { bg: 'bg-slate-50 dark:bg-slate-950/30', text: 'text-slate-600 dark:text-slate-400', hoverBg: 'group-hover/navitem:bg-slate-500/10', hoverText: 'group-hover/navitem:text-slate-600 dark:group-hover/navitem:text-slate-400', hoverIcon: 'group-hover/navitem:text-slate-500' };
+                  }
+                };
+                const colors = getColors(cat.id);
+                return (
+                  <div key={cat.id} className="relative group/navitem dropdown-item">
+                    <button
+                      onClick={() => handleItemClick(() => navigate(`/category/${cat.id}`))}
+                      className={`w-full text-left flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200 border-b border-slate-100 dark:border-slate-800/40 cursor-pointer`}
+                    >
+                      <div className="flex items-center">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${colors.bg} ${colors.text} ${colors.hoverBg} transition-colors`}>
+                          <cat.icon className="w-4.5 h-4.5" />
+                        </div>
+                        <div className="flex flex-col ml-3">
+                          <span className={`text-xs font-extrabold text-slate-800 dark:text-slate-100 ${colors.hoverText} transition-colors`}>
+                            {cat.title}
+                          </span>
+                          <span className="text-[9.5px] text-slate-400 dark:text-slate-500 font-medium">
+                            {cat.subtitle}
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className={`w-3.5 h-3.5 text-slate-350 dark:text-slate-650 group-hover/navitem:translate-x-1 ${colors.hoverIcon} transition-all`} />
+                    </button>
+                    
+                    {/* Subcategories Flyout */}
+                    {cat.subCategories && cat.subCategories.length > 0 && (
+                      <div className="hidden md:block absolute top-0 right-[98%] mr-1 w-64 max-h-[80vh] overflow-y-auto custom-scrollbar bg-white/95 dark:bg-slate-900/95 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-2xl backdrop-blur-xl z-50 opacity-0 invisible group-hover/navitem:opacity-100 group-hover/navitem:visible transition-all duration-200 py-1.5">
+                        {cat.subCategories.map(sub => (
+                          <button
+                            key={sub.id}
+                            onClick={(e) => { e.stopPropagation(); handleItemClick(() => navigate(`/subcategory/${cat.id}/${sub.id}`)); }}
+                            className="w-full text-left flex items-center px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200 cursor-pointer group/subitem"
+                          >
+                            {sub.logoUrl ? (
+                              <img src={sub.logoUrl} className="w-6 h-6 object-contain mr-3 group-hover/subitem:scale-110 transition-transform" alt="" />
+                            ) : (
+                              <div className="w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-3">
+                                <div className="w-1.5 h-1.5 rounded-full bg-slate-400 group-hover/subitem:bg-blue-500 transition-colors"></div>
+                              </div>
+                            )}
+                            <div className="flex flex-col">
+                              <span className="text-[11.5px] font-bold text-slate-700 dark:text-slate-200 group-hover/subitem:text-blue-600 dark:group-hover/subitem:text-blue-400 transition-colors line-clamp-1">
+                                {sub.title}
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <div className="flex flex-col ml-3">
-                    <span className="text-xs font-extrabold text-slate-800 dark:text-slate-100 group-hover/item:text-blue-600 dark:group-hover/item:text-blue-400 transition-colors">
-                      Thí nghiệm mô phỏng
-                    </span>
-                    <span className="text-[9.5px] text-slate-400 dark:text-slate-500 font-medium">
-                      Phòng thực hành ảo 3D
-                    </span>
-                  </div>
-                </div>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-350 dark:text-slate-650 group-hover/item:translate-x-1 group-hover/item:text-blue-500 transition-all" />
-              </button>
-
-              <button
-                onClick={() => handleItemClick(() => navigate('/category/on-tap'))}
-                className="dropdown-item w-full text-left flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200 border-b border-slate-100 dark:border-slate-800/40 group/item cursor-pointer"
-              >
-                <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 group-hover/item:bg-emerald-500/10 transition-colors">
-                    <ClipboardCheck className="w-4.5 h-4.5" />
-                  </div>
-                  <div className="flex flex-col ml-3">
-                    <span className="text-xs font-extrabold text-slate-800 dark:text-slate-100 group-hover/item:text-emerald-600 dark:group-hover/item:text-emerald-400 transition-colors">
-                      Ôn tập & kiểm tra
-                    </span>
-                    <span className="text-[9.5px] text-slate-400 dark:text-slate-500 font-medium">
-                      Đề thi & Ngân hàng câu hỏi
-                    </span>
-                  </div>
-                </div>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-350 dark:text-slate-650 group-hover/item:translate-x-1 group-hover/item:text-emerald-500 transition-all" />
-              </button>
-
-              <button
-                onClick={() => handleItemClick(() => navigate('/category/tro-choi'))}
-                className="dropdown-item w-full text-left flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200 border-b border-slate-100 dark:border-slate-800/40 group/item cursor-pointer"
-              >
-                <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 group-hover/item:bg-rose-500/10 transition-colors">
-                    <Gamepad2 className="w-4.5 h-4.5" />
-                  </div>
-                  <div className="flex flex-col ml-3">
-                    <span className="text-xs font-extrabold text-slate-800 dark:text-slate-100 group-hover/item:text-rose-600 dark:group-hover/item:text-rose-400 transition-colors">
-                      Trò chơi học tập
-                    </span>
-                    <span className="text-[9.5px] text-slate-400 dark:text-slate-500 font-medium">
-                      Chơi để học vui vẻ
-                    </span>
-                  </div>
-                </div>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-350 dark:text-slate-650 group-hover/item:translate-x-1 group-hover/item:text-rose-500 transition-all" />
-              </button>
-
-              <button
-                onClick={() => handleItemClick(() => navigate('/category/e-learning'))}
-                className="dropdown-item w-full text-left flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200 border-b border-slate-100 dark:border-slate-800/40 group/item cursor-pointer"
-              >
-                <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 group-hover/item:bg-purple-500/10 transition-colors">
-                    <BookOpen className="w-4.5 h-4.5" />
-                  </div>
-                  <div className="flex flex-col ml-3">
-                    <span className="text-xs font-extrabold text-slate-800 dark:text-slate-100 group-hover/item:text-purple-600 dark:group-hover/item:text-purple-400 transition-colors">
-                      Bài giảng & Tài liệu
-                    </span>
-                    <span className="text-[9.5px] text-slate-400 dark:text-slate-500 font-medium">
-                      Sách & Tư liệu điện tử
-                    </span>
-                  </div>
-                </div>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-350 dark:text-slate-650 group-hover/item:translate-x-1 group-hover/item:text-purple-500 transition-all" />
-              </button>
-
-              <button
-                onClick={() => handleItemClick(() => navigate('/category/ai-tool'))}
-                className="dropdown-item w-full text-left flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200 group/item cursor-pointer"
-              >
-                <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 group-hover/item:bg-amber-500/10 transition-colors">
-                    <Sparkles className="w-4.5 h-4.5" />
-                  </div>
-                  <div className="flex flex-col ml-3">
-                    <span className="text-xs font-extrabold text-slate-800 dark:text-slate-100 group-hover/item:text-amber-600 dark:group-hover/item:text-amber-400 transition-colors">
-                      Trợ lý AI học tập
-                    </span>
-                    <span className="text-[9.5px] text-slate-400 dark:text-slate-500 font-medium">
-                      Công cụ thông minh
-                    </span>
-                  </div>
-                </div>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-350 dark:text-slate-650 group-hover/item:translate-x-1 group-hover/item:text-amber-500 transition-all" />
-              </button>
+                );
+              })}
 
               {onLeaderboardClick && (
                 <button
