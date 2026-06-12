@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate, useParams, useLocation } from 'react-router
 import { Maximize, Minimize } from 'lucide-react';
 
 import { useAuth } from './context/AuthContext';
+import { useTheme } from './context/ThemeContext';
 import { MultiplayerProvider } from './context/MultiplayerContext';
 import { CatLoader } from './components/CatLoader';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -72,6 +73,7 @@ function StarRaceWrapper() {
 
 export default function App() {
   const { currentUser } = useAuth();
+  const { theme } = useTheme();
   const location = useLocation();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -91,23 +93,23 @@ export default function App() {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-slate-950 font-sans text-slate-100 overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
+      <div className="min-h-screen bg-slate-200 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200 transition-colors duration-500">
         <Login />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative text-slate-100 font-sans overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200 items-center custom-scrollbar">
+    <div className="min-h-screen flex flex-col relative text-slate-900 dark:text-slate-100 font-sans overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200 items-center custom-scrollbar transition-colors duration-500">
       {/* Background Elements */}
       <div 
-        className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-slate-950 bg-cover bg-center bg-no-repeat"
+        className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-slate-200 dark:bg-slate-950 bg-cover bg-center bg-no-repeat transition-colors duration-500"
         style={{ backgroundImage: 'url(https://i.postimg.cc/rsLy3gxh/bg-science.png)' }}
       >
-        <div className="absolute inset-0 bg-slate-950/10 backdrop-blur-[1px]"></div>
-        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-cyan-400/40 blur-[120px] rounded-full animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-fuchsia-500/40 blur-[120px] rounded-full animate-pulse delay-700"></div>
-        <div className="absolute top-[20%] right-[10%] w-[40%] h-[40%] bg-blue-400/30 blur-[100px] rounded-full"></div>
+        <div className="absolute inset-0 bg-slate-200/90 dark:bg-slate-950/10 backdrop-blur-[2px] transition-colors duration-500"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-cyan-400/10 dark:bg-cyan-400/40 blur-[120px] rounded-full animate-pulse transition-colors duration-500"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-fuchsia-500/10 dark:bg-fuchsia-500/40 blur-[120px] rounded-full animate-pulse delay-700 transition-colors duration-500"></div>
+        <div className="absolute top-[20%] right-[10%] w-[40%] h-[40%] bg-blue-400/5 dark:bg-blue-400/30 blur-[100px] rounded-full transition-colors duration-500"></div>
       </div>
 
       {isFullscreenPage && (

@@ -17,6 +17,8 @@ interface Question {
   id: string;
   npcLabel: string;
   npcEmoji: string;
+  npcImage?: string;
+  npcScale?: number;
   question: string;
   options: string[];
   correctAnswer: number; // 0-3
@@ -31,15 +33,15 @@ interface LevelData {
   questions: Question[];
 }
 
-const LEVEL_TEMPLATES: Record<LevelTheme, { name: string; bgClass: string; bgImage?: string; npcs: { label: string; emoji: string; pos: {x: number, y: number} }[] }> = {
+const LEVEL_TEMPLATES: Record<LevelTheme, { name: string; bgClass: string; bgImage?: string; npcs: { label: string; emoji: string; image?: string; scale?: number; pos: {x: number, y: number} }[] }> = {
   jungle: {
     name: 'Rừng Rậm Nhiệt Đới',
     bgClass: 'from-emerald-900 via-green-900 to-teal-950',
     bgImage: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1200&q=80',
     npcs: [
-      { label: 'Khỉ', emoji: '🐒', pos: { x: 20, y: 30 } },
-      { label: 'Hổ', emoji: '🐅', pos: { x: 70, y: 60 } },
-      { label: 'Vẹt', emoji: '🦜', pos: { x: 80, y: 20 } },
+      { label: 'Khỉ', emoji: '🐒', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fcon_kh%E1%BB%89-removebg-preview.png?alt=media&token=ad21683d-4212-44cb-a379-93eb5d0595d8', scale: 3.8, pos: { x: 8, y: 60 } },
+      { label: 'Hổ', emoji: '🐅', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fcon_h%E1%BB%95-removebg-preview.png?alt=media&token=323cfed2-392f-432c-9461-8458c8f3e554', scale: 3.2, pos: { x: 70, y: 60 } },
+      { label: 'Vẹt', emoji: '🦜', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2FGemini_Generated_Image_ruqbeyruqbeyruqb-removebg-preview.png?alt=media&token=a6f5cca6-f1fa-4844-ac76-8148bec24ec9', scale: 1.5, pos: { x: 35, y: 25 } },
     ]
   },
   desert: {
@@ -47,9 +49,9 @@ const LEVEL_TEMPLATES: Record<LevelTheme, { name: string; bgClass: string; bgIma
     bgClass: 'from-orange-950 via-amber-900 to-yellow-950',
     bgImage: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1200&q=80',
     npcs: [
-      { label: 'Lạc đà', emoji: '🐪', pos: { x: 30, y: 50 } },
-      { label: 'Rắn', emoji: '🐍', pos: { x: 80, y: 70 } },
-      { label: 'Xương rồng', emoji: '🌵', pos: { x: 15, y: 75 } },
+      { label: 'Lạc đà', emoji: '🐪', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fl%E1%BA%A1c_%C4%91%C3%A0-removebg-preview.png?alt=media&token=869e14f2-c703-4389-b77e-36c3616f59c2', scale: 3.5, pos: { x: 50, y: 45 } },
+      { label: 'Rắn', emoji: '🐍', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fb%E1%BA%A1n_th%C3%A2nh-removebg-preview.png?alt=media&token=f13496be-aeeb-42cd-8c8d-be533e0e7e12', scale: 0.8, pos: { x: 85, y: 80 } },
+      { label: 'Xương rồng', emoji: '🌵', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fx%C6%B0%C6%A1ng_r%E1%BB%93ng-removebg-preview.png?alt=media&token=528ee9a6-3530-4f89-8cf6-170d2ee6c232', scale: 2.5, pos: { x: 15, y: 75 } },
     ]
   },
   mountain: {
@@ -57,9 +59,9 @@ const LEVEL_TEMPLATES: Record<LevelTheme, { name: string; bgClass: string; bgIma
     bgClass: 'from-slate-900 via-slate-800 to-zinc-900',
     bgImage: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80',
     npcs: [
-      { label: 'Đại bàng', emoji: '🦅', pos: { x: 50, y: 20 } },
-      { label: 'Gấu', emoji: '🐻', pos: { x: 25, y: 75 } },
-      { label: 'Cây thông', emoji: '🌲', pos: { x: 85, y: 55 } },
+      { label: 'Đại bàng', emoji: '🦅', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91%E1%BA%A1i_b%C3%A0ng-removebg-preview.png?alt=media&token=d4f5373a-86d9-4e81-b5e4-c676cbd4984b', pos: { x: 50, y: 20 } },
+      { label: 'Gấu', emoji: '🐻', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fg%E1%BA%A5u-removebg-preview.png?alt=media&token=84f3282e-5170-429f-bb28-b092d7efb927', pos: { x: 25, y: 75 } },
+      { label: 'Cây thông', emoji: '🌲', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fth%C3%B4ng-removebg-preview.png?alt=media&token=40656746-2682-447a-9a82-82831bd6bf28', scale: 8.0, pos: { x: 85, y: 55 } },
     ]
   },
   plains: {
@@ -67,19 +69,19 @@ const LEVEL_TEMPLATES: Record<LevelTheme, { name: string; bgClass: string; bgIma
     bgClass: 'from-green-700 via-lime-800 to-emerald-900',
     bgImage: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80',
     npcs: [
-      { label: 'Trâu', emoji: '🐃', pos: { x: 40, y: 60 } },
-      { label: 'Cò', emoji: '🕊️', pos: { x: 75, y: 30 } },
-      { label: 'Bông lúa', emoji: '🌾', pos: { x: 15, y: 80 } },
+      { label: 'Trâu', emoji: '🐃', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fcon_tr%C3%A2u-removebg-preview.png?alt=media&token=08d5debd-7c84-418b-9a1f-92ef1af54feb', pos: { x: 40, y: 60 } },
+      { label: 'Chim sẻ', emoji: '🐦', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fchim_s%E1%BA%BB-removebg-preview.png?alt=media&token=76998bd5-ba2a-49c6-9ed6-f6512f1d26b2', pos: { x: 75, y: 30 } },
+      { label: 'Bù nhìn', emoji: '🧍', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fb%C3%B9_nh%C3%ACn-removebg-preview.png?alt=media&token=e2caf06b-c505-4cb8-b91e-4c8e6eec5923', scale: 3.5, pos: { x: 15, y: 80 } },
     ]
   },
   ocean: {
     name: 'Đại Dương Bao La',
     bgClass: 'from-blue-950 via-cyan-900 to-sky-950',
-    bgImage: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=1200&q=80',
+    bgImage: 'https://images.unsplash.com/photo-1546026423-cc4642628d2b?w=1200&q=80',
     npcs: [
-      { label: 'Cá mập', emoji: '🦈', pos: { x: 20, y: 40 } },
-      { label: 'Rùa biển', emoji: '🐢', pos: { x: 70, y: 75 } },
-      { label: 'San hô', emoji: '🪸', pos: { x: 80, y: 50 } },
+      { label: 'Cá', emoji: '🐟', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fc%C3%A1-removebg-preview.png?alt=media&token=44289599-e476-4ba0-8a1b-ca63c2ce7d62', pos: { x: 20, y: 40 } },
+      { label: 'Cua', emoji: '🦀', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fcua%20%E1%BA%A9n%20s%C4%A9.png?alt=media&token=98e93333-bb69-4abe-98c9-2b2fbf489599', pos: { x: 70, y: 75 } },
+      { label: 'Tôm', emoji: '🦐', image: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Ft%C3%B4m-removebg-preview.png?alt=media&token=70b6db86-874f-4847-891f-4f39be1b55c7', scale: 3.5, pos: { x: 40, y: 85 } },
     ]
   }
 };
@@ -141,6 +143,8 @@ export function KhamPhaTheGioiGame({ initialQuestions, onBack }: KhamPhaTheGioiP
               id: rawQ.id || `${theme}-q${i}`,
               npcLabel: LEVEL_TEMPLATES[theme].npcs[i].label,
               npcEmoji: LEVEL_TEMPLATES[theme].npcs[i].emoji,
+              npcImage: LEVEL_TEMPLATES[theme].npcs[i].image,
+              npcScale: LEVEL_TEMPLATES[theme].npcs[i].scale,
               question: rawQ.text || rawQ.question,
               options: rawQ.options,
               correctAnswer: rawQ.answer !== undefined ? rawQ.answer : rawQ.correctAnswer
@@ -150,6 +154,8 @@ export function KhamPhaTheGioiGame({ initialQuestions, onBack }: KhamPhaTheGioiP
               id: `${theme}-q${i}`,
               npcLabel: LEVEL_TEMPLATES[theme].npcs[i].label,
               npcEmoji: LEVEL_TEMPLATES[theme].npcs[i].emoji,
+              npcImage: LEVEL_TEMPLATES[theme].npcs[i].image,
+              npcScale: LEVEL_TEMPLATES[theme].npcs[i].scale,
               question: `Đây là ${LEVEL_TEMPLATES[theme].npcs[i].label}. Hãy hỏi tôi một câu hỏi!`,
               options: ['Đáp án A', 'Đáp án B', 'Đáp án C', 'Đáp án D'],
               correctAnswer: 0
@@ -241,6 +247,8 @@ export function KhamPhaTheGioiGame({ initialQuestions, onBack }: KhamPhaTheGioiP
             id: `${theme}-q${i}`,
             npcLabel: LEVEL_TEMPLATES[theme].npcs[i].label,
             npcEmoji: LEVEL_TEMPLATES[theme].npcs[i].emoji,
+            npcImage: LEVEL_TEMPLATES[theme].npcs[i].image,
+            npcScale: LEVEL_TEMPLATES[theme].npcs[i].scale,
             question: `Đây là ${LEVEL_TEMPLATES[theme].npcs[i].label}. Hãy hỏi tôi một câu hỏi!`,
             options: ['Đáp án A', 'Đáp án B', 'Đáp án C', 'Đáp án D'],
             correctAnswer: 0
@@ -252,6 +260,8 @@ export function KhamPhaTheGioiGame({ initialQuestions, onBack }: KhamPhaTheGioiP
               id: `${theme}-q${i}`,
               npcLabel: LEVEL_TEMPLATES[theme].npcs[i].label,
               npcEmoji: LEVEL_TEMPLATES[theme].npcs[i].emoji,
+              npcImage: LEVEL_TEMPLATES[theme].npcs[i].image,
+              npcScale: LEVEL_TEMPLATES[theme].npcs[i].scale,
               ...parsed
             });
           } else {
@@ -671,7 +681,11 @@ Lưu ý: TRẢ VỀ DUY NHẤT MẢNG JSON, KHÔNG THÊM BẤT KỲ VĂN BẢN N
                   onClick={() => handleSelectNpc(q)}
                 >
                   <div className="text-5xl md:text-7xl lg:text-9xl filter drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] transition-transform group-active:scale-95 group-hover:rotate-6">
-                    {q.npcEmoji}
+                    {q.npcImage ? (
+                      <img src={q.npcImage} alt={q.npcLabel} className="w-24 h-24 md:w-32 md:h-32 lg:w-48 lg:h-48 object-contain" style={q.npcScale ? { transform: `scale(${q.npcScale})`, transformOrigin: 'center' } : undefined} />
+                    ) : (
+                      q.npcEmoji
+                    )}
                   </div>
                   <div className="mt-4 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl">
                     Chạm tôi để giải đố!
@@ -702,7 +716,11 @@ Lưu ý: TRẢ VỀ DUY NHẤT MẢNG JSON, KHÔNG THÊM BẤT KỲ VĂN BẢN N
 
                 <div className="flex gap-4 md:gap-6 items-center mb-6 md:mb-8 shrink-0">
                   <div className="w-16 h-16 md:w-20 md:h-20 bg-white/10 rounded-full flex items-center justify-center text-3xl md:text-4xl border border-white/20 shadow-inner">
-                    {selectedQuestion.npcEmoji}
+                    {selectedQuestion.npcImage ? (
+                      <img src={selectedQuestion.npcImage} alt={selectedQuestion.npcLabel} className="w-12 h-12 md:w-16 md:h-16 object-contain drop-shadow-md" />
+                    ) : (
+                      selectedQuestion.npcEmoji
+                    )}
                   </div>
                   <div className="flex-1">
                      <h3 className="text-base md:text-lg text-emerald-400 font-bold uppercase tracking-widest">{selectedQuestion.npcLabel} hỏi:</h3>

@@ -100,7 +100,7 @@ export default function HomePage() {
                       <img 
                         src={cat.logoUrl} 
                         alt={cat.title} 
-                        className="w-full h-full object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.2)] transition-transform duration-300"
+                        className={`w-full h-full object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.2)] transition-transform duration-300 ${cat.id === 'thi-nghiem' ? 'scale-[0.85]' : ''}`}
                       />
                     </div>
                   ) : (
@@ -248,11 +248,11 @@ export default function HomePage() {
                         )}
                         {imgSrc ? (
                           <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-[1.25rem] flex items-center justify-center overflow-hidden transition-all duration-300 shrink-0 shadow-lg border-2 ${isTop ? 'bg-linear-to-br from-orange-500/30 to-red-600/30 border-orange-400/60 group-hover:border-orange-400 group-hover:shadow-[0_0_20px_rgba(249,115,22,0.6)] group-hover:scale-110' : 'bg-white/20 border-white/40 group-hover:border-white/70 group-hover:bg-white/30 backdrop-blur-md group-hover:scale-110'}`}>
-                            <img src={imgSrc} alt={displayTitle} className="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow-lg" />
+                            <img src={imgSrc} alt={displayTitle} className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-lg" />
                           </div>
                         ) : (
                           <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[1.25rem] bg-linear-to-br from-orange-500/80 to-red-600/80 flex items-center justify-center shrink-0 border-2 border-white/30 group-hover:border-white/60 transition-all duration-300 shadow-xl group-hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] group-hover:scale-110">
-                            <Flame className="w-6 h-6 sm:w-7 sm:h-7 text-white drop-shadow-md" />
+                            <Flame className="w-8 h-8 sm:w-9 sm:h-9 text-white drop-shadow-md" />
                           </div>
                         )}
                         <div className="absolute -bottom-2 right-0 bg-white border border-orange-500 flex items-center gap-1 px-1.5 py-0.5 rounded-full shadow-md group-hover:border-orange-600 transition-colors z-10">

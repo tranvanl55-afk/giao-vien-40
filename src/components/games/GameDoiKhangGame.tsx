@@ -68,14 +68,14 @@ export function GameDoiKhangGame({ questions, onBack }: { questions: Question[];
   };
 
   if (questions.length === 0) return (
-    <div className="h-screen bg-slate-950 flex items-center justify-center text-white text-center p-8">
+    <div className="absolute inset-0 z-50 bg-slate-950 flex items-center justify-center text-white text-center p-8">
       <div><p className="text-5xl mb-4">📭</p><p className="text-xl font-bold mb-4">Chưa có câu hỏi!</p>
         <button onClick={onBack} className="px-6 py-3 bg-purple-600 rounded-xl font-bold">Quay lại</button></div>
     </div>
   );
 
   if (winner !== null) return (
-    <div className={`h-screen flex flex-col items-center justify-center text-white gap-6 bg-linear-to-br ${TEAMS[winner].bg}`}>
+    <div className={`absolute inset-0 z-50 flex flex-col items-center justify-center text-white gap-6 bg-linear-to-br ${TEAMS[winner].bg}`}>
       <div className="text-8xl">🏆</div>
       <motion.h2 initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.5 }}
         className="text-5xl font-black text-yellow-300">{TEAMS[winner].emoji} {TEAMS[winner].name} Thắng!</motion.h2>
@@ -91,7 +91,7 @@ export function GameDoiKhangGame({ questions, onBack }: { questions: Question[];
   );
 
   return (
-    <div className="h-screen bg-slate-950 text-white flex flex-col overflow-hidden">
+    <div className="absolute inset-0 z-50 bg-slate-950 text-white flex flex-col overflow-hidden">
       {/* Header */}
       <div className="shrink-0 bg-slate-900 border-b border-white/10 px-4 py-3">
         <div className="flex items-center justify-between mb-2">
