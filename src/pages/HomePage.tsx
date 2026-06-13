@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Flame, TrendingUp, Search, ChevronRight } from 'lucide-react';
 import { categories, Category, SubCategory } from '../data';
 import { useHotTools } from '../hooks/useHotTools';
+import { resolveSimulationId } from '../config/constants';
 
 export const getFallbackToolIcon = (subId: string, subTitle: string, contentUrl?: string): string => {
   const id = subId.toLowerCase();
@@ -71,9 +72,12 @@ export default function HomePage() {
     recordToolUsage(sub, cat.id);
     if (sub.contentUrl) { window.open(sub.contentUrl, '_blank'); return; }
     
-    // Simplistic routing logic based on if it's a lesson or subcategory
-    // Because we use standard React Router, we just navigate.
-    navigate(`/subcategory/${cat.id}/${sub.id}`);
+    const targetSimId = resolveSimulationId(sub.id);
+    if (targetSimId) {
+      navigate(`/lesson/${targetSimId}`);
+    } else {
+      navigate(`/subcategory/${cat.id}/${sub.id}`);
+    }
   };
 
   return (
@@ -221,7 +225,10 @@ export default function HomePage() {
           ) : (
             <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
               <div className="flex gap-4 pt-4 px-2 pb-4 min-w-max lg:min-w-0 lg:flex-wrap">
-                {[...hotTools].sort((a, b) => b.count - a.count || b.lastUsed - a.lastUsed).slice(0, 8).map((tool, idx) => {
+                {[...hotTools].filter(tool => {
+                  const cat = categories.find(c => c.id === tool.catId);
+                  return cat?.subCategories.some(s => s.id === tool.subId);
+                }).sort((a, b) => b.count - a.count || b.lastUsed - a.lastUsed).slice(0, 8).map((tool, idx) => {
                   const isTop = idx === 0;
                   const cat = categories.find(c => c.id === tool.catId);
                   const sub = cat?.subCategories.find(s => s.id === tool.subId);

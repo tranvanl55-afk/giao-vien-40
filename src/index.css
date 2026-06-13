@@ -109,6 +109,12 @@ body {
   }
 }
 
+@utility animate-spin-y {
+  animation: coin-spin3d 15s linear infinite;
+  transform-style: preserve-3d;
+}
+
+
 /* 3D Animated Science Coin */
 @keyframes coin-float {
   0%, 100% { transform: translateY(0px); }

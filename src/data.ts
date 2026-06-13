@@ -541,15 +541,6 @@ export const categories: Category[] = [
         description: "Tích hợp Năng lực số & Năng lực AI tự động vào giáo án Word 📝",
         colorClass: "hover:bg-blue-500/20 hover:border-blue-500/50",
         logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fgi%C3%A1o_%C3%A1n-removebg-preview.png?alt=media&token=64d8584c-6e57-43ae-a27e-d47662baa0d5",
-        lessons: [
-          {
-            id: "giao-an-ai",
-            title: "Trợ lý Nâng cấp Giáo án",
-            description: "Hệ thống tự động đọc file Word (.docx), phân tích bài học bằng AI và chèn thêm 2 mục năng lực số và AI vào đúng chuẩn mà không làm hỏng định dạng.",
-            icon: Robot,
-            theme: "blue"
-          }
-        ]
       }
     ]
   },
@@ -751,9 +742,8 @@ export const categories: Category[] = [
     logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fskkn-removebg-preview.png?alt=media&token=2f5c09cb-fdf9-4ab5-a7a3-cda6c4dfc9c1",
     colorClass: "from-yellow-400 via-orange-400 to-red-500",
     subCategories: [
-      { id: "skkn-2023", title: "SKKN Cấp trường", description: "Phương pháp dạy học theo định hướng dự án", logoUrl: "https://img.icons8.com/fluency/96/light-on.png" },
-      { id: "skkn-2024", title: "SKKN Cấp Quận", description: "Ứng dụng AI và sơ đồ tư duy trong soạn giảng", logoUrl: "https://img.icons8.com/fluency/96/innovation.png" },
-      { id: "skkn-upload", title: "Kho lưu trữ cá nhân", description: "Tải lên, quản lý và lưu trữ tài liệu PDF sáng kiến kinh nghiệm cá nhân", logoUrl: "https://img.icons8.com/fluency/96/upload-to-cloud.png" }
+      { id: "skkn-generator", title: "Viết Sáng kiến kinh nghiệm", description: "Hệ thống tự động tạo và xuất báo cáo sáng kiến kinh nghiệm chuẩn", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fvi%E1%BA%BFt_skkn-removebg-preview.png?alt=media&token=ea98a5f7-d72f-45ce-8717-43ee0822725e" },
+      { id: "skkn-upload", title: "Kho lưu trữ cá nhân", description: "Tải lên, quản lý và lưu trữ tài liệu PDF sáng kiến kinh nghiệm cá nhân", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fkho_skkn-removebg-preview.png?alt=media&token=e9a19bb0-c462-440b-a914-af03b1057c96" }
     ]
   },
   {
@@ -764,12 +754,12 @@ export const categories: Category[] = [
     logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fnckh-removebg-preview.png?alt=media&token=94da70e4-aed2-49bd-b27b-198faa6f380b",
     colorClass: "from-indigo-400 via-blue-500 to-cyan-600",
     subCategories: [
-      { id: "nc-sp", title: "Nghiên cứu Sư phạm", description: "Khảo sát tâm lý & Động lực học tập học sinh", logoUrl: "https://img.icons8.com/fluency/96/search.png" },
+      { id: "nc-sp", title: "Nghiên cứu Sư phạm", description: "Khảo sát tâm lý & Động lực học tập học sinh", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fnghi%C3%AAn%20c%E1%BB%A9u%20s%C6%B0%20ph%E1%BA%A1m.png?alt=media&token=61429322-cf71-4be4-bb04-789212c55169" },
       { 
         id: "nc-ung-dung", 
         title: "KHKT Học sinh", 
         description: "Các dự án Khoa học Kỹ thuật khối THCS",
-        logoUrl: "https://img.icons8.com/fluency/96/experiment.png",
+        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fkhoa_h%E1%BB%8Dc_kt-removebg-preview.png?alt=media&token=182e688f-b155-4427-ac8c-dc131f707ab8",
         embedDocs: [
           { title: "Tài liệu 1", url: "https://docs.google.com/document/d/1t4shgATizzrGUhFHak0jm9_OacCH0tdx/preview" },
           { title: "Tài liệu 2", url: "https://docs.google.com/document/d/14zxj2a6XjIQJMIB9BwCOsHM03rdaNb48/preview" },
@@ -780,7 +770,7 @@ export const categories: Category[] = [
         id: "nc-machine-learning", 
         title: "Machine Learning", 
         description: "Tìm hiểu cơ bản về Học máy và các ứng dụng trong nghiên cứu khoa học.", 
-        logoUrl: "https://img.icons8.com/fluency/96/machine-learning.png",
+        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fh%E1%BB%8Dc_m%C3%A1y-removebg-preview.png?alt=media&token=cbcd3ab9-c56b-48e5-87a0-b12c745b79d0",
         lessons: [
           {
             id: "ml-regression",
@@ -809,7 +799,7 @@ export const categories: Category[] = [
         id: "nc-deep-learning", 
         title: "Deep Learning", 
         description: "Khám phá mạng nơ-ron nhân tạo và ứng dụng của Học sâu trong thực tế.", 
-        logoUrl: "https://img.icons8.com/fluency/96/artificial-intelligence.png",
+        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fh%E1%BB%8Dc_s%C3%A2u-removebg-preview.png?alt=media&token=05d43beb-c228-4fff-b79a-b4e433912da5",
         lessons: [
           {
             id: "dl-ann",
@@ -844,8 +834,8 @@ export const categories: Category[] = [
     logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fsteam-removebg-preview.png?alt=media&token=29aa2902-f6ca-4944-ad9c-a00e286e3614",
     colorClass: "from-teal-400 via-emerald-500 to-lime-600",
     subCategories: [
-      { id: "steam-eco", title: "Dự án Tái chế", description: "Mô hình thùng rác thông minh phân loại tự động", logoUrl: "https://img.icons8.com/fluency/96/recycle-sign.png" },
-      { id: "steam-robot", title: "Chế tạo vật lý", description: "Chế tạo xe chạy bằng phản lực đồ chơi", logoUrl: "https://img.icons8.com/fluency/96/robot-2.png" },
+      { id: "steam-giao-an", title: "Xây dựng giáo án dạy học STEAM", description: "Công cụ hỗ trợ xây dựng giáo án và kế hoạch bài dạy chuẩn STEAM", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fsteam1-removebg-preview.png?alt=media&token=82e5e866-c586-40b8-8f1a-6f78baa505d8" },
+      { id: "steam-du-an", title: "Dự án dạy học STEAM", description: "Thư viện các dự án thực tế và ý tưởng thiết kế mô hình STEAM", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fsteam2-removebg-preview.png?alt=media&token=6f510d44-22ad-4e5c-865e-4eea3b47f0aa" },
     ]
   },
   {
@@ -860,7 +850,7 @@ export const categories: Category[] = [
         id: "day-hoc-tich-cuc-gallery",
         title: "Triển lãm sản phẩm 3D",
         description: "Không gian 3D Panorama trưng bày các sản phẩm học tập và dự án thực tế của học sinh.",
-        logoUrl: "https://img.icons8.com/fluency/96/museum.png",
+        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fb%E1%BA%A3o%20t%C3%A0ng%20rmg.png?alt=media&token=2fc0bff7-7c8a-43d5-8cae-999ae8f9a6b9",
         lessons: [
           {
             id: "phong-tranh-panorama",

@@ -6,6 +6,8 @@ import { useViewMode } from '../hooks/useViewMode';
 
 const SKKNManager = lazy(() => import('../components/simulations/SKKNManager'));
 const ND30Formatter = lazy(() => import('../components/simulations/ND30Formatter').then(m => ({ default: m.ND30Formatter })));
+const SKKNGenerator = lazy(() => import('../components/simulations/SKKNGenerator'));
+const GiaoAnAI = lazy(() => import('../components/simulations/GiaoAnAI').then(m => ({ default: m.GiaoAnAI })));
 
 export default function SubcategoryPage() {
   const { catId, subId } = useParams<{ catId: string; subId: string }>();
@@ -54,17 +56,19 @@ export default function SubcategoryPage() {
       <div className={`flex-1 flex flex-col transition-all duration-500 ${
         selectedSub.lessons && viewMode === 'gamified'
           ? 'bg-transparent border-0 shadow-none p-0'
-          : 'bg-slate-900/60 backdrop-blur-3xl border border-slate-700/60 rounded-3xl p-6 lg:p-8 shadow-2xl'
+          : ['skkn-generator', 'skkn-nd30', 'skkn-upload', 'giao-an-ai-tool'].includes(selectedSub.id)
+            ? 'bg-[#FAF9F6] border border-slate-200 rounded-3xl p-6 lg:p-8 shadow-xl'
+            : 'bg-slate-900/60 backdrop-blur-3xl border border-slate-700/60 rounded-3xl p-6 lg:p-8 shadow-2xl'
       }`}>
         {viewMode === 'modern' || !selectedSub.lessons ? (
-          <div className="mb-6 border-b border-slate-700/60 pb-6 flex items-start justify-between">
+          <div className={`mb-6 border-b ${['skkn-generator', 'skkn-nd30', 'skkn-upload', 'giao-an-ai-tool'].includes(selectedSub.id) ? 'border-slate-200' : 'border-slate-700/60'} pb-6 flex items-start justify-between`}>
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 font-heading drop-shadow-sm">{selectedSub.title}</h2>
-              <p className="text-slate-400 font-medium">{selectedSub.description}</p>
+              <h2 className={`text-2xl md:text-3xl font-bold mb-3 font-heading drop-shadow-sm ${['skkn-generator', 'skkn-nd30', 'skkn-upload', 'giao-an-ai-tool'].includes(selectedSub.id) ? 'text-slate-800' : 'text-white'}`}>{selectedSub.title}</h2>
+              <p className={`font-medium ${['skkn-generator', 'skkn-nd30', 'skkn-upload', 'giao-an-ai-tool'].includes(selectedSub.id) ? 'text-slate-500' : 'text-slate-400'}`}>{selectedSub.description}</p>
             </div>
             {selectedCategory.logoUrl ? (
               <div className="hidden sm:flex items-center justify-center">
-                  <img src={selectedCategory.logoUrl} className="w-16 h-16 object-contain drop-shadow-sm opacity-90" alt="" />
+                  <img src={selectedCategory.logoUrl} className="w-16 h-16 object-contain drop-shadow-sm opacity-90 animate-spin-y" alt="" />
               </div>
             ) : (
               <div className={`hidden sm:flex p-4 rounded-2xl bg-linear-to-br ${selectedCategory.colorClass} shadow-lg opacity-90`}>
@@ -79,19 +83,25 @@ export default function SubcategoryPage() {
             ? 'bg-slate-50/95 p-4 md:p-8 overflow-y-auto custom-scrollbar' 
             : selectedSub.lessons && viewMode === 'gamified'
               ? 'bg-transparent p-0 overflow-y-auto custom-scrollbar' 
-              : selectedCategory.id === 'skkn' || ['test-gk', 'test-ck', 'bg-khtn', 'docs-sgk'].includes(selectedSub.id)
-                ? 'bg-black/60 border border-slate-800/80 min-h-[500px] p-4 md:p-8 overflow-y-auto custom-scrollbar' 
-                : 'bg-black/60 border border-slate-800 items-center justify-center text-center min-h-[500px] overflow-hidden group shadow-inner p-4 md:p-8'
+              : ['skkn-generator', 'skkn-nd30', 'skkn-upload', 'giao-an-ai-tool'].includes(selectedSub.id)
+                ? 'bg-transparent border-0 min-h-[500px] p-0 overflow-y-auto custom-scrollbar'
+                : ['test-gk', 'test-ck', 'bg-khtn', 'docs-sgk'].includes(selectedSub.id)
+                  ? 'bg-black/60 border border-slate-800/80 min-h-[500px] p-4 md:p-8 overflow-y-auto custom-scrollbar' 
+                  : 'bg-black/60 border border-slate-800 items-center justify-center text-center min-h-[500px] overflow-hidden group shadow-inner p-4 md:p-8'
         }`}>
-            {!selectedSub.lessons && (
+            {!selectedSub.lessons && !['skkn-generator', 'skkn-nd30', 'skkn-upload', 'giao-an-ai-tool'].includes(selectedSub.id) && (
               <>
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-cyan-900/20 via-transparent to-transparent opacity-50 pointer-events-none"></div>
               </>
             )}
             
-            {selectedCategory.id === 'skkn' && selectedSub.id === 'skkn-nd30' ? (
+            {selectedSub.id === 'skkn-generator' ? (
+              <SKKNGenerator />
+            ) : selectedSub.id === 'skkn-nd30' ? (
               <ND30Formatter />
+            ) : selectedSub.id === 'giao-an-ai-tool' ? (
+              <GiaoAnAI />
             ) : selectedCategory.id === 'skkn' || ['test-gk', 'test-ck', 'bg-khtn', 'docs-sgk'].includes(selectedSub.id) ? (
               <SKKNManager subCategoryId={selectedSub.id} categoryTitle={selectedSub.title} />
             ) : selectedSub.lessons && selectedSub.lessons.length > 0 ? (
@@ -127,7 +137,7 @@ export default function SubcategoryPage() {
                                     <img 
                                       src={lesson.logoUrl} 
                                       alt={lesson.title} 
-                                      className="w-16 h-16 md:w-20 md:h-20 scale-125 object-contain drop-shadow-md relative z-10" 
+                                      className="w-16 h-16 md:w-20 md:h-20 scale-125 object-contain drop-shadow-md relative z-10 animate-spin-y" 
                                     />
                                   </>
                                 ) : (
@@ -249,7 +259,7 @@ export default function SubcategoryPage() {
                                   <img 
                                     src={lesson.logoUrl} 
                                     alt={lesson.title} 
-                                    className="w-24 h-24 scale-125 object-contain drop-shadow-md relative z-10" 
+                                    className="w-24 h-24 scale-125 object-contain drop-shadow-md relative z-10 animate-spin-y" 
                                   />
                                 </>
                               ) : (

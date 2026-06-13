@@ -218,9 +218,9 @@ const ND30_RULES = [
   {
     section: '1. Khổ giấy & Định lề',
     icon: '📄',
-    color: 'text-blue-400',
-    border: 'border-blue-500/30',
-    bg: 'bg-blue-500/10',
+    color: 'text-blue-700',
+    border: 'border-blue-200',
+    bg: 'bg-blue-50',
     rules: [
       'Khổ giấy: A4 (210mm × 297mm)',
       'Lề trên: 20–25mm | Lề dưới: 20–25mm',
@@ -231,9 +231,9 @@ const ND30_RULES = [
   {
     section: '2. Phông chữ & Cỡ chữ',
     icon: '🔤',
-    color: 'text-purple-400',
-    border: 'border-purple-500/30',
-    bg: 'bg-purple-500/10',
+    color: 'text-purple-700',
+    border: 'border-purple-200',
+    bg: 'bg-purple-50',
     rules: [
       'Phông chữ: Times New Roman, Unicode TCVN 6909:2001',
       'Màu chữ: đen (RGB 0,0,0)',
@@ -245,9 +245,9 @@ const ND30_RULES = [
   {
     section: '3. Số & Ký hiệu văn bản',
     icon: '🔢',
-    color: 'text-cyan-400',
-    border: 'border-cyan-500/30',
-    bg: 'bg-cyan-500/10',
+    color: 'text-cyan-700',
+    border: 'border-cyan-200',
+    bg: 'bg-cyan-50',
     rules: [
       'Số văn bản: chữ số Ả Rập, cỡ 13pt, kiểu chữ đứng',
       'Số < 10 phải thêm số 0 phía trước (VD: 01, 02…)',
@@ -259,9 +259,9 @@ const ND30_RULES = [
   {
     section: '4. Tên loại & Trích yếu nội dung',
     icon: '📋',
-    color: 'text-amber-400',
-    border: 'border-amber-500/30',
-    bg: 'bg-amber-500/10',
+    color: 'text-amber-700',
+    border: 'border-amber-200',
+    bg: 'bg-amber-50',
     rules: [
       'Tên thể loại văn bản: chữ IN HOA, 13–14pt, đứng, in đậm, canh giữa',
       'Trích yếu nội dung: chữ thường, 13–14pt, đứng, in đậm, canh giữa',
@@ -272,9 +272,9 @@ const ND30_RULES = [
   {
     section: '5. Căn cứ ban hành',
     icon: '⚖️',
-    color: 'text-emerald-400',
-    border: 'border-emerald-500/30',
-    bg: 'bg-emerald-500/10',
+    color: 'text-emerald-700',
+    border: 'border-emerald-200',
+    bg: 'bg-emerald-50',
     rules: [
       'Chữ in thường, kiểu chữ nghiêng (italic), 13–14pt',
       'Ghi rõ: tên loại văn bản, trích yếu, số/ký hiệu, cơ quan ban hành, ngày tháng năm',
@@ -286,9 +286,9 @@ const ND30_RULES = [
   {
     section: '6. Bố cục phần, chương, mục, điều',
     icon: '🗂️',
-    color: 'text-rose-400',
-    border: 'border-rose-500/30',
-    bg: 'bg-rose-500/10',
+    color: 'text-rose-700',
+    border: 'border-rose-200',
+    bg: 'bg-rose-50',
     rules: [
       'Phần/Chương: số La Mã, canh giữa, in thường, đứng, đậm, 13–14pt',
       'Tiêu đề Phần/Chương: IN HOA ngay phía dưới, canh giữa, đứng, đậm',
@@ -300,9 +300,9 @@ const ND30_RULES = [
   {
     section: '7. Chữ ký & Chức vụ',
     icon: '✍️',
-    color: 'text-orange-400',
-    border: 'border-orange-500/30',
-    bg: 'bg-orange-500/10',
+    color: 'text-orange-700',
+    border: 'border-orange-200',
+    bg: 'bg-orange-50',
     rules: [
       'Họ tên: không ghi học hàm, học vị, danh hiệu danh dự',
       'Đơn vị vũ trang, giáo dục, y tế: có thể ghi quân hàm, học vị trước họ tên',
@@ -313,9 +313,9 @@ const ND30_RULES = [
   {
     section: '8. Nơi nhận',
     icon: '📮',
-    color: 'text-indigo-400',
-    border: 'border-indigo-500/30',
-    bg: 'bg-indigo-500/10',
+    color: 'text-indigo-700',
+    border: 'border-indigo-200',
+    bg: 'bg-indigo-50',
     rules: [
       'Tờ trình/Báo cáo/Công văn: Phần 1 – "Kính gửi" (cơ quan trực tiếp giải quyết)',
       'Phần 2 – "Nơi nhận": bắt đầu bằng "Như trên", tiếp theo là các nơi liên quan',
@@ -481,7 +481,7 @@ async function generateFormattedDocx(sections: ParsedSection[], meta: DocumentMe
 function AccordionItem({ rule, defaultOpen = false }: { rule: typeof ND30_RULES[0]; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={`rounded-2xl border ${rule.border} overflow-hidden`}>
+    <div className={`rounded-2xl border ${rule.border} overflow-hidden bg-white`}>
       <button onClick={() => setOpen(o => !o)}
         className={`w-full flex items-center justify-between px-5 py-4 ${rule.bg} transition-all cursor-pointer`}>
         <div className="flex items-center gap-3">
@@ -491,11 +491,11 @@ function AccordionItem({ rule, defaultOpen = false }: { rule: typeof ND30_RULES[
         {open ? <ChevronUp className={`w-4 h-4 ${rule.color}`} /> : <ChevronDown className={`w-4 h-4 ${rule.color}`} />}
       </button>
       {open && (
-        <div className="px-5 py-4 bg-slate-950/40 border-t border-white/5 space-y-2.5">
+        <div className="px-5 py-4 bg-white border-t border-slate-100 space-y-2.5">
           {rule.rules.map((r, i) => (
             <div key={i} className="flex items-start gap-2.5">
               <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${rule.color.replace('text-', 'bg-')}`} />
-              <p className="text-[12px] text-slate-300 leading-relaxed">{r}</p>
+              <p className="text-[12px] text-slate-600 leading-relaxed">{r}</p>
             </div>
           ))}
         </div>
@@ -595,107 +595,104 @@ export function ND30Formatter() {
   const meta = (field: keyof DocumentMetadata) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setMetadata(m => ({ ...m, [field]: e.target.value }));
 
-  const ic = 'w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/20 text-xs text-slate-100 placeholder-slate-600 outline-none transition-all';
-  const lc = 'block text-[10px] font-black uppercase text-slate-500 tracking-wider mb-1';
+  const ic = 'w-full px-4 py-2 rounded-xl bg-white border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-sm text-slate-800 placeholder-slate-400 outline-none transition-all';
+  const lc = 'block text-xs font-semibold text-slate-700 mb-1.5';
 
   return (
-    <div className="w-full flex flex-col space-y-5 text-slate-100 animate-in fade-in duration-300">
-
+    <div className="w-full flex flex-col space-y-6 text-slate-800 animate-in fade-in duration-300 max-w-6xl mx-auto p-4">
       {/* Banner */}
-      <div className="relative overflow-hidden bg-linear-to-br from-red-500/10 via-orange-500/5 to-yellow-500/5 border border-red-500/20 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-5 shadow-md">
-        <div className="p-4 bg-red-500/15 border border-red-500/30 rounded-2xl shrink-0">
-          <FileCheck className="w-8 h-8 text-red-400" />
+      <div className="relative overflow-hidden bg-linear-to-br from-red-50 to-orange-50 border border-red-100 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+        <div className="p-4 bg-white border border-red-100 rounded-2xl shadow-sm shrink-0">
+          <FileCheck className="w-10 h-10 text-red-500" />
         </div>
-        <div className="space-y-1.5 text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
-            <span className="px-3 py-0.5 rounded-full bg-red-500/20 border border-red-500/30 text-[10px] font-black uppercase tracking-wider text-red-400">Nghị định 30/2020/NĐ-CP</span>
-            <span className="px-3 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider text-amber-400">Công tác văn thư</span>
+        <div className="space-y-2 text-center md:text-left flex-1">
+          <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap mb-2">
+            <span className="px-3 py-1 rounded-full bg-red-100 text-xs font-bold text-red-600">Nghị định 30/2020/NĐ-CP</span>
+            <span className="px-3 py-1 rounded-full bg-amber-100 text-xs font-bold text-amber-600">Công tác văn thư</span>
           </div>
-          <h2 className="text-xl font-black text-white">Công cụ Định Dạng Văn Bản Chuẩn ND30</h2>
-          <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
-            Tải lên tệp Word <strong className="text-white">(.docx)</strong>, nhập thông tin thể thức, hệ thống sẽ tự động
-            định dạng đúng chuẩn <strong className="text-amber-400">Nghị định 30/2020/NĐ-CP</strong>:
-            phông Times New Roman, định lề chuẩn, số văn bản, ký hiệu, tiêu đề và xuất file Word.
+          <h2 className="text-2xl font-black text-slate-900">Công cụ Định Dạng Văn Bản Chuẩn ND30</h2>
+          <p className="text-sm text-slate-600 leading-relaxed max-w-3xl">
+            Tải lên tệp Word <strong className="text-slate-800">(.docx)</strong>, nhập thông tin thể thức, hệ thống sẽ tự động định dạng đúng chuẩn <strong className="text-red-600">Nghị định 30/2020/NĐ-CP</strong>: phông Times New Roman, định lề chuẩn, số văn bản, ký hiệu, tiêu đề và xuất file Word.
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 bg-slate-900/60 border border-white/10 rounded-2xl p-1.5">
+      <div className="flex gap-2 bg-slate-100/80 border border-slate-200 rounded-2xl p-1.5 w-full md:w-auto mx-auto md:mx-0">
         <button onClick={() => setActiveTab('formatter')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${activeTab === 'formatter' ? 'bg-linear-to-r from-red-600 to-orange-500 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}>
+          className={`flex-1 md:w-64 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer ${activeTab === 'formatter' ? 'bg-white text-blue-600 shadow-md border-b-2 border-blue-500' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>
           <Sparkles className="w-4 h-4" /> Định dạng văn bản ND30
         </button>
         <button onClick={() => setActiveTab('guidelines')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${activeTab === 'guidelines' ? 'bg-linear-to-r from-blue-600 to-cyan-500 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}>
+          className={`flex-1 md:w-64 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer ${activeTab === 'guidelines' ? 'bg-white text-blue-600 shadow-md border-b-2 border-blue-500' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>
           <BookOpen className="w-4 h-4" /> Hướng dẫn soạn thảo ND30
         </button>
       </div>
 
       {/* ═══ FORMATTER ═══ */}
       {activeTab === 'formatter' && (
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Left: Upload + Metadata */}
-          <div className="lg:col-span-2 space-y-4">
-
+          <div className="lg:col-span-2 space-y-6">
             {/* Upload */}
-            <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-4">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
-                <Upload className="w-4 h-4 text-yellow-400" />
-                <h3 className="text-xs font-black uppercase text-white tracking-wider">Tải lên tệp Word (.docx)</h3>
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-5">
+              <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
+                <Upload className="w-5 h-5 text-blue-500" />
+                <h3 className="text-sm font-bold uppercase text-slate-800 tracking-wider">Tải lên tệp Word (.docx)</h3>
               </div>
 
               {error && (
-                <div className="p-3 bg-red-950/40 border border-red-900/50 rounded-2xl flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
-                  <p className="text-[11px] text-red-300 leading-relaxed">{error}</p>
+                <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 shrink-0 text-red-500 mt-0.5" />
+                  <p className="text-sm text-red-700 leading-relaxed">{error}</p>
                 </div>
               )}
 
               <div onDrop={handleDrop} onDragOver={e => e.preventDefault()} onClick={() => fileInputRef.current?.click()}
-                className={`relative border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all group ${uploadedFile ? 'border-emerald-500/50 bg-emerald-950/20' : 'border-slate-700 hover:border-yellow-500/50 bg-slate-950/40 hover:bg-slate-950/80'}`}>
+                className={`relative border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all group ${uploadedFile ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-300 hover:border-blue-400 bg-slate-50 hover:bg-blue-50/30'}`}>
                 <input ref={fileInputRef} type="file" accept=".docx" onChange={e => e.target.files?.[0] && handleFileSelect(e.target.files[0])} className="hidden" />
                 {uploadedFile ? (
-                  <div className="flex items-center justify-center gap-3">
-                    <CheckCircle2 className="w-7 h-7 text-emerald-400" />
-                    <div className="text-left">
-                      <p className="text-xs font-bold text-emerald-300 truncate max-w-48">{uploadedFile.name}</p>
-                      <p className="text-[10px] text-slate-500">{(uploadedFile.size / 1024).toFixed(0)} KB · DOCX</p>
+                  <div className="flex items-center justify-center gap-4">
+                    <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+                    <div className="text-left flex-1 min-w-0">
+                      <p className="text-sm font-bold text-emerald-700 truncate">{uploadedFile.name}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{(uploadedFile.size / 1024).toFixed(0)} KB · DOCX</p>
                     </div>
                     <button onClick={e => { e.stopPropagation(); setUploadedFile(null); setParsedSections([]); setDownloadReady(false); setOutputBlob(null); setPreviewHtml(''); setError(''); }}
-                      className="p-1 rounded-full hover:bg-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer">
-                      <X className="w-4 h-4" />
+                      className="p-2 rounded-full hover:bg-emerald-100 text-slate-500 hover:text-emerald-700 transition-all cursor-pointer">
+                      <X className="w-5 h-5" />
                     </button>
                   </div>
                 ) : (
                   <>
-                    <Upload className="w-8 h-8 text-slate-500 group-hover:text-yellow-400 mx-auto mb-2 transition-colors" />
-                    <p className="text-xs font-bold text-slate-400 group-hover:text-slate-200">Kéo thả hoặc nhấp để chọn</p>
-                    <p className="text-[10px] text-slate-600 mt-1">Chỉ hỗ trợ <strong>.docx</strong> · Tối đa 10MB</p>
+                    <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center mx-auto mb-3">
+                      <Upload className="w-6 h-6 text-slate-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
+                    <p className="text-sm font-bold text-slate-700 group-hover:text-blue-600">Kéo thả hoặc nhấp để chọn</p>
+                    <p className="text-xs text-slate-500 mt-2">Chỉ hỗ trợ <strong>.docx</strong> · Tối đa 10MB</p>
                   </>
                 )}
               </div>
 
               {isProcessing && (
-                <div className="flex items-center gap-2 text-[11px] text-amber-400 font-medium">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />{processingStep}
+                <div className="flex items-center gap-2 text-sm text-blue-600 font-medium p-3 bg-blue-50 rounded-xl">
+                  <Loader2 className="w-4 h-4 animate-spin" />{processingStep}
                 </div>
               )}
               {!isProcessing && parsedSections.length > 0 && (
-                <div className="flex items-center gap-2 text-[11px] text-emerald-400 font-medium">
-                  <CheckCircle2 className="w-3.5 h-3.5" />Phân tích {parsedSections.length} đoạn văn bản thành công
+                <div className="flex items-center gap-2 text-sm text-emerald-600 font-medium p-3 bg-emerald-50 rounded-xl">
+                  <CheckCircle2 className="w-4 h-4" />Phân tích {parsedSections.length} đoạn văn bản thành công
                 </div>
               )}
             </div>
 
             {/* Metadata form */}
-            <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-4">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
-                <Info className="w-4 h-4 text-cyan-400" />
-                <h3 className="text-xs font-black uppercase text-white tracking-wider">Thông tin thể thức văn bản</h3>
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-5">
+              <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
+                <Info className="w-5 h-5 text-amber-500" />
+                <h3 className="text-sm font-bold uppercase text-slate-800 tracking-wider">Thông tin thể thức văn bản</h3>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2"><label className={lc}>Tên cơ quan, tổ chức ban hành</label><input placeholder="VD: SỞ GIÁO DỤC VÀ ĐÀO TẠO TP.HCM" value={metadata.coQuan} onChange={meta('coQuan')} className={ic} /></div>
                 <div><label className={lc}>Số văn bản</label><input placeholder="01, 25..." value={metadata.soVanBan} onChange={meta('soVanBan')} className={ic} /></div>
                 <div><label className={lc}>Ký hiệu</label><input placeholder="QĐ-BGDĐT" value={metadata.kyHieu} onChange={meta('kyHieu')} className={ic} /></div>
@@ -709,20 +706,15 @@ export function ND30Formatter() {
                   <label className={lc}>Nơi nhận (mỗi dòng một nơi)</label>
                   <textarea rows={3} placeholder={"Ban Giám hiệu;\nPhòng Giáo dục;\nLưu: VT."} value={metadata.noiNhan} onChange={meta('noiNhan')} className={`${ic} resize-none`} />
                 </div>
-                <div className="col-span-2 pt-2 border-t border-slate-800 flex items-center justify-between">
-                  <label className="text-xs font-medium text-slate-300 cursor-pointer flex items-center gap-2">
-                    <input 
-                      type="checkbox" 
-                      checked={useDash} 
-                      onChange={(e) => setUseDash(e.target.checked)} 
-                      className="w-4 h-4 rounded border-slate-700 text-yellow-500 focus:ring-yellow-500/20 bg-slate-900 cursor-pointer"
-                    />
-                    Tự động thêm dấu gạch ngang (-) cho danh sách liệt kê
+                <div className="col-span-2 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <label className="text-sm font-medium text-slate-600 cursor-pointer flex items-center gap-2">
+                    <input type="checkbox" checked={useDash} onChange={(e) => setUseDash(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 cursor-pointer" />
+                    Tự động thêm (-) cho danh sách
                   </label>
                   {parsedSections.length > 0 && (
                      <button onClick={() => uploadedFile && handleFileSelect(uploadedFile)}
-                       className="text-[10px] font-bold px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 transition-colors">
-                       Cập nhật lại
+                       className="text-xs font-bold px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-slate-700 transition-colors">
+                       Làm mới nội dung
                      </button>
                   )}
                 </div>
@@ -731,43 +723,44 @@ export function ND30Formatter() {
           </div>
 
           {/* Right: Preview + Actions */}
-          <div className="lg:col-span-3 space-y-4">
-
+          <div className="lg:col-span-3 space-y-6">
             {/* Preview */}
-            <div className="bg-slate-900/80 border border-slate-800 rounded-3xl overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
+            <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+              <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-slate-50">
                 <div className="flex items-center gap-2">
-                  <Eye className="w-4 h-4 text-slate-400" />
-                  <h3 className="text-xs font-black uppercase text-white tracking-wider">Xem trước nội dung</h3>
-                  {parsedSections.length > 0 && <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-[9px] text-emerald-400 font-bold">{parsedSections.length} đoạn</span>}
+                  <Eye className="w-5 h-5 text-slate-500" />
+                  <h3 className="text-sm font-bold uppercase text-slate-800 tracking-wider">Xem trước nội dung</h3>
+                  {parsedSections.length > 0 && <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-xs text-emerald-700 font-bold ml-2">{parsedSections.length} đoạn</span>}
                 </div>
-                {previewHtml && <button onClick={() => setShowPreview(p => !p)} className="text-[10px] font-bold text-cyan-400 hover:text-cyan-300 transition-colors cursor-pointer">{showPreview ? 'Thu gọn' : 'Xem đầy đủ'}</button>}
+                {previewHtml && <button onClick={() => setShowPreview(p => !p)} className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors cursor-pointer">{showPreview ? 'Thu gọn' : 'Xem đầy đủ'}</button>}
               </div>
-              <div className="p-5">
+              <div className="p-6 bg-slate-100/50">
                 {!uploadedFile ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-slate-600 space-y-3">
-                    <FileText className="w-12 h-12 text-slate-800 animate-pulse" />
-                    <p className="text-xs">Tải lên tệp Word để xem nội dung tại đây</p>
+                  <div className="flex flex-col items-center justify-center py-20 text-slate-400 space-y-4 bg-white rounded-2xl border border-dashed border-slate-200">
+                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center">
+                      <FileText className="w-8 h-8 text-slate-300" />
+                    </div>
+                    <p className="text-sm font-medium">Tải lên tệp Word để xem nội dung tại đây</p>
                   </div>
                 ) : isProcessing ? (
-                  <div className="flex flex-col items-center justify-center py-16 space-y-3">
-                    <Loader2 className="w-8 h-8 text-yellow-400 animate-spin" />
-                    <p className="text-xs text-slate-400">{processingStep}</p>
+                  <div className="flex flex-col items-center justify-center py-20 space-y-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                    <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+                    <p className="text-sm text-slate-500 font-medium">{processingStep}</p>
                   </div>
                 ) : previewHtml ? (
-                  <div className={`overflow-y-auto transition-all ${showPreview ? 'max-h-[600px]' : 'max-h-52'} custom-scrollbar`}>
-                    <div className="bg-white rounded-xl p-6 shadow-lg text-gray-900 text-[12px] leading-relaxed" style={{ fontFamily: 'Times New Roman, serif' }}>
+                  <div className={`overflow-y-auto transition-all ${showPreview ? 'max-h-[800px]' : 'max-h-80'} custom-scrollbar`}>
+                    <div className="bg-white border border-slate-200 shadow-sm p-8 text-gray-900 text-sm leading-relaxed min-h-[400px]" style={{ fontFamily: 'Times New Roman, serif' }}>
                       {/* ND30 mock header */}
                       {(metadata.coQuan || metadata.tenLoaiVanBan) && (
-                        <div className="border-b border-gray-200 pb-4 mb-4 text-center space-y-1">
-                          {metadata.coQuan && <p className="font-bold uppercase text-[11px]">{metadata.coQuan}</p>}
-                          {metadata.soVanBan && <p className="text-[11px]">Số: {parseInt(metadata.soVanBan) < 10 ? '0' + parseInt(metadata.soVanBan) : metadata.soVanBan}/{metadata.kyHieu}</p>}
-                          {metadata.diaDiem && <p className="text-right text-[11px] italic">{metadata.diaDiem}, ngày {metadata.ngayBanHanh}</p>}
-                          {metadata.tenLoaiVanBan && <p className="font-bold uppercase text-sm mt-2">{metadata.tenLoaiVanBan}</p>}
-                          {metadata.trichYeu && <><p className="font-bold text-[12px]">{metadata.trichYeu}</p><div className="border-b-2 border-gray-700 w-1/3 mx-auto mt-1" /></>}
+                        <div className="border-b border-gray-300 pb-6 mb-6 text-center space-y-1.5">
+                          {metadata.coQuan && <p className="font-bold uppercase text-sm">{metadata.coQuan}</p>}
+                          {metadata.soVanBan && <p className="text-sm">Số: {parseInt(metadata.soVanBan) < 10 ? '0' + parseInt(metadata.soVanBan) : metadata.soVanBan}/{metadata.kyHieu}</p>}
+                          {metadata.diaDiem && <p className="text-right text-sm italic mt-2">{metadata.diaDiem}, ngày {metadata.ngayBanHanh}</p>}
+                          {metadata.tenLoaiVanBan && <p className="font-bold uppercase text-lg mt-4">{metadata.tenLoaiVanBan}</p>}
+                          {metadata.trichYeu && <><p className="font-bold text-sm mt-2">{metadata.trichYeu}</p><div className="border-b-[1.5px] border-black w-1/3 mx-auto mt-2" /></>}
                         </div>
                       )}
-                      <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                      <div dangerouslySetInnerHTML={{ __html: previewHtml }} className="space-y-3" />
                     </div>
                   </div>
                 ) : null}
@@ -776,45 +769,49 @@ export function ND30Formatter() {
 
             {/* Section tags */}
             {parsedSections.length > 0 && (
-              <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-4">
-                <p className="text-[10px] font-black uppercase text-slate-500 tracking-wider mb-3">Cấu trúc phát hiện ({parsedSections.length} đoạn)</p>
-                <div className="flex flex-wrap gap-2">
+              <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                <p className="text-xs font-bold uppercase text-slate-500 tracking-wider mb-4 flex items-center gap-2">
+                  <Info className="w-4 h-4" /> Thống kê cấu trúc phát hiện
+                </p>
+                <div className="flex flex-wrap gap-2.5">
                   {(['heading1','heading2','heading3','italic','body','numbered'] as const).map(type => {
                     const count = parsedSections.filter(s => s.type === type).length;
                     if (!count) return null;
                     const label: Record<string,string> = { heading1:'Phần/Chương', heading2:'Mục', heading3:'Điều', italic:'Căn cứ', body:'Nội dung', numbered:'Danh sách' };
-                    const clr: Record<string,string>   = { heading1:'bg-purple-500/15 border-purple-500/30 text-purple-300', heading2:'bg-blue-500/15 border-blue-500/30 text-blue-300', heading3:'bg-cyan-500/15 border-cyan-500/30 text-cyan-300', italic:'bg-emerald-500/15 border-emerald-500/30 text-emerald-300', body:'bg-slate-700/50 border-slate-600 text-slate-300', numbered:'bg-amber-500/15 border-amber-500/30 text-amber-300' };
-                    return <span key={type} className={`px-2.5 py-1 rounded-full border text-[10px] font-bold ${clr[type]}`}>{label[type]}: {count}</span>;
+                    const clr: Record<string,string>   = { heading1:'bg-purple-100 text-purple-700 border-purple-200', heading2:'bg-blue-100 text-blue-700 border-blue-200', heading3:'bg-cyan-100 text-cyan-700 border-cyan-200', italic:'bg-emerald-100 text-emerald-700 border-emerald-200', body:'bg-slate-100 text-slate-700 border-slate-200', numbered:'bg-amber-100 text-amber-700 border-amber-200' };
+                    return <span key={type} className={`px-3 py-1.5 rounded-full border text-xs font-bold ${clr[type]}`}>{label[type]}: {count}</span>;
                   })}
                 </div>
               </div>
             )}
 
             {/* Action buttons */}
-            <div className="space-y-3">
+            <div className="space-y-4">
               <button onClick={handleFormat} disabled={parsedSections.length === 0 || isProcessing}
-                className="w-full py-3.5 rounded-2xl font-black text-sm flex items-center justify-center gap-2.5 transition-all cursor-pointer bg-linear-to-r from-red-600 to-orange-500 hover:from-red-500 hover:to-orange-400 text-white shadow-lg shadow-red-950/30 disabled:opacity-40 disabled:cursor-not-allowed">
+                className="w-full py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 transition-all cursor-pointer bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed">
                 {isProcessing ? <><Loader2 className="w-5 h-5 animate-spin" />{processingStep}</> : <><Sparkles className="w-5 h-5" />Áp dụng định dạng Nghị định 30 & Xuất file</>}
               </button>
               {downloadReady && outputBlob && (
                 <button onClick={handleDownload}
-                  className="w-full py-3.5 rounded-2xl font-black text-sm flex items-center justify-center gap-2.5 transition-all cursor-pointer bg-linear-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-lg shadow-emerald-950/30 animate-pulse">
+                  className="w-full py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 transition-all cursor-pointer bg-linear-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg shadow-emerald-500/25 animate-pulse">
                   <Download className="w-5 h-5" />Tải xuống tệp Word chuẩn ND30 (.docx)
                 </button>
               )}
             </div>
 
             {/* Tip box */}
-            <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4">
-              <div className="flex items-start gap-2.5">
-                <Info className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
-                <div className="space-y-1.5">
-                  <p className="text-[10px] font-black text-amber-400 uppercase tracking-wider">Lưu ý</p>
-                  <ul className="text-[11px] text-slate-400 space-y-1 leading-relaxed">
-                    <li>• Chỉ hỗ trợ định dạng <strong className="text-white">.docx</strong> (Word 2007 trở lên). Nếu có tệp .doc cũ, hãy mở trong Word và lưu lại dưới dạng .docx</li>
-                    <li>• Công cụ tự nhận dạng Phần/Chương, Mục, Điều, Căn cứ từ từ khóa đầu dòng</li>
-                    <li>• Phông xuất ra: <strong className="text-white">Times New Roman</strong> 13–14pt · Lề: Trái 3cm, Phải 2cm, Trên/Dưới 2.5cm</li>
-                    <li>• Sau khi tải xuống, kiểm tra lại và chỉnh thủ công nếu cần thiết</li>
+            <div className="bg-amber-50 border border-amber-200 rounded-3xl p-6 shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-linear-to-r from-blue-100 to-indigo-100 flex items-center justify-center shrink-0">
+                  <Info className="w-4 h-4 text-amber-600" />
+                </div>
+                <div className="space-y-2 pt-1.5">
+                  <p className="text-xs font-black text-amber-800 uppercase tracking-wider">Lưu ý quan trọng</p>
+                  <ul className="text-sm text-amber-900/80 space-y-1.5 leading-relaxed">
+                    <li>• Chỉ hỗ trợ định dạng <strong className="font-bold">.docx</strong> (Word 2007 trở lên). Nếu có tệp .doc cũ, hãy mở trong Word và lưu lại dưới dạng .docx.</li>
+                    <li>• Công cụ tự nhận dạng Phần/Chương, Mục, Điều, Căn cứ từ từ khóa đầu dòng.</li>
+                    <li>• Phông xuất ra: <strong className="font-bold">Times New Roman</strong> 13–14pt · Lề: Trái 3cm, Phải 2cm, Trên/Dưới 2.5cm.</li>
+                    <li>• Sau khi tải xuống, vui lòng kiểm tra lại và chỉnh sửa thủ công nếu cần thiết.</li>
                   </ul>
                 </div>
               </div>
@@ -825,42 +822,47 @@ export function ND30Formatter() {
 
       {/* ═══ GUIDELINES ═══ */}
       {activeTab === 'guidelines' && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="space-y-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label:'Khổ giấy', value:'A4', sub:'210×297mm', color:'text-blue-400', bg:'bg-blue-500/10', border:'border-blue-500/20' },
-              { label:'Phông chữ', value:'Times New Roman', sub:'Unicode TCVN', color:'text-purple-400', bg:'bg-purple-500/10', border:'border-purple-500/20' },
-              { label:'Cỡ chữ', value:'13–14pt', sub:'Nội dung chính', color:'text-amber-400', bg:'bg-amber-500/10', border:'border-amber-500/20' },
-              { label:'Nghị định', value:'30/2020', sub:'Công tác văn thư', color:'text-red-400', bg:'bg-red-500/10', border:'border-red-500/20' },
+              { label:'Khổ giấy', value:'A4', sub:'210×297mm', color:'text-blue-700', bg:'bg-blue-50', border:'border-blue-200' },
+              { label:'Phông chữ', value:'Times New Roman', sub:'Unicode TCVN', color:'text-purple-700', bg:'bg-purple-50', border:'border-purple-200' },
+              { label:'Cỡ chữ', value:'13–14pt', sub:'Nội dung chính', color:'text-amber-700', bg:'bg-amber-50', border:'border-amber-200' },
+              { label:'Nghị định', value:'30/2020', sub:'Công tác văn thư', color:'text-red-700', bg:'bg-red-50', border:'border-red-200' },
             ].map(item => (
-              <div key={item.label} className={`${item.bg} border ${item.border} rounded-2xl p-4 text-center`}>
-                <p className={`text-lg font-black ${item.color}`}>{item.value}</p>
-                <p className="text-[10px] text-slate-400 font-bold mt-0.5">{item.label}</p>
-                <p className="text-[9px] text-slate-600">{item.sub}</p>
+              <div key={item.label} className={`${item.bg} border ${item.border} rounded-3xl p-5 text-center shadow-sm`}>
+                <p className={`text-xl font-black ${item.color} mb-1`}>{item.value}</p>
+                <p className="text-xs text-slate-800 font-bold">{item.label}</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">{item.sub}</p>
               </div>
             ))}
           </div>
 
-          <div className="space-y-3">
-            {ND30_RULES.map((rule, i) => <AccordionItem key={rule.section} rule={rule} defaultOpen={i === 0} />)}
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
+            <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-blue-500" /> Chi tiết quy định
+            </h3>
+            <div className="space-y-4">
+              {ND30_RULES.map((rule, i) => <AccordionItem key={rule.section} rule={rule} defaultOpen={i === 0} />)}
+            </div>
           </div>
 
           {/* Reference table */}
-          <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
-              <BookOpen className="w-4 h-4 text-cyan-400" />
-              <h3 className="text-xs font-black uppercase text-white tracking-wider">Bảng tổng hợp yếu tố thể thức văn bản</h3>
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+            <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
+              <BookOpen className="w-5 h-5 text-indigo-500" />
+              <h3 className="text-sm font-bold uppercase text-slate-800 tracking-wider">Bảng tổng hợp yếu tố thể thức văn bản</h3>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-[11px]">
+              <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-800">
-                    {['Yếu tố thể thức','Phông/Cỡ chữ','Kiểu chữ','Canh lề'].map(h => (
-                      <th key={h} className="text-left py-2 px-3 text-slate-500 font-black uppercase text-[9px] tracking-wider">{h}</th>
+                  <tr className="bg-slate-50">
+                    {['Yếu tố thể thức','Phông/Cỡ chữ','Kiểu chữ','Canh lề'].map((h, i) => (
+                      <th key={h} className={`text-left py-3 px-4 text-slate-600 font-bold uppercase text-xs tracking-wider border-y border-slate-200 ${i === 0 ? 'rounded-l-lg border-l' : i === 3 ? 'rounded-r-lg border-r' : ''}`}>{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-900">
+                <tbody className="divide-y divide-slate-100">
                   {[
                     ['Tên cơ quan ban hành','TNR, 13pt','Đứng, IN HOA, Đậm','Giữa'],
                     ['Số và ký hiệu','TNR, 13pt','Đứng, In thường','Giữa'],
@@ -875,11 +877,11 @@ export function ND30Formatter() {
                     ['Chức vụ người ký','TNR, 13–14pt','Đứng, IN HOA, Đậm','Giữa (ô ký)'],
                     ['Họ tên người ký','TNR, 13–14pt','Đứng, Thường, Đậm','Giữa (ô ký)'],
                   ].map(([el, font, style, align], i) => (
-                    <tr key={el} className={i % 2 === 0 ? 'bg-slate-950/30' : ''}>
-                      <td className="py-2 px-3 text-slate-300 font-medium">{el}</td>
-                      <td className="py-2 px-3 text-cyan-400 font-mono">{font}</td>
-                      <td className="py-2 px-3 text-amber-400">{style}</td>
-                      <td className="py-2 px-3 text-emerald-400">{align}</td>
+                    <tr key={el} className="hover:bg-slate-50 transition-colors">
+                      <td className="py-3 px-4 text-slate-800 font-medium">{el}</td>
+                      <td className="py-3 px-4 text-blue-600 font-mono text-xs">{font}</td>
+                      <td className="py-3 px-4 text-amber-700 text-xs">{style}</td>
+                      <td className="py-3 px-4 text-emerald-600 font-medium text-xs">{align}</td>
                     </tr>
                   ))}
                 </tbody>

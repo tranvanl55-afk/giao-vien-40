@@ -62,7 +62,7 @@ export default function CategoryPage() {
       
       <div className="flex items-center space-x-5 mb-10 bg-white/40 border border-white/60 p-6 rounded-3xl backdrop-blur-md shadow-md">
          {selectedCategory.logoUrl ? (
-            <img src={selectedCategory.logoUrl} className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-md" alt="" />
+            <img src={selectedCategory.logoUrl} className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-md animate-spin-y" alt="" />
          ) : (
             <div className={`p-4 rounded-2xl bg-linear-to-br ${selectedCategory.colorClass} shadow-lg`}>
                 <selectedCategory.icon className="w-10 h-10 text-white" weight="duotone" />
@@ -184,7 +184,7 @@ export default function CategoryPage() {
                         <img 
                           src={sub.logoUrl} 
                           alt={sub.title} 
-                          className={`w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-xl relative z-10 transition-transform duration-500 ${sub.id === 'khtn-8' ? 'scale-[1.3] group-hover:scale-[1.4]' : 'group-hover:scale-110'}`} 
+                          className={`w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-xl relative z-10 transition-transform duration-500 animate-spin-y ${sub.id === 'khtn-8' ? 'scale-[1.3] group-hover:scale-[1.4]' : 'group-hover:scale-110'}`} 
                         />
                         <div className="absolute top-1 left-2 sm:top-2 sm:left-4 w-16 h-8 sm:w-24 sm:h-12 bg-linear-to-b from-white/60 to-transparent rounded-full rotate-[-15deg] pointer-events-none"></div>
                       </>

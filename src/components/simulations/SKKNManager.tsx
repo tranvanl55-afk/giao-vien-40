@@ -98,6 +98,9 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
         });
         setDocs(fetchedDocs);
         setLoading(false);
+      }, (fallbackError) => {
+        console.error("Error in fallback query: ", fallbackError);
+        setLoading(false);
       });
     });
 
@@ -232,30 +235,30 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
   });
 
   return (
-    <div className="w-full flex flex-col space-y-6 text-slate-100 animate-in fade-in duration-300">
+    <div className="w-full flex flex-col space-y-6 text-slate-800 animate-in fade-in duration-300">
       
       {/* TRÌNH XEM PDF INLINE (MODAL OVERLAY) */}
       {previewUrl && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-700/60 rounded-3xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+        <div className="fixed inset-0 z-50 bg-white/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in duration-300">
             {/* Header Preview */}
-            <div className="p-4 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-cyan-400">
+            <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-blue-600">
                 <FileText className="w-5 h-5" />
-                <span className="font-bold truncate max-w-md md:max-w-xl text-sm md:text-base text-white">{previewTitle}</span>
+                <span className="font-bold truncate max-w-md md:max-w-xl text-sm md:text-base text-slate-800">{previewTitle}</span>
               </div>
               <div className="flex items-center gap-2">
                 <a 
                   href={previewUrl} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold transition-all flex items-center gap-1.5 text-slate-350 hover:text-white"
+                  className="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-xs font-bold transition-all flex items-center gap-1.5 text-slate-700 hover:text-slate-900"
                 >
                   <Download className="w-4 h-4" /> Mở trong tab mới
                 </a>
                 <button 
                   onClick={() => { setPreviewUrl(null); setPreviewTitle(''); }}
-                  className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-all cursor-pointer"
+                  className="p-2 rounded-full hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-all cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -277,14 +280,14 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
       <div className="relative overflow-hidden bg-linear-to-br from-yellow-500/10 to-orange-500/5 border border-yellow-500/20 rounded-3xl p-6 flex flex-col md:flex-row items-center md:items-start justify-between gap-6 shadow-md">
         <div className="space-y-2 text-center md:text-left flex-1">
           <div className="flex items-center justify-center md:justify-start gap-2">
-            <span className="px-3 py-1 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-xs font-black uppercase tracking-wider text-yellow-400">
-              {categoryTitle} 💡
+            <span className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-[10px] font-bold uppercase tracking-wider">
+              {categoryTitle}
             </span>
           </div>
-          <h2 className="text-xl md:text-2xl font-black text-white font-heading">
+          <h2 className="text-xl md:text-2xl font-black text-slate-800 font-heading">
             Hệ Thống Đăng Tải & Lưu Trữ PDF
           </h2>
-          <p className="text-xs leading-relaxed text-slate-300 max-w-2xl font-medium">
+          <p className="text-xs leading-relaxed text-slate-500 max-w-2xl font-medium">
             Nơi giáo viên chia sẻ, quản lý và lưu trữ các đề tài, bài kiểm tra, giáo án và tài liệu học tập chất lượng cao dưới dạng tệp PDF tiêu chuẩn.
           </p>
         </div>
@@ -295,46 +298,46 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
         
         {/* PANEL TRÁI: FORM UPLOAD (1 Cột) */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-6 space-y-6 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-linear-to-bl from-yellow-500/5 via-transparent to-transparent pointer-events-none" />
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-linear-to-bl from-blue-500/5 via-transparent to-transparent pointer-events-none" />
             
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-4">
-              <UploadCloud className="w-5 h-5 text-yellow-400" />
-              <h3 className="text-sm font-black uppercase text-white tracking-wider">Tải tài liệu lên</h3>
+            <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
+              <UploadCloud className="w-6 h-6 text-orange-500" />
+              <h2 className="text-lg font-black text-slate-800 tracking-tight">TẢI TÀI LIỆU LÊN</h2>
             </div>
 
             {currentUser ? (
               // Bảng điều khiển upload cho Admin/Giáo viên đã đăng nhập
               <form onSubmit={handleUpload} className="space-y-4">
                 {uploadError && (
-                  <div className="p-3 bg-red-950/40 border border-red-900/50 rounded-2xl flex items-start gap-2 text-xs text-red-300">
+                  <div className="p-3 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-2 text-xs text-red-600">
                     <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
                     <p className="leading-normal font-medium">{uploadError}</p>
                   </div>
                 )}
 
                 {uploadSuccess && (
-                  <div className="p-3 bg-emerald-950/40 border border-emerald-900/50 rounded-2xl flex items-start gap-2 text-xs text-emerald-300 animate-bounce">
+                  <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-start gap-2 text-xs text-emerald-600 animate-bounce">
                     <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
                     <p className="leading-normal font-medium">Đã đăng tải và lưu trữ tài liệu thành công!</p>
                   </div>
                 )}
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Tiêu đề tài liệu:</label>
+                  <label className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Tiêu đề tài liệu:</label>
                   <input
                     type="text"
                     required
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Ví dụ: Đổi mới phương pháp dạy KHTN 6..."
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/30 text-xs text-slate-100 placeholder-slate-600 outline-none transition-all"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:border-orange-500/60 focus:ring-1 focus:ring-orange-500/30 text-xs text-slate-800 placeholder-slate-400 outline-none transition-all"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Chọn tệp PDF:</label>
-                  <div className="relative border border-dashed border-slate-800 hover:border-yellow-500/50 bg-slate-950/60 rounded-2xl p-6 text-center cursor-pointer transition-all hover:bg-slate-950/90 group">
+                  <label className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Chọn tệp PDF:</label>
+                  <div className="relative border border-dashed border-slate-300 hover:border-orange-500/50 bg-slate-50 rounded-2xl p-6 text-center cursor-pointer transition-all hover:bg-orange-50/50 group">
                     <input
                       id="pdf-file-input"
                       type="file"
@@ -343,26 +346,26 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
                       onChange={handleFileChange}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
-                    <UploadCloud className="w-8 h-8 text-slate-500 group-hover:text-yellow-400 mx-auto mb-2 transition-colors" />
-                    <p className="text-[10.5px] font-bold text-slate-350 group-hover:text-slate-200 truncate">
+                    <UploadCloud className="w-8 h-8 text-slate-400 group-hover:text-orange-500 mx-auto mb-2 transition-colors" />
+                    <p className="text-[10.5px] font-bold text-slate-500 group-hover:text-slate-700 truncate">
                       {file ? file.name : 'Nhấp để duyệt tệp tin PDF'}
                     </p>
-                    <p className="text-[9px] text-slate-500 mt-1">Hỗ trợ tệp PDF tối đa 15MB</p>
+                    <p className="text-[9px] text-slate-400 mt-1">Hỗ trợ tệp PDF tối đa 15MB</p>
                   </div>
                 </div>
 
                 {isUploading && (
                   <div className="space-y-2 pt-2">
-                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold">
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold">
                       <span className="flex items-center gap-1">
-                        <Loader2 className="w-3 h-3 animate-spin text-yellow-400" />
+                        <Loader2 className="w-3 h-3 animate-spin text-orange-500" />
                         {uploadStep || 'Đang xử lý...'}
                       </span>
                       <span>{uploadProgress ?? 0}%</span>
                     </div>
-                    <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-900">
+                    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-linear-to-r from-yellow-500 to-orange-500 transition-all duration-500"
+                        className="h-full bg-orange-500 transition-all duration-500"
                         style={{ width: `${uploadProgress ?? 0}%` }}
                       />
                     </div>
@@ -372,7 +375,7 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
                 <button
                   type="submit"
                   disabled={isUploading}
-                  className="w-full py-3 mt-2 rounded-xl bg-linear-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md disabled:opacity-50 cursor-pointer shadow-yellow-950/20"
+                  className="w-full py-3 mt-2 rounded-xl bg-slate-800 hover:bg-black text-white font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 cursor-pointer"
                 >
                   {isUploading ? (
                     <>
@@ -389,13 +392,13 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
               </form>
             ) : (
               // Trạng thái khóa khi chưa đăng nhập
-              <div className="p-6 bg-slate-950/60 rounded-2xl border border-slate-800/80 text-center space-y-4">
-                <div className="w-12 h-12 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500">
-                  <Lock className="w-5 h-5 text-yellow-500" />
+              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 text-center space-y-4">
+                <div className="w-12 h-12 rounded-full bg-white border border-slate-200 flex items-center justify-center mx-auto text-slate-400">
+                  <Lock className="w-5 h-5 text-orange-400" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="text-xs font-bold text-slate-200">Giới hạn tải lên</h4>
-                  <p className="text-[10px] text-slate-400 leading-relaxed font-semibold">
+                  <h4 className="text-xs font-bold text-slate-700">Giới hạn tải lên</h4>
+                  <p className="text-[10px] text-slate-500 leading-relaxed font-semibold">
                     Vui lòng Đăng nhập tài khoản giáo viên của bạn ở thanh điều hướng trên cùng để có quyền đăng tải tài liệu mới.
                   </p>
                 </div>
@@ -406,25 +409,25 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
 
         {/* PANEL PHẢI: DANH SÁCH FILE PDF (2 Cột) */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-6 space-y-5 shadow-xl min-h-[500px] flex flex-col">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 space-y-5 shadow-sm min-h-[500px] flex flex-col">
             
-            {/* Thanh tìm kiếm & lọc */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+            {/* Search and Header */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
               <div className="relative flex-1 max-w-md glowing-search rounded-xl">
-                <div className="glowing-search-inner h-full flex relative rounded-xl">
+                <div className="glowing-search-inner h-full flex relative rounded-xl bg-slate-50">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10">
-                    <Search className="w-4 h-4 text-cyan-400" />
+                    <Search className="w-4 h-4 text-slate-400" />
                   </div>
                   <input
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Tìm kiếm tài liệu đã đăng..."
-                    className="w-full pl-10 pr-4 py-2.5 bg-transparent border-none text-xs font-bold text-white placeholder-slate-400 outline-none transition-all shadow-inner relative z-10"
+                    className="w-full pl-10 pr-4 py-2.5 bg-transparent border-none text-xs font-bold text-slate-700 placeholder-slate-400 outline-none transition-all"
                   />
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-slate-400">
+              <div className="flex items-center gap-2 text-slate-500">
                 <Filter className="w-3.5 h-3.5" />
                 <span className="text-[10px] font-bold uppercase tracking-wider">Tổng số: {filteredDocs.length} tài liệu</span>
               </div>
@@ -433,12 +436,12 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
             {/* DANH SÁCH TÀI LIỆU */}
             {loading ? (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-slate-450">
-                <Loader2 className="w-8 h-8 animate-spin text-yellow-500 mb-2" />
+                <Loader2 className="w-8 h-8 animate-spin text-orange-500 mb-2" />
                 <p className="text-xs font-semibold">Đang cập nhật danh mục tài liệu từ cơ sở dữ liệu...</p>
               </div>
             ) : filteredDocs.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-slate-500 space-y-3">
-                <FileText className="w-16 h-16 text-slate-800 animate-pulse" />
+                <FileText className="w-16 h-16 opacity-20 text-slate-400" />
                 <div className="space-y-1">
                   <p className="text-xs font-bold text-slate-400">Chưa tìm thấy tài liệu phù hợp</p>
                   <p className="text-[10px] max-w-sm mx-auto leading-normal text-slate-500">
@@ -451,21 +454,21 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
                 {filteredDocs.map((docItem) => (
                   <div 
                     key={docItem.id}
-                    className="bg-slate-950/40 hover:bg-slate-950/90 border border-slate-800 hover:border-yellow-500/40 rounded-2xl p-4.5 transition-all flex flex-col justify-between gap-4 shadow-sm group"
+                    className="bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl p-4.5 transition-all flex flex-col justify-between gap-4 shadow-sm group"
                   >
                     <div className="space-y-2">
                       {/* Cột thông tin cơ bản */}
                       <div className="flex items-start justify-between gap-3">
-                        <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-yellow-400 group-hover:scale-105 group-hover:text-yellow-350 transition-all">
-                          <FileText className="w-5 h-5" />
+                        <div className="p-2.5 rounded-xl bg-orange-50 border border-orange-100 text-orange-500 group-hover:scale-105 group-hover:text-orange-600 transition-all">
+                          <FileText className="w-6 h-6" />
                         </div>
-                        <h4 className="text-xs font-black leading-snug text-white flex-1 line-clamp-2">
+                        <h4 className="text-xs font-black leading-snug text-slate-800 flex-1 line-clamp-2">
                           {docItem.title}
                         </h4>
                       </div>
 
                       {/* Thông tin mô tả kích thước, ngày đăng */}
-                      <div className="pt-2 grid grid-cols-2 gap-2 text-[9.5px] text-slate-400 font-semibold border-t border-slate-900/60">
+                      <div className="pt-2 grid grid-cols-2 gap-2 text-[9.5px] text-slate-500 font-semibold border-t border-slate-100">
                         <div>
                           <span className="block text-slate-500 text-[8.5px] uppercase">Dung lượng tệp</span>
                           {formatBytes(docItem.fileSize)}
@@ -482,12 +485,12 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
                     </div>
 
                     {/* Nút hành động */}
-                    <div className="flex items-center gap-1.5 pt-2 border-t border-slate-900/60">
+                    <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100">
                       <button
                         onClick={() => { setPreviewUrl(docItem.pdfUrl); setPreviewTitle(docItem.title); }}
-                        className="flex-1 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-[10px] font-extrabold uppercase tracking-wider text-slate-300 hover:text-white transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="flex-1 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-[10px] font-extrabold uppercase tracking-wider text-slate-600 hover:text-slate-800 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                       >
-                        <Eye className="w-3.5 h-3.5 text-cyan-400" /> Đọc tài liệu
+                        <Eye className="w-3.5 h-3.5" /> Xem trước
                       </button>
                       
                       <a
@@ -495,18 +498,18 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
                         download={docItem.fileName}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-2 rounded-lg bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white transition-all cursor-pointer flex items-center justify-center"
+                        className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-800 transition-all cursor-pointer flex items-center justify-center"
                         title="Tải tệp tin về máy"
                       >
-                        <Download className="w-3.5 h-3.5 text-emerald-400" />
+                        <Download className="w-3.5 h-3.5" />
                       </a>
 
                       {/* Chỉ hiện nút xóa nếu người dùng đã đăng nhập */}
                       {currentUser && (
                         <button
                           onClick={() => handleDelete(docItem.id, docItem.storagePath)}
-                          className="p-2 rounded-lg bg-slate-900 hover:bg-red-950/40 border border-slate-800 hover:border-red-900/40 text-slate-400 hover:text-red-400 transition-all cursor-pointer flex items-center justify-center"
-                          title="Xóa tài liệu khỏi kho"
+                          className="p-2 rounded-lg bg-red-50 hover:bg-red-100 border border-red-100 text-red-500 hover:text-red-600 transition-all cursor-pointer flex items-center justify-center"
+                          title="Xóa tài liệu"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
