@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { ArrowLeft, Upload, FileText, Cpu, CheckCircle, Download, Loader2, AlertTriangle, Play } from 'lucide-react';
 import { extractTextFromDocx, generateAICompetencies, insertCompetenciesIntoDocx } from '../../utils/docxEditor';
 
+import { AIConnectionBadge } from '../AIConnectionBadge';
+
 export function GiaoAnAI({ onBack }: { onBack?: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -75,8 +77,9 @@ export function GiaoAnAI({ onBack }: { onBack?: () => void }) {
             <ArrowLeft className="w-5 h-5 text-slate-600" />
           </button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-slate-800">
+            <h1 className="text-2xl md:text-3xl font-black text-slate-800 flex items-center gap-3">
               Trợ lý Nâng cấp Giáo án AI
+              <AIConnectionBadge />
             </h1>
             <p className="text-slate-500 text-sm mt-1">Tự động phân tích và bổ sung "Năng lực số" & "Năng lực AI" vào đúng chuẩn mẫu KHTN.</p>
           </div>

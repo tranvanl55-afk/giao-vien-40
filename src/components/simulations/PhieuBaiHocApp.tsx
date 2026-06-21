@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { AIConnectionBadge } from '../AIConnectionBadge';
 import { motion } from 'motion/react';
 import { UploadCloud, Loader2, Sparkles, NotebookPen, PenTool, Star, Printer, Plus, Link as LinkIcon, X, ArrowLeft } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
@@ -344,10 +345,11 @@ Bạn PHẢI trả về JSON với cấu trúc sau:
             <div className="inline-flex items-center justify-center p-3 text-indigo-600 mb-2">
               <NotebookPen size={48} />
             </div>
-            <h1 className="text-5xl md:text-6xl font-hand font-bold text-neutral-800 tracking-tight">
+            <h1 className="text-5xl md:text-6xl font-hand font-bold text-neutral-800 tracking-tight flex items-center justify-center gap-4">
               Tạo Sketchnote Sinh Động
+              <AIConnectionBadge />
             </h1>
-            <p className="text-neutral-500 font-sans max-w-lg mx-auto">
+            <p className="text-neutral-500 font-sans max-w-lg mx-auto mt-2">
               Upload ảnh sách giáo khoa và AI sẽ hô biến thành một trang sketchnote nghệ thuật giống như ảnh minh họa!
             </p>
           </div>

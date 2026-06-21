@@ -5,6 +5,7 @@ import confetti from 'canvas-confetti';
 import { BlockMath, InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import { getGeminiClient, getGeminiApiKey } from '../../lib/gemini';
+import { AIConnectionBadge } from '../AIConnectionBadge';
 
 // Initialize Gemini SDK conditionally inside the scan function, using getGeminiClient
 const getGeminiAPI = () => {
@@ -497,7 +498,9 @@ Lưu ý: TRẢ VỀ DUY NHẤT MẢNG JSON, KHÔNG THÊM BẤT KỲ VĂN BẢN N
         <div className="bg-slate-800/60 p-8 rounded-3xl border border-slate-700 shadow-2xl backdrop-blur-xl">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
             <div>
-              <h1 className="text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-teal-400 mb-2">Khám Phá Thế Giới 🌍</h1>
+              <h1 className="text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-teal-400 mb-2 flex items-center gap-3">
+                Khám Phá Thế Giới 🌍 <AIConnectionBadge />
+              </h1>
               <p className="text-slate-400">Trò chơi quản lý năng lượng, vượt qua các sinh vật huyền bí bằng tri thức.</p>
             </div>
             

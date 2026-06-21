@@ -3,6 +3,8 @@ import { generateSKKNDocument, SKKNData, Author, Supporter, Solution } from '../
 import { FileDown, Plus, Trash2, ArrowRight, ArrowLeft, Sparkles, Loader2, FileUp } from 'lucide-react';
 import { getGeminiClient } from '../../lib/gemini';
 
+import { AIConnectionBadge } from '../AIConnectionBadge';
+
 export default function SKKNGenerator() {
   const [step, setStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -194,7 +196,10 @@ Nếu người dùng chưa nhập gì, hãy tự sáng tác một đoạn phù h
         <div className="bg-[#1E1B2E] rounded-2xl p-6 mb-8 flex flex-col md:flex-row items-center justify-between relative overflow-hidden shadow-lg gap-4">
           <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(to right, #ffffff15 1px, transparent 1px), linear-gradient(to bottom, #ffffff15 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
           <div className="relative z-10 text-center md:text-left">
-            <h2 className="text-2xl font-bold text-white mb-1">Viết Sáng kiến kinh nghiệm</h2>
+            <h2 className="text-2xl font-bold text-white mb-1 flex items-center gap-3">
+              Viết Sáng kiến kinh nghiệm
+              <AIConnectionBadge />
+            </h2>
             <p className="text-slate-300 text-sm">Hệ thống tự động tạo ... Hệ thống viết sáng kiến kinh nghiệm</p>
           </div>
           <button

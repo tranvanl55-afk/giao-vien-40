@@ -129,10 +129,10 @@ export default function App() {
           <Suspense fallback={<CatLoader />}>
             <Routes>
               {/* No layout routes */}
-              <Route path="/lesson/:simId" element={<LessonWrapper />} />
-              <Route path="/lobby" element={<Lobby />} />
-              <Route path="/room/:roomId" element={<Room />} />
-              <Route path="/room/:roomId/play" element={<StarRaceWrapper />} />
+              <Route path="/lesson/:simId" element={<div className="h-screen w-full overflow-y-auto relative z-10"><LessonWrapper /></div>} />
+              <Route path="/lobby" element={<div className="relative z-10 w-full"><Lobby /></div>} />
+              <Route path="/room/:roomId" element={<div className="relative z-10 w-full"><Room /></div>} />
+              <Route path="/room/:roomId/play" element={<div className="relative z-10 w-full"><StarRaceWrapper /></div>} />
 
               {/* Main layout routes */}
               <Route element={<MainLayout />}>

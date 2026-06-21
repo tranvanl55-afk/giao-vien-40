@@ -1,8 +1,9 @@
 import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
-import { Camera, Image as ImageIcon, Upload, FileText, Loader2, Download, AlertCircle, Share2, Expand, ZoomIn, ZoomOut, CheckCircle, Brain, Target, Sparkles, Map, X, Zap, Beaker, Dna, Rocket, Leaf, BookOpen, Lightbulb, Bot, GraduationCap } from 'lucide-react';
+import { Camera, Image as ImageIcon, Upload, FileText, Loader2, Download, AlertCircle, Share2, Expand, ZoomIn, ZoomOut, CheckCircle, Brain, Target, Sparkles, Map, X, Zap, Beaker, Dna, Rocket, Leaf, BookOpen, Lightbulb, Bot, GraduationCap, ArrowLeft } from 'lucide-react';
 import { getGeminiClient, getGeminiApiKey } from '../../lib/gemini';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toPng } from 'html-to-image';
+import { AIConnectionBadge } from '../AIConnectionBadge';
 
 interface MindmapNode {
   title: string;
@@ -281,7 +282,7 @@ const HorizontalMindmap = ({ data, zoom, mapRef, onLayout }: { data: MindmapNode
         className="absolute top-0 left-0 origin-top-left transition-transform duration-200"
         style={{ transform: `scale(${zoom})`, width: W, height: H }}
       >
-        <div ref={mapRef} className="absolute inset-0 bg-slate-900" style={{ width: W, height: H }}>
+        <div ref={mapRef} className="absolute inset-0 bg-slate-50" style={{ width: W, height: H }}>
           <svg width={W} height={H} className="absolute inset-0">
           {edges.map((e, i) => {
             const color = BRANCH_PALETTE[e.to.colorIdx % BRANCH_PALETTE.length];
@@ -373,7 +374,7 @@ const HorizontalMindmap = ({ data, zoom, mapRef, onLayout }: { data: MindmapNode
               style={{ left: px, top: py }}
             >
               <div
-                className="px-4 py-2 rounded-2xl shadow-lg border-2 text-sm font-semibold max-w-[180px] text-center bg-slate-900 z-20 relative"
+                className="px-4 py-2 rounded-2xl shadow-lg border-2 text-sm font-semibold max-w-[180px] text-center bg-white z-20 relative"
                 style={{
                   borderColor: color,
                   color: color,
@@ -390,7 +391,7 @@ const HorizontalMindmap = ({ data, zoom, mapRef, onLayout }: { data: MindmapNode
   );
 };
 
-export default function MindmapApp() {
+export default function MindmapApp({ onBack }: { onBack?: () => void }) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [mindmapData, setMindmapData] = useState<MindmapNode | null>(null);
@@ -537,23 +538,34 @@ Trả về JSON đúng chuẩn theo format sau, không kèm bất kỳ giải th
   };
 
   return (
-    <div className="w-full h-screen overflow-hidden bg-slate-900 text-slate-100 flex flex-col md:flex-row relative">
+    <div className="w-full h-screen overflow-hidden bg-slate-50 text-slate-800 flex flex-col md:flex-row relative">
       {/* Cột trái: Tải ảnh & Xử lý */}
-      <div className="w-full md:w-1/3 xl:w-1/4 bg-slate-800/50 backdrop-blur-md border-r border-white/10 p-4 md:p-6 flex flex-col overflow-y-auto">
+      <div className="w-full md:w-1/3 xl:w-1/4 bg-white/80 backdrop-blur-md border-r border-slate-200 p-4 md:p-6 flex flex-col overflow-y-auto z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+        {onBack && (
+          <button 
+            onClick={onBack} 
+            className="flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-all text-sm font-bold w-fit shadow-sm border border-slate-200"
+          >
+            <ArrowLeft className="w-4 h-4" /> Quay lại
+          </button>
+        )}
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
             <Brain className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white leading-tight">Sơ Đồ Tư Duy AI</h2>
-            <p className="text-xs text-cyan-400 font-medium">Tóm tắt siêu tốc từ ảnh</p>
+            <h2 className="text-xl font-black text-slate-800 leading-tight flex items-center gap-3">
+              Sơ Đồ Tư Duy AI
+              <AIConnectionBadge />
+            </h2>
+            <p className="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1.5">Tóm tắt siêu tốc từ ảnh</p>
           </div>
         </div>
 
         <div className="flex-1 flex flex-col space-y-4">
-          <div className="bg-slate-900/50 p-4 rounded-2xl border border-white/5 shadow-inner">
-            <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wider flex items-center gap-2">
-              <Upload className="w-4 h-4 text-emerald-400" />
+          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider flex items-center gap-2">
+              <Upload className="w-4 h-4 text-emerald-500" />
               Nguồn Dữ Liệu
             </h3>
             
@@ -576,17 +588,17 @@ Trả về JSON đúng chuẩn theo format sau, không kèm bất kỳ giải th
             <div className="grid grid-cols-2 gap-3 mb-4">
               <button 
                 onClick={() => cameraInputRef.current?.click()}
-                className="flex flex-col items-center justify-center p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all group"
+                className="flex flex-col items-center justify-center p-3 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 rounded-xl transition-all group shadow-sm"
               >
-                <Camera className="w-6 h-6 text-emerald-400 mb-2 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-medium">Chụp ảnh</span>
+                <Camera className="w-6 h-6 text-emerald-500 mb-2 group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-bold text-slate-600 group-hover:text-emerald-700">Chụp ảnh</span>
               </button>
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="flex flex-col items-center justify-center p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all group"
+                className="flex flex-col items-center justify-center p-3 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-xl transition-all group shadow-sm"
               >
-                <ImageIcon className="w-6 h-6 text-blue-400 mb-2 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-medium">Tải lên</span>
+                <ImageIcon className="w-6 h-6 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-bold text-slate-600 group-hover:text-blue-700">Tải lên</span>
               </button>
             </div>
 
@@ -609,19 +621,19 @@ Trả về JSON đúng chuẩn theo format sau, không kèm bất kỳ giải th
           </div>
 
           {error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start gap-2 animate-in fade-in slide-in-from-top-2">
-              <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-              <p className="text-xs text-red-300 leading-relaxed">{error}</p>
+            <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2 animate-in fade-in slide-in-from-top-2">
+              <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-red-700 leading-relaxed">{error}</p>
             </div>
           )}
 
           <button
             onClick={generateMindmap}
             disabled={!imagePreview || isProcessing}
-            className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all relative overflow-hidden group ${
+            className={`w-full py-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all relative overflow-hidden group ${
               !imagePreview || isProcessing 
-                ? 'bg-slate-800 text-slate-500 cursor-not-allowed' 
-                : 'bg-linear-to-r from-cyan-500 to-blue-600 text-white hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] hover:scale-[1.02]'
+                ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200' 
+                : 'bg-linear-to-r from-cyan-500 to-blue-600 text-white hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] hover:scale-[1.02] border border-blue-500'
             }`}
           >
             {isProcessing ? (
@@ -640,19 +652,22 @@ Trả về JSON đúng chuẩn theo format sau, không kèm bất kỳ giải th
       </div>
 
       {/* Cột phải: Canvas hiển thị Sơ đồ */}
-      <div className="flex-1 bg-slate-900 relative flex flex-col">
+      <div className="flex-1 bg-slate-50 relative flex flex-col bg-[url('https://i.postimg.cc/rsLy3gxh/bg-science.png')] bg-cover bg-center bg-no-repeat bg-fixed">
+        {/* Lớp phủ sáng nhẹ cho background */}
+        <div className="absolute inset-0 bg-white/70 backdrop-blur-3xl z-0 pointer-events-none" />
+        
         {/* Thanh công cụ Canvas */}
         {mindmapData && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 p-2 bg-slate-800/80 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl">
-            <button onClick={() => setZoom(z => Math.max(0.5, z - 0.2))} className="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-300 hover:text-white" title="Thu nhỏ">
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 p-2 bg-white/90 backdrop-blur-xl border border-slate-200 rounded-full shadow-lg">
+            <button onClick={() => setZoom(z => Math.max(0.5, z - 0.2))} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-600 hover:text-slate-900" title="Thu nhỏ">
               <ZoomOut className="w-5 h-5" />
             </button>
-            <span className="text-xs font-bold text-cyan-400 min-w-[3ch] text-center">{Math.round(zoom * 100)}%</span>
-            <button onClick={() => setZoom(z => Math.min(2, z + 0.2))} className="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-300 hover:text-white" title="Phóng to">
+            <span className="text-xs font-bold text-slate-700 min-w-[3ch] text-center">{Math.round(zoom * 100)}%</span>
+            <button onClick={() => setZoom(z => Math.min(2, z + 0.2))} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-600 hover:text-slate-900" title="Phóng to">
               <ZoomIn className="w-5 h-5" />
             </button>
-            <div className="w-px h-6 bg-white/10 mx-1" />
-            <button onClick={handleDownloadPNG} className="p-2 hover:bg-emerald-500/20 rounded-full transition-colors text-emerald-400 hover:text-emerald-300 flex items-center gap-2 px-4" title="Tải xuống">
+            <div className="w-px h-6 bg-slate-200 mx-1" />
+            <button onClick={handleDownloadPNG} className="p-2 hover:bg-emerald-50 rounded-full transition-colors text-emerald-600 hover:text-emerald-700 flex items-center gap-2 px-4 border border-transparent hover:border-emerald-200" title="Tải xuống">
               <Download className="w-5 h-5" />
               <span className="text-sm font-bold hidden sm:block">Xuất PNG</span>
             </button>
@@ -662,7 +677,7 @@ Trả về JSON đúng chuẩn theo format sau, không kèm bất kỳ giải th
         {/* Khu vực vẽ */}
         <div 
           ref={containerRef}
-          className="flex-1 overflow-auto w-full h-full p-8 grid [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 hover:[&::-webkit-scrollbar-thumb]:bg-white/20 relative"
+          className="flex-1 overflow-auto w-full h-full p-8 grid [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 hover:[&::-webkit-scrollbar-thumb]:bg-slate-400 relative z-10"
           style={{ placeContent: 'safe center' }}
         >
           <AnimatePresence>
@@ -671,13 +686,13 @@ Trả về JSON đúng chuẩn theo format sau, không kèm bất kỳ giải th
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="flex flex-col items-center justify-center text-slate-500 max-w-sm text-center"
+                className="flex flex-col items-center justify-center text-center p-12 max-w-md mx-auto my-auto"
               >
-                <div className="w-24 h-24 mb-6 rounded-3xl bg-slate-800/50 flex items-center justify-center border border-white/5 shadow-inner">
-                  <Map className="w-12 h-12 opacity-50" />
+                <div className="w-24 h-24 bg-white border border-slate-200 rounded-3xl flex items-center justify-center shadow-sm mb-6">
+                  <Map className="w-10 h-10 text-slate-300" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-400 mb-2">Bản vẽ trống</h3>
-                <p className="text-sm leading-relaxed">Tải lên một hình ảnh sách giáo khoa hoặc tài liệu để AI trích xuất và thiết kế Sơ đồ tư duy cho bạn.</p>
+                <h3 className="text-2xl font-black text-slate-800 mb-3">Bản vẽ trống</h3>
+                <p className="text-slate-500 font-medium">Tải lên một hình ảnh sách giáo khoa hoặc tài liệu để AI trích xuất và thiết kế Sơ đồ tư duy cho bạn.</p>
               </motion.div>
             )}
 

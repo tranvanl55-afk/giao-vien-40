@@ -3,6 +3,7 @@ import { ArrowLeft, Plus, Trash2, Image, Sparkles, Check } from 'lucide-react';
 import { Robot, Question as QuestionIcon } from '@phosphor-icons/react';
 import { getGeminiClient, getGeminiApiKey } from '../../lib/gemini';
 import { Type } from '@google/genai';
+import { AIConnectionBadge } from '../AIConnectionBadge';
 
 export interface QuestionType {
   id: string;
@@ -139,8 +140,10 @@ export function GameHub({ onBack }: { onBack: () => void }) {
           <button onClick={onBack} className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 transition-all text-sm font-bold shadow-md hover:-translate-x-1">
             <ArrowLeft className="w-4 h-4" /> Quay lại
           </button>
-          <div className="text-center">
-            <h1 className="text-2xl font-black bg-clip-text text-transparent bg-linear-to-r from-yellow-300 to-pink-400 drop-shadow-md">📚 Ngân Hàng Câu Hỏi</h1>
+          <div className="text-center flex flex-col items-center">
+            <h1 className="text-2xl font-black bg-clip-text text-transparent bg-linear-to-r from-yellow-300 to-pink-400 drop-shadow-md flex items-center gap-2">
+              📚 Ngân Hàng Câu Hỏi <AIConnectionBadge />
+            </h1>
             <p className="text-xs text-purple-300 uppercase tracking-widest mt-1 font-bold">Quản lý kho dữ liệu trò chơi</p>
           </div>
           <div className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-linear-to-r from-indigo-600 to-purple-600 shadow-lg text-sm font-bold">

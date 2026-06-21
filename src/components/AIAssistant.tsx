@@ -3,6 +3,7 @@ import { Bot, X, Send, Sparkles, Loader2, Maximize2, Minimize2 } from 'lucide-re
 import { motion, AnimatePresence } from 'framer-motion';
 import { getGeminiClient } from '../lib/gemini';
 import ReactMarkdown from 'react-markdown';
+import { AIConnectionBadge } from './AIConnectionBadge';
 
 interface AIAssistantProps {
   contextTitle?: string;
@@ -126,10 +127,17 @@ Hãy trả lời ngắn gọn, súc tích, dễ hiểu đối với học sinh c
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-28 right-6 md:bottom-32 md:right-8 w-14 h-14 bg-linear-to-r from-cyan-500 to-blue-600 rounded-full shadow-lg shadow-cyan-500/30 flex items-center justify-center z-50 text-white border border-cyan-400/30 group"
+            className="fixed bottom-28 right-6 md:bottom-32 md:right-8 w-20 h-20 flex items-center justify-center z-50 group drop-shadow-2xl"
           >
-            <Bot className="w-7 h-7 group-hover:animate-pulse" />
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-slate-900 animate-bounce"></div>
+            <video 
+              src="https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fn%E1%BB%81n_xanh_%C4%91%E1%BA%ADm_n%E1%BB%81n_s%E1%BA%A1ch_kh%C3%B4ng_c-Picsart-BackgroundRemover.webm?alt=media&token=a6676a1c-40ef-4416-ae2c-d9c988229244"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-contain group-hover:scale-110 transition-transform pointer-events-none" 
+            />
+            <div className="absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-slate-900 animate-bounce shadow-sm"></div>
           </motion.button>
         )}
       </AnimatePresence>
@@ -151,13 +159,21 @@ Hãy trả lời ngắn gọn, súc tích, dễ hiểu đối với học sinh c
             {/* Header */}
             <div className="px-4 py-3 bg-linear-to-r from-slate-800 to-slate-900 border-b border-slate-700 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center border border-cyan-500/30">
-                  <Bot className="w-6 h-6 text-cyan-400" />
+                <div className="w-12 h-12 flex items-center justify-center overflow-visible drop-shadow-md">
+                  <video 
+                    src="https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fn%E1%BB%81n_xanh_%C4%91%E1%BA%ADm_n%E1%BB%81n_s%E1%BA%A1ch_kh%C3%B4ng_c-Picsart-BackgroundRemover.webm?alt=media&token=a6676a1c-40ef-4416-ae2c-d9c988229244"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-12 h-12 object-contain scale-125" 
+                  />
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-sm flex items-center gap-1.5">
                     Trợ giảng AI
                     <Sparkles className="w-3.5 h-3.5 text-orange-400" />
+                    <AIConnectionBadge />
                   </h3>
                   <p className="text-[10px] text-cyan-400 font-semibold truncate max-w-[200px]">
                     Hỗ trợ: {contextTitle}

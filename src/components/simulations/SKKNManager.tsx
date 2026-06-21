@@ -277,14 +277,14 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
       )}
 
       {/* THÔNG TIN CHUNG */}
-      <div className="relative overflow-hidden bg-linear-to-br from-yellow-500/10 to-orange-500/5 border border-yellow-500/20 rounded-3xl p-6 flex flex-col md:flex-row items-center md:items-start justify-between gap-6 shadow-md">
+      <div className="relative overflow-hidden bg-linear-to-br from-indigo-900/40 to-blue-900/30 border border-blue-500/20 rounded-3xl p-6 flex flex-col md:flex-row items-center md:items-start justify-between gap-6 shadow-md">
         <div className="space-y-2 text-center md:text-left flex-1">
           <div className="flex items-center justify-center md:justify-start gap-2">
             <span className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-[10px] font-bold uppercase tracking-wider">
               {categoryTitle}
             </span>
           </div>
-          <h2 className="text-xl md:text-2xl font-black text-slate-800 font-heading">
+          <h2 className="text-xl md:text-2xl font-black text-blue-800 dark:text-blue-400 font-heading">
             Hệ Thống Đăng Tải & Lưu Trữ PDF
           </h2>
           <p className="text-xs leading-relaxed text-slate-500 max-w-2xl font-medium">
@@ -302,8 +302,8 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
             <div className="absolute top-0 right-0 w-24 h-24 bg-linear-to-bl from-blue-500/5 via-transparent to-transparent pointer-events-none" />
             
             <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
-              <UploadCloud className="w-6 h-6 text-orange-500" />
-              <h2 className="text-lg font-black text-slate-800 tracking-tight">TẢI TÀI LIỆU LÊN</h2>
+              <UploadCloud className="w-6 h-6 text-blue-500" />
+              <h2 className="text-lg font-black text-blue-900 tracking-tight">TẢI TÀI LIỆU LÊN</h2>
             </div>
 
             {currentUser ? (
@@ -331,13 +331,13 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Ví dụ: Đổi mới phương pháp dạy KHTN 6..."
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:border-orange-500/60 focus:ring-1 focus:ring-orange-500/30 text-xs text-slate-800 placeholder-slate-400 outline-none transition-all"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 text-xs text-slate-800 placeholder-slate-400 outline-none transition-all"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Chọn tệp PDF:</label>
-                  <div className="relative border border-dashed border-slate-300 hover:border-orange-500/50 bg-slate-50 rounded-2xl p-6 text-center cursor-pointer transition-all hover:bg-orange-50/50 group">
+                  <div className="relative border border-dashed border-slate-300 hover:border-blue-500/50 bg-slate-50 rounded-2xl p-6 text-center cursor-pointer transition-all hover:bg-blue-50/50 group">
                     <input
                       id="pdf-file-input"
                       type="file"
@@ -346,7 +346,7 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
                       onChange={handleFileChange}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
-                    <UploadCloud className="w-8 h-8 text-slate-400 group-hover:text-orange-500 mx-auto mb-2 transition-colors" />
+                    <UploadCloud className="w-8 h-8 text-slate-400 group-hover:text-blue-500 mx-auto mb-2 transition-colors" />
                     <p className="text-[10.5px] font-bold text-slate-500 group-hover:text-slate-700 truncate">
                       {file ? file.name : 'Nhấp để duyệt tệp tin PDF'}
                     </p>
@@ -358,14 +358,14 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
                   <div className="space-y-2 pt-2">
                     <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold">
                       <span className="flex items-center gap-1">
-                        <Loader2 className="w-3 h-3 animate-spin text-orange-500" />
+                        <Loader2 className="w-3 h-3 animate-spin text-blue-500" />
                         {uploadStep || 'Đang xử lý...'}
                       </span>
                       <span>{uploadProgress ?? 0}%</span>
                     </div>
                     <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-orange-500 transition-all duration-500"
+                        className="h-full bg-blue-500 transition-all duration-500"
                         style={{ width: `${uploadProgress ?? 0}%` }}
                       />
                     </div>
@@ -436,7 +436,7 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
             {/* DANH SÁCH TÀI LIỆU */}
             {loading ? (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-slate-450">
-                <Loader2 className="w-8 h-8 animate-spin text-orange-500 mb-2" />
+                <Loader2 className="w-8 h-8 animate-spin text-blue-500 mb-2" />
                 <p className="text-xs font-semibold">Đang cập nhật danh mục tài liệu từ cơ sở dữ liệu...</p>
               </div>
             ) : filteredDocs.length === 0 ? (
@@ -459,7 +459,7 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
                     <div className="space-y-2">
                       {/* Cột thông tin cơ bản */}
                       <div className="flex items-start justify-between gap-3">
-                        <div className="p-2.5 rounded-xl bg-orange-50 border border-orange-100 text-orange-500 group-hover:scale-105 group-hover:text-orange-600 transition-all">
+                        <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-100 text-blue-500 group-hover:scale-105 group-hover:text-blue-600 transition-all">
                           <FileText className="w-6 h-6" />
                         </div>
                         <h4 className="text-xs font-black leading-snug text-slate-800 flex-1 line-clamp-2">

@@ -188,7 +188,6 @@ export const LESSON_REGISTRY: Record<string, LessonRegistryEntry> = {
   'mindmap-app': {
     component: lazy(() => import('../components/simulations/MindmapApp')),
     backTarget: 'category',
-    fullscreenWrapper: true,
   },
   'giao-an-ai': {
     component: lazyNamed(() => import('../components/simulations/GiaoAnAI'), 'GiaoAnAI'),

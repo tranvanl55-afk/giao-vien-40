@@ -11,6 +11,8 @@ interface TaoDeKiemTraAppProps {
 
 type Step = 1 | 2 | 3 | 4;
 
+import { AIConnectionBadge } from '../AIConnectionBadge';
+
 export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
   const [step, setStep] = useState<Step>(1);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -236,8 +238,9 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
              <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-md">
                <GraduationCap className="w-6 h-6 text-white" />
              </div>
-             <h1 className="text-xl md:text-2xl font-black tracking-tight text-slate-800 flex items-center">
+             <h1 className="text-xl md:text-2xl font-black tracking-tight text-slate-800 flex items-center gap-3">
                <span className="text-red-500 mr-1">Ôn tập vui</span> <Rocket className="w-6 h-6 text-purple-500" />
+               <AIConnectionBadge />
              </h1>
            </div>
         </div>

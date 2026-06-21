@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { getGeminiClient, getGeminiApiKey } from '../../lib/gemini';
+import { AIConnectionBadge } from '../AIConnectionBadge';
 
 // ----------------------------------------------------
 // ĐỊNH NGHĨA PHÂN LOẠI CÂU HỎI
@@ -714,6 +715,7 @@ Bạn BẮT BUỘC trả về ĐÚNG MỘT MẢNG JSON, không giải thích gì
             <h1 className="text-sm md:text-base font-black text-white tracking-tight uppercase flex items-center gap-2">
               <Play className="w-5 h-5 text-indigo-400 animate-pulse animate-duration-1000" />
               Video Bài Giảng Tương Tác
+              <span className="ml-2"><AIConnectionBadge /></span>
             </h1>
             <p className="text-[9px] md:text-[10px] text-orange-500 font-bold uppercase tracking-widest leading-none mt-1">
               Dạy học tích cực
