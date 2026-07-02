@@ -290,6 +290,11 @@ export const LESSON_REGISTRY: Record<string, LessonRegistryEntry> = {
     backTarget: 'category',
     needsQuestions: true,
   },
+  'game-ban-trung-hoa-hoc': {
+    component: lazyNamed(() => import('../components/games/BanTrungHoaHocGame'), 'BanTrungHoaHocGame'),
+    backTarget: 'category',
+    needsQuestions: true,
+  },
   'game-doi-khang': {
     component: lazyNamed(() => import('../components/games/GameDoiKhangGame'), 'GameDoiKhangGame'),
     backTarget: 'category',
@@ -317,6 +322,11 @@ export const LESSON_REGISTRY: Record<string, LessonRegistryEntry> = {
   },
   'game-giai-ma-buc-tranh': {
     component: lazyNamed(() => import('../components/games/GiaiMaBucTranhGame'), 'GiaiMaBucTranhGame'),
+    backTarget: 'category',
+    needsQuestions: true,
+  },
+  'game-angry-khtn': {
+    component: lazyNamed(() => import('../components/games/AngryKhtnGame'), 'AngryKhtnGame'),
     backTarget: 'category',
     needsQuestions: true,
   },

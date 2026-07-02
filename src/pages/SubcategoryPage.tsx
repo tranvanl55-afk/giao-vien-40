@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Play, ExternalLink, Box, Atom } from 'lucide-react';
 import { categories } from '../data';
 import { useViewMode } from '../hooks/useViewMode';
+import { resolveSimulationId } from '../config/constants';
+import { useEffect } from 'react';
 
 const SKKNManager = lazy(() => import('../components/simulations/SKKNManager'));
 const ND30Formatter = lazy(() => import('../components/simulations/ND30Formatter').then(m => ({ default: m.ND30Formatter })));
@@ -16,6 +18,15 @@ export default function SubcategoryPage() {
 
   const selectedCategory = categories.find(c => c.id === catId);
   const selectedSub = selectedCategory?.subCategories.find(s => s.id === subId);
+
+  useEffect(() => {
+    if (selectedSub) {
+      const targetSimId = resolveSimulationId(selectedSub.id);
+      if (targetSimId) {
+        navigate(`/lesson/${targetSimId}`, { replace: true });
+      }
+    }
+  }, [selectedSub, navigate]);
 
   if (!selectedCategory || !selectedSub) {
     return (
@@ -110,15 +121,28 @@ export default function SubcategoryPage() {
                   {selectedSub.lessons.map(lesson => {
                       const getColors = (t: string) => {
                         switch(t) {
-                          case 'blue': return { iconBg: 'bg-gradient-to-br from-blue-400 to-indigo-500', iconColor: 'text-white', blob: 'bg-gradient-to-br from-blue-100 to-indigo-100', btnBg: 'from-blue-400 to-indigo-500', glow: 'shadow-blue-200' };
-                          case 'orange': return { iconBg: 'bg-gradient-to-br from-orange-400 to-amber-500', iconColor: 'text-white', blob: 'bg-gradient-to-br from-orange-100 to-amber-100', btnBg: 'from-orange-400 to-amber-500', glow: 'shadow-orange-200' };
-                          case 'purple': return { iconBg: 'bg-gradient-to-br from-violet-500 to-fuchsia-600', iconColor: 'text-white', blob: 'bg-gradient-to-br from-violet-100 to-fuchsia-100', btnBg: 'from-violet-500 to-fuchsia-600', glow: 'shadow-violet-200' };
-                          case 'green': return { iconBg: 'bg-gradient-to-br from-emerald-400 to-teal-500', iconColor: 'text-white', blob: 'bg-gradient-to-br from-emerald-100 to-teal-100', btnBg: 'from-emerald-400 to-teal-500', glow: 'shadow-emerald-200' };
-                          case 'red': return { iconBg: 'bg-gradient-to-br from-rose-500 to-red-600', iconColor: 'text-white', blob: 'bg-gradient-to-br from-rose-100 to-red-100', btnBg: 'from-rose-500 to-red-600', glow: 'shadow-rose-200' };
-                          default: return { iconBg: 'bg-gradient-to-br from-blue-400 to-indigo-500', iconColor: 'text-white', blob: 'bg-gradient-to-br from-blue-100 to-indigo-100', btnBg: 'from-blue-400 to-indigo-500', glow: 'shadow-blue-200' };
+                          case 'blue': return { iconBg: 'bg-gradient-to-br from-blue-400 to-indigo-500', iconColor: 'text-white', blob: 'bg-gradient-to-br from-blue-100 to-indigo-100', glow: 'shadow-blue-200' };
+                          case 'orange': return { iconBg: 'bg-gradient-to-br from-orange-400 to-amber-500', iconColor: 'text-white', blob: 'bg-gradient-to-br from-orange-100 to-amber-100', glow: 'shadow-orange-200' };
+                          case 'purple': return { iconBg: 'bg-gradient-to-br from-violet-500 to-fuchsia-600', iconColor: 'text-white', blob: 'bg-gradient-to-br from-violet-100 to-fuchsia-100', glow: 'shadow-violet-200' };
+                          case 'green': return { iconBg: 'bg-gradient-to-br from-emerald-400 to-teal-500', iconColor: 'text-white', blob: 'bg-gradient-to-br from-emerald-100 to-teal-100', glow: 'shadow-emerald-200' };
+                          case 'red': return { iconBg: 'bg-gradient-to-br from-rose-500 to-red-600', iconColor: 'text-white', blob: 'bg-gradient-to-br from-rose-100 to-red-100', glow: 'shadow-rose-200' };
+                          default: return { iconBg: 'bg-gradient-to-br from-blue-400 to-indigo-500', iconColor: 'text-white', blob: 'bg-gradient-to-br from-blue-100 to-indigo-100', glow: 'shadow-blue-200' };
                         }
                       };
                       const colors = getColors(lesson.theme);
+
+                      const getBtnConfig = (l: any) => {
+                        const id = l.id || '';
+                        const title = (l.title || '').toLowerCase();
+                        if (title.includes('bảng tuần hoàn')) return { text: 'Giải mã Bảng', bg: 'from-green-500 to-teal-500', shadow: 'shadow-[0_4px_15px_rgba(16,185,129,0.4)]', hover: 'hover:shadow-[0_0_20px_rgba(16,185,129,0.6)]', ring: 'hover:ring-emerald-400/50' };
+                        if (title.includes('ion')) return { text: 'Học ngay 3D', bg: 'from-orange-500 to-red-500', shadow: 'shadow-[0_4px_15px_rgba(249,115,22,0.4)]', hover: 'hover:shadow-[0_0_20px_rgba(249,115,22,0.6)]', ring: 'hover:ring-orange-400/50' };
+                        if (title.includes('cộng hóa trị')) return { text: 'Khám phá ngay', bg: 'from-blue-700 to-blue-900', shadow: 'shadow-[0_4px_15px_rgba(29,78,216,0.4)]', hover: 'hover:shadow-[0_0_20px_rgba(29,78,216,0.6)]', ring: 'hover:ring-blue-400/50' };
+                        if (title.includes('đồ thị')) return { text: 'Thử thách Đồ thị', bg: 'from-purple-500 to-blue-500', shadow: 'shadow-[0_4px_15px_rgba(168,85,247,0.4)]', hover: 'hover:shadow-[0_0_25px_rgba(6,182,212,0.8)]', ring: 'hover:ring-cyan-400/80' };
+                        if (title.includes('bóng tối') || title.includes('lực')) return { text: 'Vận dụng Lực', bg: 'from-violet-800 to-fuchsia-800', shadow: 'shadow-[0_4px_15px_rgba(139,92,246,0.4)]', hover: 'hover:shadow-[0_0_20px_rgba(139,92,246,0.6)]', ring: 'hover:ring-fuchsia-400/50' };
+                        if (title.includes('kiến tạo') || title.includes('nguyên tử')) return { text: 'Bắt đầu', bg: 'from-sky-400 to-blue-500', shadow: 'shadow-[0_4px_15px_rgba(56,189,248,0.4)]', hover: 'hover:shadow-[0_0_20px_rgba(56,189,248,0.6)]', ring: 'hover:ring-sky-400/50' };
+                        return { text: 'Bắt đầu ngay', bg: 'from-indigo-500 to-purple-500', shadow: 'shadow-[0_4px_15px_rgba(99,102,241,0.4)]', hover: 'hover:shadow-[0_0_20px_rgba(99,102,241,0.6)]', ring: 'hover:ring-indigo-400/50' };
+                      };
+                      const btn = getBtnConfig(lesson);
                       return (
                         <div 
                           key={lesson.id} 
@@ -155,10 +179,11 @@ export default function SubcategoryPage() {
                                 e.stopPropagation();
                                 navigate(`/lesson/${lesson.id}`);
                               }}
-                              className={`mt-auto px-5 py-2.5 rounded-full font-bold flex items-center gap-2 transition-all bg-linear-to-r ${colors.btnBg} text-white shadow-md hover:shadow-lg hover:scale-105 active:scale-95`}
+                              className={`group/btn relative mt-auto px-5 py-2.5 rounded-full font-bold flex items-center justify-center gap-2 transition-all duration-300 bg-linear-to-r ${btn.bg} text-white ${btn.shadow} ${btn.hover} ring-1 ring-white/20 hover:ring-4 ${btn.ring} hover:scale-105 active:scale-95 overflow-hidden`}
                             >
-                              <span className="text-xs tracking-wide">Bắt đầu</span>
-                              <Play fill="currentColor" className="w-3.5 h-3.5" />
+                              <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent translate-x-[-150%] group-hover/btn:translate-x-[150%] transition-transform duration-700 ease-in-out" />
+                              <span className="text-xs tracking-wide relative z-10 drop-shadow-md">{btn.text}</span>
+                              <Play fill="currentColor" className="w-3.5 h-3.5 relative z-10 drop-shadow-md group-hover/btn:scale-110 transition-transform" />
                             </button>
                           </div>
                         </div>

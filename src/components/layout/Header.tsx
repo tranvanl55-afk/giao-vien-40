@@ -212,7 +212,7 @@ export function Header({
         </div>
 
         {/* Nav (Desktop) */}
-        <nav className="hidden md:flex items-center relative h-14 px-1 bg-white/40 border border-indigo-200/50 rounded-full shadow-inner magic-nav overflow-visible mt-2">
+        <nav id="tour-magic-nav" className="hidden md:flex items-center relative h-14 px-1 bg-white/40 border border-indigo-200/50 rounded-full shadow-inner magic-nav overflow-visible mt-2">
           <ul className="flex items-center relative">
             {/* The Indicator */}
             {(() => {
@@ -285,7 +285,7 @@ export function Header({
             </li>
 
             {currentUser && (
-              <li className="flex justify-center items-center w-[60px] h-[56px] relative">
+              <li id="tour-notifications" className="flex justify-center items-center w-[60px] h-[56px] relative">
                 <a onClick={() => setShowNotifDropdown(!showNotifDropdown)} title="Thông báo" className="cursor-pointer relative">
                   <span className="icon"><Bell className="w-5 h-5 icon-shadow text-indigo-900 hover:text-orange-600 transition-colors duration-500" /></span>
                   {unreadCount > 0 && (
@@ -361,6 +361,7 @@ export function Header({
 
           {/* User avatar & points with dropdown */}
           <div 
+            id="tour-profile"
             className="relative"
             onMouseEnter={() => setShowUserDropdown(true)}
             onMouseLeave={() => setShowUserDropdown(false)}

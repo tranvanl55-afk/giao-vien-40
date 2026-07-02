@@ -226,7 +226,7 @@ export function Login() {
 
       {/* Title */}
       <div className="relative z-30 text-center mb-6">
-        <h1 className="font-heading text-4xl sm:text-5xl font-black tracking-tighter bg-clip-text text-transparent bg-linear-to-r from-cyan-300 via-blue-400 to-fuchsia-500 uppercase italic drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+        <h1 className="font-heading text-4xl sm:text-5xl font-black tracking-tighter bg-clip-text text-transparent bg-linear-to-r from-cyan-300 via-blue-400 to-fuchsia-500 uppercase italic drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] pr-2">
           {t.title}
         </h1>
         <p className="text-cyan-300 font-bold text-xs tracking-[0.3em] uppercase mt-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">

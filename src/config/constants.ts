@@ -108,6 +108,26 @@ export const QUIZ_GAMES: Record<string, { title: string; description: string; ru
       'Có thể chọn dừng cuộc chơi bất cứ lúc nào để bảo toàn số tiền thưởng hiện tại.'
     ]
   },
+  'game-ban-trung-hoa-hoc': {
+    title: 'Bắn Trứng Hóa Học',
+    description: 'Bắn các ion để tạo thành hợp chất hóa học có tổng điện tích bằng 0! 🧪',
+    rules: [
+      'Bắn các ion lên trần nhà giống trò chơi Bắn Trứng truyền thống.',
+      'Bóng chỉ rụng khi tạo thành một cụm các ion có tổng điện tích bằng 0 (ví dụ: 2 Na⁺ và 1 SO₄²⁻).',
+      'Sau 5 lần bắn trượt (không tạo được hợp chất), trần nhà sẽ tự động hạ xuống.',
+      'Ghi điểm càng cao càng tốt trước khi bóng chạm vạch đỏ dưới cùng màn hình!'
+    ]
+  },
+  'game-angry-khtn': {
+    title: 'Bắn Chim KHTN',
+    description: 'Trả lời câu hỏi để nhận đạn xịn, dùng súng cao su tiêu diệt bầy heo!',
+    rules: [
+      'Sử dụng kiến thức để trả lời các câu hỏi Khoa học Tự nhiên.',
+      'Trả lời đúng, bạn sẽ nhận được chim Bomb với sức công phá lớn.',
+      'Trả lời sai, bạn chỉ nhận được quả bóng nhỏ yếu ớt.',
+      'Kéo và thả súng cao su để bắn vỡ cấu trúc và tiêu diệt mục tiêu!'
+    ]
+  },
   'action-quiz-game': {
     title: 'Trắc nghiệm vận động',
     description: 'Vừa học vừa chơi, thực hiện các động tác thể chất vui nhộn theo đáp án.',
@@ -137,7 +157,7 @@ export const GAMES_AND_APPS = [
   'game-duck-race', 'game-hub', 'game-star-race', 'game-puzzle-flip',
   'game-spin-wheel', 'game-keo-co', 'game-doi-khang', 'game-chem-hoa-qua',
   'game-theo-luot', 'game-quiz', 'game-crossword', 'game-giai-ma-buc-tranh',
-  'game-dai-duong-ma-thuat', 'game-ai-la-trieu-phu'
+  'game-dai-duong-ma-thuat', 'game-ai-la-trieu-phu', 'game-ban-trung-hoa-hoc', 'game-angry-khtn'
 ];
 
 /**

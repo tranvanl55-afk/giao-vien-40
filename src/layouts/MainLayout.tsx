@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, ChevronRight, Box } from 'lucide-react';
@@ -18,6 +18,19 @@ export default function MainLayout() {
   const location = useLocation();
   const { logout: firebaseLogout } = useAuth();
   const { startTour } = useOnboardingTour();
+
+  useEffect(() => {
+    if (location.pathname === '/' && location.state?.startTour) {
+      const timer = setTimeout(() => {
+        startTour();
+      }, 800);
+      
+      // Clean up the state so it doesn't trigger again on refresh
+      navigate('/', { replace: true, state: {} });
+      
+      return () => clearTimeout(timer);
+    }
+  }, [location.pathname, location.state, startTour, navigate]);
 
   const handleLogout = async () => {
     await firebaseLogout();
@@ -51,7 +64,13 @@ export default function MainLayout() {
         onCommunityClick={handleCommunityClick}
         onAboutClick={() => navigate('/about')}
         onLogoClick={handleLogoClick}
-        onTourClick={startTour}
+        onTourClick={() => {
+          if (location.pathname !== '/') {
+            navigate('/', { state: { startTour: true } });
+          } else {
+            startTour();
+          }
+        }}
         onLeaderboardClick={() => navigate('/leaderboard')}
         onReviewClick={() => setReviewOpen(true)}
       />

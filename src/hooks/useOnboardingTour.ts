@@ -29,9 +29,13 @@ export const useOnboardingTour = () => {
       onDestroyStarted: () => {
         if (!driverObj.hasNextStep() || confirm('Bạn có chắc chắn muốn bỏ qua hướng dẫn không?')) {
           localStorage.setItem('has_seen_tour', 'true');
+          document.body.classList.remove('tour-active');
           driverObj.destroy();
           setHasStarted(false);
         }
+      },
+      onHighlightStarted: () => {
+        document.body.classList.add('tour-active');
       },
       steps: [
         {
@@ -52,10 +56,10 @@ export const useOnboardingTour = () => {
           }
         },
         {
-          element: '#tour-ai-tool',
+          element: '#tour-on-tap',
           popover: {
-            title: '🤖 Kho Công cụ AI',
-            description: 'Truy cập hàng chục công cụ Trí tuệ nhân tạo khổng lồ phục vụ cho việc học tập và nghiên cứu.',
+            title: '📝 Kho Ôn tập & Sơ đồ tư duy',
+            description: 'Công cụ vẽ sơ đồ tư duy Mindmap và các phiếu bài học giúp hệ thống hóa kiến thức.',
             side: 'bottom',
             align: 'start'
           }
@@ -70,19 +74,28 @@ export const useOnboardingTour = () => {
           }
         },
         {
-          element: '#tour-skkn',
+          element: '#tour-e-learning',
           popover: {
-            title: '👩‍🏫 Sổ tay Giáo viên',
-            description: 'Nơi tổng hợp các Sáng kiến kinh nghiệm và công cụ quản lý chuyên môn dành riêng cho thầy cô.',
+            title: '💻 Bài giảng E-learning',
+            description: 'Hệ thống bài giảng điện tử tương tác chuẩn hóa, giúp tự học mọi lúc mọi nơi.',
             side: 'bottom',
             align: 'start'
           }
         },
         {
-          element: '#tour-on-tap',
+          element: '#tour-van-ban-thong-minh',
           popover: {
-            title: '📝 Kho Ôn tập & Sơ đồ tư duy',
-            description: 'Công cụ vẽ sơ đồ tư duy Mindmap và các phiếu bài học giúp hệ thống hóa kiến thức.',
+            title: '📄 Văn bản thông minh',
+            description: 'Công cụ số hóa và xử lý văn bản, giúp quản lý tài liệu học tập một cách hiệu quả.',
+            side: 'bottom',
+            align: 'start'
+          }
+        },
+        {
+          element: '#tour-ai-tool',
+          popover: {
+            title: '🤖 Kho Công cụ AI',
+            description: 'Truy cập hàng chục công cụ Trí tuệ nhân tạo khổng lồ phục vụ cho việc học tập và nghiên cứu.',
             side: 'bottom',
             align: 'start'
           }
@@ -103,6 +116,33 @@ export const useOnboardingTour = () => {
             description: 'Nơi vinh danh các bài học, công cụ đang được cộng đồng học sinh trải nghiệm nhiều nhất.',
             side: 'top',
             align: 'start'
+          }
+        },
+        {
+          element: '#tour-magic-nav',
+          popover: {
+            title: '🧭 Thanh Điều hướng',
+            description: 'Di chuyển nhanh giữa các khu vực: Trang chủ, Cộng đồng, Bảng xếp hạng và Giới thiệu.',
+            side: 'bottom',
+            align: 'center'
+          }
+        },
+        {
+          element: '#tour-notifications',
+          popover: {
+            title: '🔔 Thông báo',
+            description: 'Nhận các cập nhật mới nhất, tin nhắn và thông báo thành tích từ hệ thống.',
+            side: 'bottom',
+            align: 'end'
+          }
+        },
+        {
+          element: '#tour-profile',
+          popover: {
+            title: '👤 Hồ sơ Cá nhân',
+            description: 'Quản lý thông tin tài khoản, xem lại các danh mục bài học nhanh chóng và đăng xuất.',
+            side: 'bottom',
+            align: 'end'
           }
         }
       ]
