@@ -157,7 +157,8 @@ export const GAMES_AND_APPS = [
   'game-duck-race', 'game-hub', 'game-star-race', 'game-puzzle-flip',
   'game-spin-wheel', 'game-keo-co', 'game-doi-khang', 'game-chem-hoa-qua',
   'game-theo-luot', 'game-quiz', 'game-crossword', 'game-giai-ma-buc-tranh',
-  'game-dai-duong-ma-thuat', 'game-ai-la-trieu-phu', 'game-ban-trung-hoa-hoc', 'game-angry-khtn'
+  'game-dai-duong-ma-thuat', 'game-ai-la-trieu-phu', 'game-ban-trung-hoa-hoc', 'game-angry-khtn',
+  'qr-code-generator'
 ];
 
 /**
