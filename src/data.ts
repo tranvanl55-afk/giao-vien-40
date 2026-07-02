@@ -1,8 +1,9 @@
 import { 
   Flask, ClipboardText, BookOpenText, GameController, Robot, Lightbulb, Atom, 
   RocketLaunch, ArrowDown, Wrench, Sun, Lightning, Hexagon, Target, Drop, Wind,
-  PersonSimpleRun, BowlFood, Scales, Presentation, Brain, Network, Leaf
+  PersonSimpleRun, BowlFood, Scales, Presentation, Brain, Network, Leaf, QrCode
 } from '@phosphor-icons/react';
+
 
 
 export interface SubCategory {
@@ -538,11 +539,27 @@ export const categories: Category[] = [
     subCategories: [
       { id: "skkn-nd30", title: "Định dạng văn bản ND30", description: "Tải lên tệp Word và tự động định dạng chuẩn Nghị định 30/2020/NĐ-CP về công tác văn thư — phông chữ, định lề, số ký hiệu, tiêu đề đúng quy chuẩn.", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F%C4%91%E1%BB%8Bnh_d%E1%BA%A1ng_v%C4%83n_b%E1%BA%A3n-removebg-preview.png?alt=media&token=5f1e391c-fab2-4cb6-8e95-572c48274b50", colorClass: "hover:bg-red-500/20 hover:border-red-500/50" },
       {
-        id: "giao-an-ai-tool",
-        title: "Nâng Cấp Giáo Án AI",
-        description: "Tích hợp Năng lực số & Năng lực AI tự động vào giáo án Word 📝",
-        colorClass: "hover:bg-blue-500/20 hover:border-blue-500/50",
-        logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fgi%C3%A1o_%C3%A1n-removebg-preview.png?alt=media&token=64d8584c-6e57-43ae-a27e-d47662baa0d5",
+        id: 'giao-an-ai-tool',
+        title: 'Nâng Cấp Giáo Án AI',
+        description: 'Tích hợp Năng lực số & Năng lực AI tự động vào giáo án Word 📝',
+        colorClass: 'hover:bg-blue-500/20 hover:border-blue-500/50',
+        logoUrl: 'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fgi%C3%A1o_%C3%A1n-removebg-preview.png?alt=media&token=64d8584c-6e57-43ae-a27e-d47662baa0d5',
+      },
+      {
+        id: 'qr-code-generator',
+        title: 'Tạo Mã QR',
+        description: 'Chuyển URL hoặc văn bản thành mã QR tức thì — tùy chỉnh màu sắc, kích thước và tải về PNG 📲',
+        colorClass: 'hover:bg-orange-500/20 hover:border-orange-500/50',
+        logoUrl: 'https://img.icons8.com/fluency/96/qr-code.png',
+        lessons: [
+          {
+            id: 'qr-code-generator',
+            title: 'Tạo Mã QR',
+            description: 'Nhập URL hoặc văn bản, tùy chỉnh màu và kích thước, tải về PNG ngay lập tức.',
+            icon: QrCode,
+            theme: 'orange',
+          }
+        ]
       }
     ]
   },

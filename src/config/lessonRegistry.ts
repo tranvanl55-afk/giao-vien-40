@@ -229,6 +229,10 @@ export const LESSON_REGISTRY: Record<string, LessonRegistryEntry> = {
     component: lazyNamed(() => import('../components/simulations/VideoTuongTac'), 'VideoTuongTac'),
     backTarget: 'subcategory',
   },
+  'qr-code-generator': {
+    component: lazyNamed(() => import('../components/simulations/QrCodeGenerator'), 'QrCodeGenerator'),
+    backTarget: 'subcategory',
+  },
 
   // ── AI / ML / Deep Learning ────────────────────────────────────
   'ml-regression': {
