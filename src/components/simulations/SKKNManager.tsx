@@ -409,7 +409,7 @@ export default function SKKNManager({ subCategoryId, categoryTitle }: SKKNManage
 
         {/* PANEL PHẢI: DANH SÁCH FILE PDF (2 Cột) */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 space-y-5 shadow-sm min-h-[500px] flex flex-col">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 space-y-5 shadow-sm min-h-125 flex flex-col">
             
             {/* Search and Header */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">

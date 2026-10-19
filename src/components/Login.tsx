@@ -235,7 +235,7 @@ export function Login() {
       </div>
 
       {/* Sliding Container */}
-      <div className="relative z-30 w-full max-w-[800px] min-h-[540px] bg-white rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.5)] overflow-hidden flex">
+      <div className="relative z-30 w-full max-w-200 min-h-135 bg-white rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.5)] overflow-hidden flex">
 
         {/* ===== SIGN IN FORM (left side) ===== */}
         <div
@@ -520,8 +520,8 @@ export function Login() {
         </div>
 
         {/* Placeholder divs to set min-height on both halves */}
-        <div className="w-1/2 min-h-[540px] invisible" aria-hidden="true" />
-        <div className="w-1/2 min-h-[540px] invisible" aria-hidden="true" />
+        <div className="w-1/2 min-h-135 invisible" aria-hidden="true" />
+        <div className="w-1/2 min-h-135 invisible" aria-hidden="true" />
       </div>
     </div>
   );

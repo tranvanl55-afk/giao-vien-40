@@ -306,7 +306,7 @@ export function CrosswordGame({ questions, onBack }: { questions: Question[]; on
               </div>
 
               {/* Right Column: Question */}
-              <div className="w-full lg:w-[450px] shrink-0 lg:h-full flex flex-col min-h-[400px]">
+              <div className="w-full lg:w-112.5 shrink-0 lg:h-full flex flex-col min-h-100">
                 <AnimatePresence mode="wait">
                   {activeRow !== null && !solvedRows.has(activeRow) ? (
                     <motion.div
@@ -626,7 +626,7 @@ function SetupPhase({
               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" />
             <motion.div
               initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}
-              className="fixed inset-x-4 bottom-4 top-20 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-[640px] md:top-[10vh] md:bottom-[10vh] bg-slate-900 border border-white/15 rounded-3xl shadow-2xl z-50 flex flex-col overflow-hidden"
+              className="fixed inset-x-4 bottom-4 top-20 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-160 md:top-[10vh] md:bottom-[10vh] bg-slate-900 border border-white/15 rounded-3xl shadow-2xl z-50 flex flex-col overflow-hidden"
             >
               <div className="p-5 border-b border-white/10 shrink-0">
                 <div className="flex items-center justify-between mb-4">

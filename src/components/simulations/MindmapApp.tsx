@@ -353,7 +353,7 @@ const HorizontalMindmap = ({ data, zoom, mapRef, onLayout }: { data: MindmapNode
                 style={{ left: px, top: py }}
               >
                 <div
-                  className="flex flex-col items-center gap-2 px-6 py-4 rounded-3xl shadow-xl border-2 border-white/20 text-white font-bold text-sm max-w-[220px] text-center backdrop-blur-sm"
+                  className="flex flex-col items-center gap-2 px-6 py-4 rounded-3xl shadow-xl border-2 border-white/20 text-white font-bold text-sm max-w-55 text-center backdrop-blur-sm"
                   style={{ backgroundColor: color }}
                 >
                   <IconComponent className="w-10 h-10 drop-shadow-md text-white opacity-90" />
@@ -374,7 +374,7 @@ const HorizontalMindmap = ({ data, zoom, mapRef, onLayout }: { data: MindmapNode
               style={{ left: px, top: py }}
             >
               <div
-                className="px-4 py-2 rounded-2xl shadow-lg border-2 text-sm font-semibold max-w-[180px] text-center bg-white z-20 relative"
+                className="px-4 py-2 rounded-2xl shadow-lg border-2 text-sm font-semibold max-w-45 text-center bg-white z-20 relative"
                 style={{
                   borderColor: color,
                   color: color,

@@ -228,7 +228,7 @@ Nếu người dùng chưa nhập gì, hãy tự sáng tác một đoạn phù h
             ))}
           </div>
 
-          <div className="min-h-[400px] mt-4">
+          <div className="min-h-100 mt-4">
             {step === 1 && (
               <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
                 <div className="grid grid-cols-2 gap-5">
@@ -261,7 +261,7 @@ Nếu người dùng chưa nhập gì, hãy tự sáng tác một đoạn phù h
                     <div className="flex flex-wrap gap-2 mb-4">
                       {referenceFiles.map((f, i) => (
                         <div key={i} className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-2 rounded-lg text-sm text-slate-700 shadow-sm">
-                          <span className="truncate max-w-[250px] font-medium">{f.name}</span>
+                          <span className="truncate max-w-62.5 font-medium">{f.name}</span>
                           <span className="text-xs text-slate-400">{(f.size / 1024 / 1024).toFixed(2)} MB</span>
                           <button onClick={() => setReferenceFiles(prev => prev.filter((_, index) => index !== i))} className="text-red-500 hover:text-red-600 ml-1 p-1 hover:bg-red-50 rounded">
                             <Trash2 className="w-4 h-4"/>

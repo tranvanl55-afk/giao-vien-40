@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Play, RotateCcw, Send, CheckCircle2, XCircle, MessageCircle, X, Pause, Bot } from 'lucide-react';
+import { ArrowLeft, Play, RotateCcw, Send, CheckCircle2, XCircle, MessageCircle, X, Pause, Bot, Sparkles } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
+import ReactMarkdown from 'react-markdown';
+import { askGemini } from '../../lib/gemini';
 
 interface SimulationData {
   time: number;
@@ -52,9 +54,15 @@ export const CoNangSimulation = ({ onBack }: { onBack: () => void }) => {
   
   // Chat State
   const [chatInput, setChatInput] = useState('');
+  const [isAiThinking, setIsAiThinking] = useState(false);
+  const chatMessagesEndRef = useRef<HTMLDivElement>(null);
   const [chatMessages, setChatMessages] = useState<{role: 'user'|'ai', content: string}[]>([
     { role: 'ai', content: 'Chào em, thầy là Trợ lý Cơ năng. Em có câu hỏi gì về quá trình rơi của vật không?' }
   ]);
+
+  useEffect(() => {
+    chatMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages, isAiThinking]);
 
   // Quiz State
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number | null>>({});
@@ -147,22 +155,47 @@ export const CoNangSimulation = ({ onBack }: { onBack: () => void }) => {
     });
   };
 
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || isAiThinking) return;
     
     const userMsg = chatInput.trim();
     setChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setChatInput('');
+    setIsAiThinking(true);
     
-    // Simple AI logic response based on prompt requirements
-    setTimeout(() => {
+    try {
+      const w = Math.round(totalEnergy);
+      const wt = Math.round(potentialEnergy);
+      const wd = Math.round(kineticEnergy);
+      const h = currentHeight.toFixed(2);
+      const v = currentVelocity.toFixed(2);
+
+      const systemInstruction = `Bạn là "Trợ lý Cơ năng" thân thiện, nhiệt tình hỗ trợ học sinh học phần Cơ học - Bảo toàn và Chuyển hóa Cơ năng (Động năng và Thế năng).
+Thông số thực nghiệm thời gian thực trong mô phỏng rơi tự do:
+- Khối lượng vật: ${mass} kg
+- Độ cao ban đầu: ${initialHeight} m
+- Độ cao hiện tại: ${h} m
+- Vận tốc hiện tại: ${v} m/s
+- Thế năng trọng trường hiện tại: Wt = ${wt} J
+- Động năng hiện tại: Wđ = ${wd} J
+- Cơ năng toàn phần (bảo toàn): W = Wt + Wđ = ${w} J
+
+Quy tắc:
+1. Giải thích chính xác, rõ ràng về bảo toàn cơ năng, chuyển hóa giữa động năng (Wđ = 1/2*m*v^2) và thế năng (Wt = m*g*h).
+2. Khi câu hỏi liên quan đến mô phỏng đang chạy/dừng, hãy liên hệ ngay với các giá trị thời gian thực (độ cao ${h}m, Wt=${wt}J, Wđ=${wd}J).
+3. Xưng hô thân thiện (Thầy/Mình - Em/Bạn), giọng điệu tích cực, khuyến khích học sinh.
+4. Trình bày bằng tiếng Việt, định dạng markdown gọn gàng (2-4 câu).`;
+
+      const reply = await askGemini(userMsg, systemInstruction);
+      setChatMessages(prev => [...prev, { role: 'ai', content: reply }]);
+    } catch (error) {
+      console.error("AI error:", error);
       const w = Math.round(totalEnergy);
       const wt = Math.round(potentialEnergy);
       const wd = Math.round(kineticEnergy);
       const h = currentHeight.toFixed(2);
       
       let reply = `Tại độ cao ${h}m, thế năng của vật là ${wt}J, động năng là ${wd}J. `;
-      
       if (userMsg.toLowerCase().includes('cơ năng')) {
         reply += `Vì bỏ qua lực cản không khí, cơ năng bảo toàn và luôn bằng ${w}J.`;
       } else if (userMsg.toLowerCase().includes('động năng')) {
@@ -170,9 +203,10 @@ export const CoNangSimulation = ({ onBack }: { onBack: () => void }) => {
       } else if (userMsg.toLowerCase().includes('thế năng')) {
         reply += `Thế năng phụ thuộc vào độ cao, rơi càng thấp thì thế năng càng giảm.`;
       }
-      
       setChatMessages(prev => [...prev, { role: 'ai', content: reply }]);
-    }, 600);
+    } finally {
+      setIsAiThinking(false);
+    }
   };
 
   // Reusable component parts
@@ -243,7 +277,7 @@ export const CoNangSimulation = ({ onBack }: { onBack: () => void }) => {
       </div>
 
       {/* RIGHT PANEL : SIDEBAR */}
-      <div className="w-[450px] bg-white border-l border-slate-200 flex flex-col z-30 shadow-2xl shrink-0">
+      <div className="w-112.5 bg-white border-l border-slate-200 flex flex-col z-30 shadow-2xl shrink-0">
         
         {/* Tabs */}
         <div className="flex border-b border-slate-200">
@@ -346,7 +380,7 @@ export const CoNangSimulation = ({ onBack }: { onBack: () => void }) => {
                  </div>
 
                 {/* Chart */}
-                <div className="bg-white rounded-2xl border border-slate-200 p-3 shadow-sm flex-1 min-h-[130px] flex flex-col mt-4">
+                <div className="bg-white rounded-2xl border border-slate-200 p-3 shadow-sm flex-1 min-h-32.5 flex flex-col mt-4">
                    <h3 className="font-bold text-[11px] text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-100 pb-1.5">Đồ thị Năng lượng</h3>
                    <div className="w-full flex-1">
                       <ResponsiveContainer width="100%" height="100%">
@@ -419,11 +453,11 @@ export const CoNangSimulation = ({ onBack }: { onBack: () => void }) => {
       </div>
 
       {/* FLOATING CHAT WIDGET */}
-      <div className="fixed bottom-6 right-[480px] z-50 flex flex-col items-end">
+      <div className="fixed bottom-6 right-120 z-50 flex flex-col items-end">
         
         {/* Chat Window Popup */}
         {isChatOpen && (
-          <div className="bg-white/90 backdrop-blur-xl w-[350px] h-[500px] mb-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-white flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
+          <div className="bg-white/90 backdrop-blur-xl w-87.5 h-125 mb-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-white flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
             {/* Header */}
             <div className="bg-linear-to-r from-orange-500 to-amber-500 p-4 flex items-center gap-3 shrink-0 relative overflow-hidden">
                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-x-10 -translate-y-10"></div>
@@ -448,11 +482,30 @@ export const CoNangSimulation = ({ onBack }: { onBack: () => void }) => {
                       <Bot className="w-3.5 h-3.5 text-orange-600" />
                     </div>
                   )}
-                  <div className={`max-w-[80%] px-4 py-2.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-orange-500 text-white rounded-2xl rounded-tr-sm font-medium' : 'bg-white text-slate-700 rounded-2xl border border-slate-100 rounded-tl-sm'}`}>
-                    {msg.content}
+                  <div className={`max-w-[85%] px-4 py-2.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-orange-500 text-white rounded-2xl rounded-tr-sm font-medium' : 'bg-white text-slate-700 rounded-2xl border border-slate-100 rounded-tl-sm'}`}>
+                    {typeof msg.content === 'string' ? (
+                      <div className="prose prose-sm max-w-none text-slate-700 leading-relaxed font-sans [&>p]:m-0 [&>p+p]:mt-1.5 [&>ul]:my-1 [&>ul]:pl-4 [&>ol]:my-1 [&>ol]:pl-4">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      msg.content
+                    )}
                   </div>
                 </div>
               ))}
+              {isAiThinking && (
+                <div className="flex justify-start items-center">
+                  <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center mr-2 shrink-0">
+                    <Bot className="w-3.5 h-3.5 text-orange-600" />
+                  </div>
+                  <div className="bg-white border border-slate-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-1.5">
+                    <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                    <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                    <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" />
+                  </div>
+                </div>
+              )}
+              <div ref={chatMessagesEndRef} />
             </div>
 
             {/* Input Box */}
@@ -463,15 +516,16 @@ export const CoNangSimulation = ({ onBack }: { onBack: () => void }) => {
                    value={chatInput}
                    onChange={e => setChatInput(e.target.value)}
                    onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-                   placeholder="Hỏi về cơ năng..."
-                   className="w-full bg-transparent border-none outline-none py-2 px-4 text-sm text-slate-700 placeholder-slate-400"
+                   placeholder={isAiThinking ? "Đang suy nghĩ..." : "Hỏi về cơ năng..."}
+                   disabled={isAiThinking}
+                   className="w-full bg-transparent border-none outline-none py-2 px-4 text-sm text-slate-700 placeholder-slate-400 disabled:opacity-50"
                  />
                  <button 
                    onClick={handleSendMessage}
-                   disabled={!chatInput.trim()}
+                   disabled={!chatInput.trim() || isAiThinking}
                    className="w-8 h-8 rounded-full bg-orange-500 hover:bg-orange-600 disabled:bg-slate-300 flex items-center justify-center text-white transition-colors shrink-0"
                  >
-                   <Send className="w-4 h-4 ml-[-2px]" />
+                   <Send className="w-4 h-4 -ml-0.5" />
                  </button>
                </div>
             </div>

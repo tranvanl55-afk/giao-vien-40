@@ -626,7 +626,7 @@ export function BanTrungHoaHocGame({ onBack }: { onBack: () => void }) {
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center font-sans text-slate-100 p-4">
       {/* Header */}
-      <div className="w-full max-w-[480px] flex items-center justify-between mb-4">
+      <div className="w-full max-w-120 flex items-center justify-between mb-4">
         <button onClick={onBack} className="p-2 bg-slate-800 rounded-full hover:bg-slate-700 transition">
           <ArrowLeft className="w-6 h-6" />
         </button>
@@ -673,7 +673,7 @@ export function BanTrungHoaHocGame({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* Instructions */}
-      <div className="w-full max-w-[480px] mt-6 bg-slate-900/50 p-4 rounded-xl border border-slate-800 text-sm">
+      <div className="w-full max-w-120 mt-6 bg-slate-900/50 p-4 rounded-xl border border-slate-800 text-sm">
         <h3 className="font-bold text-amber-400 mb-2 uppercase text-xs tracking-wider">Cách chơi:</h3>
         <ul className="list-disc pl-5 space-y-1 text-slate-300">
           <li>Ngắm và chạm vào màn hình để bắn Ion.</li>

@@ -14,8 +14,8 @@ export const GenericLessonView: React.FC<GenericLessonViewProps> = ({ onBack, ti
     <div className="w-full h-screen bg-slate-950 flex flex-col items-center justify-center relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-blue-900/20 via-slate-900 to-black"></div>
-      <div className="absolute top-[20%] left-[20%] w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[120px]"></div>
-      <div className="absolute bottom-[20%] right-[20%] w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px]"></div>
+      <div className="absolute top-[20%] left-[20%] w-125 h-125 bg-cyan-600/10 rounded-full blur-[120px]"></div>
+      <div className="absolute bottom-[20%] right-[20%] w-125 h-125 bg-purple-600/10 rounded-full blur-[120px]"></div>
 
       {/* Back Button */}
       <button 

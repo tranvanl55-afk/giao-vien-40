@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Play, RotateCcw, Send, CheckCircle2, XCircle, MessageCircle, X, HardHat } from 'lucide-react';
+import { ArrowLeft, Play, RotateCcw, Send, CheckCircle2, XCircle, MessageCircle, X, HardHat, Sparkles } from 'lucide-react';
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
 import { InlineMath } from 'react-katex';
+import ReactMarkdown from 'react-markdown';
+import { askGemini } from '../../lib/gemini';
 
 const P_symbol = <InlineMath math="\mathcal{P}" />;
 
@@ -80,9 +82,15 @@ export const CongSuatSimulation = ({ onBack }: { onBack: () => void }) => {
 
   // Chat State
   const [chatInput, setChatInput] = useState('');
+  const [isAiThinking, setIsAiThinking] = useState(false);
+  const chatMessagesEndRef = useRef<HTMLDivElement>(null);
   const [chatMessages, setChatMessages] = useState<{role: 'user'|'ai', content: string}[]>([
     { role: 'ai', content: 'Xin chào! Mình là Trợ lý Cần Cẩu, sẵn sàng giúp bạn tính Công và Công suất.' }
   ]);
+
+  useEffect(() => {
+    chatMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages, isAiThinking]);
 
   // Quiz State
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number | null>>({});
@@ -154,25 +162,43 @@ export const CongSuatSimulation = ({ onBack }: { onBack: () => void }) => {
     });
   };
 
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || isAiThinking) return;
     
     const userMsg = chatInput.trim();
     setChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setChatInput('');
+    setIsAiThinking(true);
     
-    setTimeout(() => {
+    try {
+      const systemInstruction = `Bạn là "Trợ lý Cần Cẩu" vui tính, thông minh, chuyên gia về Cơ học: Công và Công suất cho học sinh KHTN.
+Thông số thí nghiệm nâng vật hiện tại:
+- Khối lượng vật: ${mass} kg (Trọng lượng / Lực nâng cần thiết F = ${force} N)
+- Độ cao nâng: ${height} m
+- Thời gian nâng: ${duration} s
+- Công cơ học thực hiện: A = F · s = ${work} J
+- Công suất cần cẩu: 𝒫 = A / t = ${power.toFixed(1)} W
+
+Quy tắc:
+1. Trả lời chính xác câu hỏi của học sinh về công cơ học (A = F·s), công suất (𝒫 = A/t), ý nghĩa của công suất (đặc trưng cho tốc độ sinh công), đơn vị Joule (J), Watt (W), kW, HP...
+2. Liên hệ với các thông số hiện tại trong mô phỏng khi phù hợp.
+3. Giọng điệu thân thiện, súc tích (2-4 câu) bằng định dạng markdown.`;
+
+      const reply = await askGemini(userMsg, systemInstruction);
+      setChatMessages(prev => [...prev, { role: 'ai', content: reply }]);
+    } catch (error) {
+      console.error("AI error:", error);
       let reply = `Với khối lượng ${mass}kg nâng lên ${height}m trong ${duration}s:\n`;
       reply += `- Lực nâng F = ${force} N\n`;
       reply += `- Công A = ${work} J\n`;
       reply += `- Công suất 𝒫 = ${power.toFixed(1)} W.\n`;
-      
       if (userMsg.toLowerCase().includes('công suất')) {
         reply += `Nhớ nhé, công suất đặc trưng cho tốc độ thực hiện công!`;
       }
-      
       setChatMessages(prev => [...prev, { role: 'ai', content: reply }]);
-    }, 600);
+    } finally {
+      setIsAiThinking(false);
+    }
   };
 
   return (
@@ -188,7 +214,7 @@ export const CongSuatSimulation = ({ onBack }: { onBack: () => void }) => {
         </button>
         
         {/* Crane Visual */}
-        <div className="relative w-[300px] flex justify-center items-end overflow-visible" style={{ height: craneBaseY }}>
+        <div className="relative w-75 flex justify-center items-end overflow-visible" style={{ height: craneBaseY }}>
           {/* Support pillar */}
           <div className="absolute bottom-0 left-4 w-6 h-full bg-amber-600 rounded-t-lg shadow-inner z-10"></div>
           
@@ -196,7 +222,7 @@ export const CongSuatSimulation = ({ onBack }: { onBack: () => void }) => {
           <div className="absolute top-8 left-4 w-full h-8 bg-amber-500 rounded-r-lg shadow-sm z-20"></div>
 
           {/* Cable box container mapping height */}
-          <div className="absolute top-[40px] left-[50%] -translate-x-1/2 flex flex-col items-center bottom-0 overflow-hidden" style={{ width: '100px' }}>
+          <div className="absolute top-10 left-[50%] -translate-x-1/2 flex flex-col items-center bottom-0 overflow-hidden" style={{ width: '100px' }}>
             {/* The moving container */}
             <motion.div 
                 className="absolute z-30 flex flex-col items-center w-full"
@@ -206,7 +232,7 @@ export const CongSuatSimulation = ({ onBack }: { onBack: () => void }) => {
                 style={{ top: maxPossibleHeight * pixelsPerMeter - 24 }} 
             >
                {/* Rope piece extending up */}
-               <div className="w-[3px] bg-slate-800 absolute bottom-full left-1/2 -translate-x-1/2" style={{ height: 1000}}></div>
+               <div className="w-0.75 bg-slate-800 absolute bottom-full left-1/2 -translate-x-1/2" style={{ height: 1000}}></div>
                
                {/* Box */}
                <div className="w-16 h-16 bg-blue-600 rounded-lg shadow-md flex items-center justify-center border-t-2 border-blue-400 relative">
@@ -222,7 +248,7 @@ export const CongSuatSimulation = ({ onBack }: { onBack: () => void }) => {
       </div>
 
       {/* RIGHT PANEL : SIDEBAR */}
-      <div className="w-[450px] bg-white border-l border-slate-200 flex flex-col z-30 shadow-2xl shrink-0">
+      <div className="w-112.5 bg-white border-l border-slate-200 flex flex-col z-30 shadow-2xl shrink-0">
         
         {/* Tabs */}
         <div className="flex border-b border-slate-200 shrink-0">
@@ -403,7 +429,7 @@ export const CongSuatSimulation = ({ onBack }: { onBack: () => void }) => {
       </div>
 
       {/* FLOATING CHAT WIDGET */}
-      <div className="fixed bottom-6 right-[480px] z-50 flex flex-col items-end">
+      <div className="fixed bottom-6 right-120 z-50 flex flex-col items-end">
         
         {/* Chat Window Popup */}
         <AnimatePresence>
@@ -413,7 +439,7 @@ export const CongSuatSimulation = ({ onBack }: { onBack: () => void }) => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="bg-white/95 backdrop-blur-xl w-[350px] h-[500px] mb-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 flex flex-col overflow-hidden"
+              className="bg-white/95 backdrop-blur-xl w-87.5 h-125 mb-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 flex flex-col overflow-hidden"
             >
               {/* Header */}
               <div className="bg-orange-500 p-4 flex items-center justify-between shrink-0">
@@ -443,11 +469,30 @@ export const CongSuatSimulation = ({ onBack }: { onBack: () => void }) => {
                         <HardHat className="w-4 h-4 text-orange-600" />
                       </div>
                     )}
-                    <div className={`max-w-[80%] px-4 py-2.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-orange-500 text-white rounded-[20px] rounded-tr-sm font-medium' : 'bg-white text-slate-700 rounded-[20px] border border-slate-100 rounded-tl-sm whitespace-pre-wrap'}`}>
-                      {msg.content}
+                    <div className={`max-w-[85%] px-4 py-2.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-orange-500 text-white rounded-[20px] rounded-tr-sm font-medium' : 'bg-white text-slate-700 rounded-[20px] border border-slate-100 rounded-tl-sm'}`}>
+                      {typeof msg.content === 'string' ? (
+                        <div className="prose prose-sm max-w-none text-slate-700 leading-relaxed font-sans [&>p]:m-0 [&>p+p]:mt-1.5 [&>ul]:my-1 [&>ul]:pl-4 [&>ol]:my-1 [&>ol]:pl-4">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        msg.content
+                      )}
                     </div>
                   </div>
                 ))}
+                {isAiThinking && (
+                  <div className="flex justify-start items-center">
+                    <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center mr-2 shrink-0 shadow-sm">
+                      <HardHat className="w-4 h-4 text-orange-600" />
+                    </div>
+                    <div className="bg-white border border-slate-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-1.5">
+                      <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                      <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                      <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" />
+                    </div>
+                  </div>
+                )}
+                <div ref={chatMessagesEndRef} />
               </div>
 
               {/* Input Box */}
@@ -458,15 +503,16 @@ export const CongSuatSimulation = ({ onBack }: { onBack: () => void }) => {
                      value={chatInput}
                      onChange={e => setChatInput(e.target.value)}
                      onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-                     placeholder="Hỏi gì đó..."
-                     className="w-full bg-transparent border-none outline-none py-2 px-4 text-sm text-slate-700 placeholder-slate-400"
+                     placeholder={isAiThinking ? "Đang suy nghĩ..." : "Hỏi gì đó..."}
+                     disabled={isAiThinking}
+                     className="w-full bg-transparent border-none outline-none py-2 px-4 text-sm text-slate-700 placeholder-slate-400 disabled:opacity-50"
                    />
                    <button 
                      onClick={handleSendMessage}
-                     disabled={!chatInput.trim()}
+                     disabled={!chatInput.trim() || isAiThinking}
                      className="w-9 h-9 rounded-full bg-orange-500 hover:bg-orange-600 disabled:bg-slate-300 flex items-center justify-center text-white transition-colors shrink-0 shadow-sm"
                    >
-                     <Send className="w-4 h-4 ml-[-2px]" />
+                     <Send className="w-4 h-4 -ml-0.5" />
                    </button>
                  </div>
               </div>

@@ -95,10 +95,10 @@ export default function SubcategoryPage() {
             : selectedSub.lessons && viewMode === 'gamified'
               ? 'bg-transparent p-0 overflow-y-auto custom-scrollbar' 
               : ['skkn-generator', 'skkn-nd30', 'skkn-upload', 'giao-an-ai-tool'].includes(selectedSub.id)
-                ? 'bg-transparent border-0 min-h-[500px] p-0 overflow-y-auto custom-scrollbar'
+                ? 'bg-transparent border-0 min-h-125 p-0 overflow-y-auto custom-scrollbar'
                 : ['test-gk', 'test-ck', 'bg-khtn', 'docs-sgk'].includes(selectedSub.id)
-                  ? 'bg-black/60 border border-slate-800/80 min-h-[500px] p-4 md:p-8 overflow-y-auto custom-scrollbar' 
-                  : 'bg-black/60 border border-slate-800 items-center justify-center text-center min-h-[500px] overflow-hidden group shadow-inner p-4 md:p-8'
+                  ? 'bg-black/60 border border-slate-800/80 min-h-125 p-4 md:p-8 overflow-y-auto custom-scrollbar' 
+                  : 'bg-black/60 border border-slate-800 items-center justify-center text-center min-h-125 overflow-hidden group shadow-inner p-4 md:p-8'
         }`}>
             {!selectedSub.lessons && !['skkn-generator', 'skkn-nd30', 'skkn-upload', 'giao-an-ai-tool'].includes(selectedSub.id) && (
               <>
@@ -271,7 +271,7 @@ export default function SubcategoryPage() {
                           <div
                             key={lesson.id}
                             onClick={() => navigate(`/lesson/${lesson.id}`)}
-                            className="relative bg-white rounded-3xl p-6 md:p-8 shadow-[0_12px_28px_rgba(0,0,0,0.18)] border-2 border-slate-200 flex items-stretch gap-6 group cursor-pointer hover:-translate-y-1.5 hover:shadow-[0_20px_40px_rgba(6,182,212,0.25)] hover:border-cyan-400/80 transition-all duration-300 select-none overflow-visible min-h-[160px] text-slate-800"
+                            className="relative bg-white rounded-3xl p-6 md:p-8 shadow-[0_12px_28px_rgba(0,0,0,0.18)] border-2 border-slate-200 flex items-stretch gap-6 group cursor-pointer hover:-translate-y-1.5 hover:shadow-[0_20px_40px_rgba(6,182,212,0.25)] hover:border-cyan-400/80 transition-all duration-300 select-none overflow-visible min-h-40 text-slate-800"
                           >
                             <div className={`absolute -top-4 -left-4 w-9 h-9 rounded-full flex items-center justify-center text-sm md:text-base font-black text-white shadow-md border-2 ${color.badge} z-20 group-hover:scale-110 transition-transform`}>
                               {idx + 1}
@@ -335,7 +335,7 @@ export default function SubcategoryPage() {
                     </div>
                     <iframe 
                       src={doc.url} 
-                      className="w-full h-[600px] border-none bg-white" 
+                      className="w-full h-150 border-none bg-white" 
                       title={doc.title}
                       allowFullScreen
                     ></iframe>

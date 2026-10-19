@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Send, CheckCircle2, XCircle, MessageCircle, X, SunMedium, MoveHorizontal, BoxSelect } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, Send, CheckCircle2, XCircle, MessageCircle, X, SunMedium, MoveHorizontal, BoxSelect, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
 import { InlineMath } from 'react-katex';
+import ReactMarkdown from 'react-markdown';
+import { askGemini } from '../../lib/gemini';
 
 const quizData = [
   {
@@ -93,9 +95,15 @@ export const BongToiBongNuaToi = ({ onBack }: { onBack: () => void }) => {
 
   // Chat State
   const [chatInput, setChatInput] = useState('');
+  const [isAiThinking, setIsAiThinking] = useState(false);
+  const chatMessagesEndRef = useRef<HTMLDivElement>(null);
   const [chatMessages, setChatMessages] = useState<{role: 'user'|'ai', content: React.ReactNode}[]>([
     { role: 'ai', content: 'Xin chào! Mình là Trợ lý Quang học. Hãy thử thay đổi kích thước nguồn sáng xem bóng trên màn thay đổi thế nào nhé!' }
   ]);
+
+  useEffect(() => {
+    chatMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages, isAiThinking]);
 
   // Quiz State
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number | null>>({});
@@ -113,27 +121,45 @@ export const BongToiBongNuaToi = ({ onBack }: { onBack: () => void }) => {
     });
   };
 
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || isAiThinking) return;
     
     const userMsg = chatInput.trim();
     setChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setChatInput('');
+    setIsAiThinking(true);
     
-    setTimeout(() => {
-      let reply: React.ReactNode = "";
-      if (userMsg.toLowerCase().includes('nhật thực')) {
-         reply = "Nhật thực xảy ra khi Mặt Trăng nằm giữa Mặt Trời và Trái Đất. Bóng tối của Mặt Trăng in lên Trái Đất tạo ra nhật thực toàn phần!";
-      } else if (userMsg.toLowerCase().includes('nguyệt thực')) {
-         reply = "Nguyệt thực xảy ra khi Trái Đất nằm giữa Mặt Trời và Mặt Trăng, khiến Mặt Trăng đi vào vùng bóng tối của Trái Đất.";
-      } else if (lightR === 0) {
-         reply = "Hiện tại nguồn sáng đang là một điểm sáng (rất nhỏ). Vì vậy trên màn chỉ xuất hiện vùng sáng và vùng bóng tối, KHÔNG có bóng nửa tối.";
-      } else {
-         reply = "Khi nguồn sáng là một nguồn rộng, các tia sáng đan chéo nhau qua mép vật cản, tạo ra một vùng bóng nửa tối (penumbra) bao quanh bóng tối (umbra).";
-      }
-      
+    try {
+      const systemInstruction = `Bạn là "Trợ lý Quang học" thân thiện, hỗ trợ học sinh học tập môn Khoa học tự nhiên về Vùng sáng, Vùng bóng tối và Vùng bóng nửa tối.
+Thông số mô phỏng hiện tại:
+- Bán kính nguồn sáng: ${lightR === 0 ? '0 (Nguồn sáng điểm - rất nhỏ)' : `${lightR}px (Nguồn sáng rộng)`}
+- Bán kính vật cản: ${objR}px
+- Vị trí vật cản: X = ${objPos}px
+- Hiện tượng trên màn chắn: ${lightR === 0 ? 'Chỉ có vùng sáng và vùng bóng tối rõ nét, HOÀN TOÀN KHÔNG có vùng bóng nửa tối.' : 'Xuất hiện vùng bóng tối ở tâm và vùng bóng nửa tối mờ dần bao quanh.'}
+
+Quy tắc:
+1. Giải thích chính xác, rõ ràng bản chất vật lý (nguồn sáng hẹp/rộng, sự lan truyền thẳng của ánh sáng, bóng tối, bóng nửa tối, hiện tượng nhật thực, nguyệt thực...).
+2. Nếu câu hỏi liên quan đến hiện tượng trên màn hình mô phỏng, hãy liên hệ với các giá trị thông số hiện tại.
+3. Trả lời bằng tiếng Việt, thân thiện, súc tích (khoảng 2-4 câu) bằng định dạng markdown.`;
+
+      const reply = await askGemini(userMsg, systemInstruction);
       setChatMessages(prev => [...prev, { role: 'ai', content: reply }]);
-    }, 600);
+    } catch (error) {
+      console.error("AI error:", error);
+      let reply = "";
+      if (userMsg.toLowerCase().includes('nhật thực')) {
+        reply = "Nhật thực xảy ra khi Mặt Trăng nằm giữa Mặt Trời và Trái Đất. Bóng tối của Mặt Trăng in lên Trái Đất tạo ra nhật thực toàn phần!";
+      } else if (userMsg.toLowerCase().includes('nguyệt thực')) {
+        reply = "Nguyệt thực xảy ra khi Trái Đất nằm giữa Mặt Trời và Mặt Trăng, khiến Mặt Trăng đi vào vùng bóng tối của Trái Đất.";
+      } else if (lightR === 0) {
+        reply = "Hiện tại nguồn sáng đang là một điểm sáng (rất nhỏ). Vì vậy trên màn chỉ xuất hiện vùng sáng và vùng bóng tối, KHÔNG có bóng nửa tối.";
+      } else {
+        reply = "Khi nguồn sáng là một nguồn rộng, các tia sáng đan chéo nhau qua mép vật cản, tạo ra một vùng bóng nửa tối (penumbra) bao quanh bóng tối (umbra).";
+      }
+      setChatMessages(prev => [...prev, { role: 'ai', content: reply }]);
+    } finally {
+      setIsAiThinking(false);
+    }
   };
 
   // Math for rendering
@@ -175,7 +201,7 @@ export const BongToiBongNuaToi = ({ onBack }: { onBack: () => void }) => {
         </button>
         
         {/* Canvas Area Container */}
-        <div className="relative w-[90%] max-w-[900px] aspect-video bg-slate-900 rounded-2xl border border-slate-700/50 shadow-2xl overflow-hidden flex items-center justify-center">
+        <div className="relative w-[90%] max-w-225 aspect-video bg-slate-900 rounded-2xl border border-slate-700/50 shadow-2xl overflow-hidden flex items-center justify-center">
           
           <div className="absolute top-4 left-6 text-slate-200 font-medium text-sm tracking-wide z-10 drop-shadow-md">
             Mô phỏng: Bóng tối và Bóng nửa tối
@@ -301,7 +327,7 @@ export const BongToiBongNuaToi = ({ onBack }: { onBack: () => void }) => {
       </div>
 
       {/* RIGHT PANEL : SIDEBAR */}
-      <div className="w-[450px] bg-slate-50 border-l border-slate-200 flex flex-col z-30 shadow-2xl shrink-0">
+      <div className="w-112.5 bg-slate-50 border-l border-slate-200 flex flex-col z-30 shadow-2xl shrink-0">
         
         {/* Tabs */}
         <div className="flex border-b border-slate-200 shrink-0 bg-white">
@@ -472,7 +498,7 @@ export const BongToiBongNuaToi = ({ onBack }: { onBack: () => void }) => {
       </div>
 
       {/* FLOATING CHAT WIDGET */}
-      <div className="fixed bottom-6 right-[480px] z-50 flex flex-col items-end">
+      <div className="fixed bottom-6 right-120 z-50 flex flex-col items-end">
         
         {/* Chat Window Popup */}
         <AnimatePresence>
@@ -482,7 +508,7 @@ export const BongToiBongNuaToi = ({ onBack }: { onBack: () => void }) => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="bg-white/95 backdrop-blur-xl w-[350px] h-[500px] mb-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 flex flex-col overflow-hidden"
+              className="bg-white/95 backdrop-blur-xl w-87.5 h-125 mb-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 flex flex-col overflow-hidden"
             >
               {/* Header */}
               <div className="bg-sky-500 p-4 flex items-center justify-between shrink-0">
@@ -512,11 +538,30 @@ export const BongToiBongNuaToi = ({ onBack }: { onBack: () => void }) => {
                         <img src="https://api.dicebear.com/7.x/micah/svg?seed=Felix&backgroundColor=transparent" alt="Avatar" className="w-6 h-6 object-cover" />
                       </div>
                     )}
-                    <div className={`max-w-[80%] px-4 py-2.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-sky-500 text-white rounded-[20px] rounded-tr-sm font-medium' : 'bg-white text-slate-700 rounded-[20px] border border-slate-100 rounded-tl-sm whitespace-pre-wrap'}`}>
-                      {msg.content}
+                    <div className={`max-w-[85%] px-4 py-2.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-sky-500 text-white rounded-[20px] rounded-tr-sm font-medium' : 'bg-white text-slate-700 rounded-[20px] border border-slate-100 rounded-tl-sm'}`}>
+                      {typeof msg.content === 'string' ? (
+                        <div className="prose prose-sm max-w-none text-slate-700 leading-relaxed font-sans [&>p]:m-0 [&>p+p]:mt-1.5 [&>ul]:my-1 [&>ul]:pl-4 [&>ol]:my-1 [&>ol]:pl-4">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        msg.content
+                      )}
                     </div>
                   </div>
                 ))}
+                {isAiThinking && (
+                  <div className="flex justify-start items-center">
+                    <div className="w-7 h-7 rounded-full bg-sky-100 flex items-center justify-center mr-2 shrink-0 shadow-sm overflow-hidden">
+                      <img src="https://api.dicebear.com/7.x/micah/svg?seed=Felix&backgroundColor=transparent" alt="Avatar" className="w-6 h-6 object-cover" />
+                    </div>
+                    <div className="bg-white border border-slate-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-1.5">
+                      <div className="w-2 h-2 bg-sky-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                      <div className="w-2 h-2 bg-sky-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                      <div className="w-2 h-2 bg-sky-400 rounded-full animate-bounce" />
+                    </div>
+                  </div>
+                )}
+                <div ref={chatMessagesEndRef} />
               </div>
 
               {/* Input Box */}
@@ -527,15 +572,16 @@ export const BongToiBongNuaToi = ({ onBack }: { onBack: () => void }) => {
                      value={chatInput}
                      onChange={e => setChatInput(e.target.value)}
                      onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-                     placeholder="Hỏi gì đó..."
-                     className="w-full bg-transparent border-none outline-none py-2 px-4 text-sm text-slate-700 placeholder-slate-400"
+                     placeholder={isAiThinking ? "Đang suy nghĩ..." : "Hỏi gì đó..."}
+                     disabled={isAiThinking}
+                     className="w-full bg-transparent border-none outline-none py-2 px-4 text-sm text-slate-700 placeholder-slate-400 disabled:opacity-50"
                    />
                    <button 
                      onClick={handleSendMessage}
-                     disabled={!chatInput.trim()}
+                     disabled={!chatInput.trim() || isAiThinking}
                      className="w-9 h-9 rounded-full bg-sky-500 hover:bg-sky-600 disabled:bg-slate-300 flex items-center justify-center text-white transition-colors shrink-0 shadow-sm"
                    >
-                     <Send className="w-4 h-4 ml-[-2px]" />
+                     <Send className="w-4 h-4 -ml-0.5" />
                    </button>
                  </div>
               </div>

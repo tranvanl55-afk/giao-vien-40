@@ -280,7 +280,7 @@ export const GiaiMaBucTranhGame: React.FC<GiaiMaBucTranhGameProps> = ({ question
         </div>
 
         {/* Right Side: The Question */}
-        <div className="w-full lg:w-[500px] xl:w-[600px] bg-slate-800/50 border-l border-slate-700 flex flex-col overflow-hidden">
+        <div className="w-full lg:w-125 xl:w-150 bg-slate-800/50 border-l border-slate-700 flex flex-col overflow-hidden">
           <div className="p-4 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <span className="w-8 h-8 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-sm">

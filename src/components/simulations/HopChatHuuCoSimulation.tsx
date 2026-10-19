@@ -791,7 +791,7 @@ export function HopChatHuuCoSimulation({ onBack }: HopChatHuuCoSimulationProps) 
         </div>
 
         {/* Right Side: Selection Dropdown & Info Panel */}
-        <div className="w-[320px] lg:w-[360px] bg-slate-900/60 border-l border-slate-900/80 flex flex-col backdrop-blur-xl z-20 shrink-0 overflow-hidden">
+        <div className="w-[320px] lg:w-90 bg-slate-900/60 border-l border-slate-900/80 flex flex-col backdrop-blur-xl z-20 shrink-0 overflow-hidden">
           <div className="p-4 border-b border-slate-900 bg-slate-900/20">
              <h3 className="font-black text-xs uppercase tracking-widest text-emerald-400 mb-1 font-heading">Danh sách hợp chất</h3>
              <p className="text-[10px] text-slate-500 font-bold">Chọn hợp chất để lắp ráp mô hình 3D.</p>
@@ -837,7 +837,7 @@ export function HopChatHuuCoSimulation({ onBack }: HopChatHuuCoSimulationProps) 
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -8, scale: 0.96 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-40 overflow-hidden max-h-[320px] overflow-y-auto custom-scrollbar"
+                      className="absolute left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-40 overflow-hidden max-h-80 overflow-y-auto custom-scrollbar"
                     >
                       {(Object.keys(COMPOUNDS) as Compound[]).map(comp => (
                         <button
@@ -909,7 +909,7 @@ export function HopChatHuuCoSimulation({ onBack }: HopChatHuuCoSimulationProps) 
                     </div>
                   )}
                   
-                  <div className="text-lg text-cyan-300 font-serif flex items-center justify-center bg-slate-950/60 p-4 rounded-xl border border-slate-800/50 shadow-inner shrink-0 min-h-[56px]">
+                  <div className="text-lg text-cyan-300 font-serif flex items-center justify-center bg-slate-950/60 p-4 rounded-xl border border-slate-800/50 shadow-inner shrink-0 min-h-14">
                     <BlockMath math={currentStructure.formula} />
                   </div>
                   

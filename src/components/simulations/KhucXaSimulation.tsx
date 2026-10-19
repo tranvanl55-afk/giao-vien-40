@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Send, CheckCircle2, XCircle, MessageCircle, X, SunMedium } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, Send, CheckCircle2, XCircle, MessageCircle, X, SunMedium, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
+import ReactMarkdown from 'react-markdown';
+import { askGemini } from '../../lib/gemini';
 
 const quizData = [
   {
@@ -93,9 +95,15 @@ export const KhucXaSimulation = ({ onBack }: { onBack: () => void }) => {
 
   // Chat State
   const [chatInput, setChatInput] = useState('');
+  const [isAiThinking, setIsAiThinking] = useState(false);
+  const chatMessagesEndRef = useRef<HTMLDivElement>(null);
   const [chatMessages, setChatMessages] = useState<{role: 'user'|'ai', content: React.ReactNode}[]>([
     { role: 'ai', content: 'Xin chào! Mình là Trợ lý Quang học. Bạn hãy điều chỉnh các thanh trượt Chiết suất và Góc tới để cảm nhận ánh sáng thay đổi như thế nào nhé!' }
   ]);
+
+  useEffect(() => {
+    chatMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages, isAiThinking]);
 
   // Quiz State
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number | null>>({});
@@ -135,34 +143,47 @@ export const KhucXaSimulation = ({ onBack }: { onBack: () => void }) => {
     });
   };
 
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || isAiThinking) return;
     
     const userMsg = chatInput.trim();
     setChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setChatInput('');
+    setIsAiThinking(true);
     
-    setTimeout(() => {
-      let reply: React.ReactNode = "";
-      if (userMsg.toLowerCase().includes('phản xạ toàn phần') || isTIR) {
-         reply = (
-           <span>
-             Với <InlineMath math={"n_1 = " + n1} /> lớn hơn <InlineMath math={"n_2 = " + n2} />, góc tới giới hạn là <InlineMath math={"i_{gh} \\approx " + criticalAngle.toFixed(1) + "^\\circ"} />.<br/>
-             Vì góc tới <InlineMath math={"i = " + angleI + "^\\circ"} /> {isTIR ? 'lớn hơn' : 'nhỏ hơn'} góc giới hạn, nên hiện tượng phản xạ toàn phần {isTIR ? 'XẢY RA' : 'KHÔNG XẢY RA'}.
-           </span>
-         );
-      } else {
-         reply = (
-           <span>
-             Ta có góc tới <InlineMath math={"i = " + angleI + "^\\circ"} />.<br/>
-             Áp dụng định luật Snell: <InlineMath math={"n_1 \\sin i = n_2 \\sin r"} /> <br/>
-             Góc khúc xạ hiện tại đang là <InlineMath math={"r = " + angleR.toFixed(2) + "^\\circ"} />.
-           </span>
-         );
-      }
-      
+    try {
+      const systemInstruction = `Bạn là "Trợ lý Quang học" thông minh, am hiểu và nhiệt tình, hỗ trợ học sinh học tập môn Khoa học tự nhiên (Vật lý - Quang học).
+Thông số thực nghiệm thời gian thực trên mô phỏng Khúc xạ ánh sáng hiện tại:
+- Môi trường 1 (chứa tia tới): chiết suất n1 = ${n1}
+- Môi trường 2 (chứa tia khúc xạ): chiết suất n2 = ${n2}
+- Góc tới i = ${angleI}°
+- Góc khúc xạ r = ${isTIR ? 'Không có tia khúc xạ (do phản xạ toàn phần)' : `${angleR.toFixed(2)}°`}
+- Tình trạng Phản xạ toàn phần: ${isTIR ? `ĐANG XẢY RA (vì n1 > n2 và góc tới i = ${angleI}° ≥ góc giới hạn igh ≈ ${criticalAngle.toFixed(1)}°)` : (n1 > n2 ? `Chưa xảy ra (cần i ≥ igh ≈ ${criticalAngle.toFixed(1)}°)` : 'Không thể xảy ra vì n1 ≤ n2')}
+- Định luật Snell: n1 * sin(i) = n2 * sin(r)
+
+Quy tắc trả lời:
+1. Trả lời trực tiếp, rõ ràng, chính xác câu hỏi của học sinh (định nghĩa khúc xạ ánh sáng, giải thích hiện tượng, công thức, bài toán, ứng dụng thực tế...).
+2. Nếu câu hỏi liên quan đến mô phỏng đang hiển thị, hãy liên hệ với các giá trị thông số hiện tại (n1=${n1}, n2=${n2}, i=${angleI}°) để giải thích sinh động.
+3. Giọng điệu thân thiện, tích cực, khuyến khích tư duy khoa học.
+4. Trình bày bằng tiếng Việt, định dạng markdown gọn gàng (dùng in đậm, gạch đầu dòng nếu cần), độ dài vừa phải (khoảng 2-4 câu hoặc 1 đoạn ngắn) phù hợp khung chat.`;
+
+      const reply = await askGemini(userMsg, systemInstruction);
       setChatMessages(prev => [...prev, { role: 'ai', content: reply }]);
-    }, 600);
+    } catch (error) {
+      console.error("AI Assistant error:", error);
+      let fallbackText = "";
+      if (userMsg.toLowerCase().includes('phản xạ toàn phần') || isTIR) {
+        fallbackText = `Với n1 = ${n1} lớn hơn n2 = ${n2}, góc tới giới hạn là igh ≈ ${criticalAngle.toFixed(1)}°. Vì góc tới i = ${angleI}° ${isTIR ? 'lớn hơn hoặc bằng' : 'nhỏ hơn'} góc giới hạn, nên hiện tượng phản xạ toàn phần ${isTIR ? 'XẢY RA' : 'KHÔNG XẢY RA'}.`;
+      } else {
+        fallbackText = `Ta có góc tới i = ${angleI}°. Áp dụng định luật Snell: n1·sin(i) = n2·sin(r) => Góc khúc xạ hiện tại r = ${angleR.toFixed(2)}°.`;
+      }
+      setChatMessages(prev => [...prev, { 
+        role: 'ai', 
+        content: fallbackText 
+      }]);
+    } finally {
+      setIsAiThinking(false);
+    }
   };
 
   // Rendering graphics lengths
@@ -202,7 +223,7 @@ export const KhucXaSimulation = ({ onBack }: { onBack: () => void }) => {
         </button>
         
         {/* Canvas Area Container - Glassmorphism */}
-        <div className="relative w-[80%] max-w-[800px] aspect-video bg-slate-800/40 backdrop-blur-md rounded-2xl border border-slate-700/50 shadow-2xl overflow-hidden flex items-center justify-center">
+        <div className="relative w-[80%] max-w-200 aspect-video bg-slate-800/40 backdrop-blur-md rounded-2xl border border-slate-700/50 shadow-2xl overflow-hidden flex items-center justify-center">
           
           {/* Backgrounds for top and bottom environment based on refractive index to simulate density visually */}
           <div className="absolute inset-x-0 top-0 bottom-1/2 transition-colors duration-500" 
@@ -309,7 +330,7 @@ export const KhucXaSimulation = ({ onBack }: { onBack: () => void }) => {
       </div>
 
       {/* RIGHT PANEL : SIDEBAR */}
-      <div className="w-[450px] bg-slate-50 border-l border-slate-200 flex flex-col z-30 shadow-2xl shrink-0">
+      <div className="w-112.5 bg-slate-50 border-l border-slate-200 flex flex-col z-30 shadow-2xl shrink-0">
         
         {/* Tabs */}
         <div className="flex border-b border-slate-200 shrink-0 bg-white">
@@ -472,7 +493,7 @@ export const KhucXaSimulation = ({ onBack }: { onBack: () => void }) => {
       </div>
 
       {/* FLOATING CHAT WIDGET */}
-      <div className="fixed bottom-6 right-[480px] z-50 flex flex-col items-end">
+      <div className="fixed bottom-6 right-120 z-50 flex flex-col items-end">
         
         {/* Chat Window Popup */}
         <AnimatePresence>
@@ -482,7 +503,7 @@ export const KhucXaSimulation = ({ onBack }: { onBack: () => void }) => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="bg-white/95 backdrop-blur-xl w-[350px] h-[500px] mb-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 flex flex-col overflow-hidden"
+              className="bg-white/95 backdrop-blur-xl w-87.5 h-125 mb-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 flex flex-col overflow-hidden"
             >
               {/* Header */}
               <div className="bg-sky-500 p-4 flex items-center justify-between shrink-0">
@@ -512,11 +533,30 @@ export const KhucXaSimulation = ({ onBack }: { onBack: () => void }) => {
                         <img src="https://api.dicebear.com/7.x/micah/svg?seed=Felix&backgroundColor=transparent" alt="Avatar" className="w-6 h-6 object-cover" />
                       </div>
                     )}
-                    <div className={`max-w-[80%] px-4 py-2.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-sky-500 text-white rounded-[20px] rounded-tr-sm font-medium' : 'bg-white text-slate-700 rounded-[20px] border border-slate-100 rounded-tl-sm whitespace-pre-wrap'}`}>
-                      {msg.content}
+                    <div className={`max-w-[85%] px-4 py-2.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-sky-500 text-white rounded-[20px] rounded-tr-sm font-medium' : 'bg-white text-slate-700 rounded-[20px] border border-slate-100 rounded-tl-sm'}`}>
+                      {typeof msg.content === 'string' ? (
+                        <div className="prose prose-sm max-w-none text-slate-700 leading-relaxed font-sans [&>p]:m-0 [&>p+p]:mt-1.5 [&>ul]:my-1 [&>ul]:pl-4 [&>ol]:my-1 [&>ol]:pl-4">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        msg.content
+                      )}
                     </div>
                   </div>
                 ))}
+                {isAiThinking && (
+                  <div className="flex justify-start items-center">
+                    <div className="w-7 h-7 rounded-full bg-sky-100 flex items-center justify-center mr-2 shrink-0 shadow-sm overflow-hidden">
+                      <img src="https://api.dicebear.com/7.x/micah/svg?seed=Felix&backgroundColor=transparent" alt="Avatar" className="w-6 h-6 object-cover" />
+                    </div>
+                    <div className="bg-white border border-slate-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-1.5">
+                      <div className="w-2 h-2 bg-sky-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                      <div className="w-2 h-2 bg-sky-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                      <div className="w-2 h-2 bg-sky-400 rounded-full animate-bounce" />
+                    </div>
+                  </div>
+                )}
+                <div ref={chatMessagesEndRef} />
               </div>
 
               {/* Input Box */}
@@ -527,15 +567,16 @@ export const KhucXaSimulation = ({ onBack }: { onBack: () => void }) => {
                      value={chatInput}
                      onChange={e => setChatInput(e.target.value)}
                      onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-                     placeholder="Hỏi gì đó..."
-                     className="w-full bg-transparent border-none outline-none py-2 px-4 text-sm text-slate-700 placeholder-slate-400"
+                     placeholder={isAiThinking ? "Đang suy nghĩ..." : "Hỏi gì đó..."}
+                     disabled={isAiThinking}
+                     className="w-full bg-transparent border-none outline-none py-2 px-4 text-sm text-slate-700 placeholder-slate-400 disabled:opacity-50"
                    />
                    <button 
                      onClick={handleSendMessage}
-                     disabled={!chatInput.trim()}
+                     disabled={!chatInput.trim() || isAiThinking}
                      className="w-9 h-9 rounded-full bg-sky-500 hover:bg-sky-600 disabled:bg-slate-300 flex items-center justify-center text-white transition-colors shrink-0 shadow-sm"
                    >
-                     <Send className="w-4 h-4 ml-[-2px]" />
+                     <Send className="w-4 h-4 -ml-0.5" />
                    </button>
                  </div>
               </div>

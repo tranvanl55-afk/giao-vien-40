@@ -139,7 +139,7 @@ export function FloatingGuide() {
               initial={{ opacity: 0, x: 16, scale: 0.9 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 16, scale: 0.9 }}
-              className="relative bg-slate-900/95 border border-white/20 rounded-2xl px-4 py-3 shadow-2xl max-w-[210px] backdrop-blur-xl"
+              className="relative bg-slate-900/95 border border-white/20 rounded-2xl px-4 py-3 shadow-2xl max-w-52.5 backdrop-blur-xl"
             >
               <p className="text-white font-bold text-sm leading-snug">👋 Bạn cần hướng dẫn không?</p>
               <p className="text-slate-300 text-xs mt-1 leading-relaxed">Nhấn vào đây để xem hướng dẫn sử dụng!</p>
@@ -197,7 +197,7 @@ export function FloatingGuide() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.88, y: 48 }}
               transition={{ type: 'spring', bounce: 0.28, duration: 0.5 }}
-              className="fixed inset-x-4 bottom-4 md:inset-auto md:bottom-24 md:right-6 md:w-[430px]
+              className="fixed inset-x-4 bottom-4 md:inset-auto md:bottom-24 md:right-6 md:w-107.5
                 z-10000 bg-slate-900/95 backdrop-blur-xl border border-white/12
                 rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden"
             >

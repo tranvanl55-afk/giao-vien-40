@@ -1403,7 +1403,7 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
         
         {/* LEFT SIDE PANEL */}
         {viewMode === 'manage' && (
-          <aside className="w-full md:w-[350px] border-b md:border-b-0 md:border-r border-slate-800/80 bg-slate-900/95 flex flex-col shrink-0 overflow-y-auto max-h-[320px] md:max-h-none z-20 custom-scrollbar shadow-2xl animate-in slide-in-from-left duration-300">
+          <aside className="w-full md:w-87.5 border-b md:border-b-0 md:border-r border-slate-800/80 bg-slate-900/95 flex flex-col shrink-0 overflow-y-auto max-h-80 md:max-h-none z-20 custom-scrollbar shadow-2xl animate-in slide-in-from-left duration-300">
             <div className="p-5 space-y-6">
             
             {/* LAYOUT OPTION */}

@@ -261,7 +261,7 @@ export const CamUngSimulation = ({ onBack }: { onBack: () => void }) => {
         </button>
         
         {/* Main Canvas Area */}
-        <div className="relative w-full max-w-[800px] aspect-square bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-3xl shadow-2xl overflow-hidden flex justify-center items-center">
+        <div className="relative w-full max-w-200 aspect-square bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-3xl shadow-2xl overflow-hidden flex justify-center items-center">
              
              {/* Background Neon Grid Decoration */}
              <div className="absolute inset-0 pointer-events-none opacity-20" style={{ backgroundImage: 'linear-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.1) 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
@@ -338,7 +338,7 @@ export const CamUngSimulation = ({ onBack }: { onBack: () => void }) => {
 
                 {/* Magnet (Interactive via Framer Motion) */}
                 {/* Wrapped in an absolute div to position over SVG easily */}
-                <div className="absolute left-1/2 top-[260px] -translate-x-1/2 -translate-y-1/2 flex flex-col justify-center items-center pointer-events-none">
+                <div className="absolute left-1/2 top-65 -translate-x-1/2 -translate-y-1/2 flex flex-col justify-center items-center pointer-events-none">
                    
                    <motion.div 
                      style={{ y: magnetY }}
@@ -349,7 +349,7 @@ export const CamUngSimulation = ({ onBack }: { onBack: () => void }) => {
                      className={`relative flex justify-center items-center ${mode === 'manual' ? 'pointer-events-auto cursor-grab active:cursor-grabbing' : 'pointer-events-auto'}`}
                    >
                      {/* Magnetic Field Lines */}
-                     <div className="absolute pointer-events-none -z-10 w-[300px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                     <div className="absolute pointer-events-none -z-10 w-75 h-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                         <svg width="100%" height="100%" viewBox="0 0 300 400" className="overflow-visible">
                            <defs>
                              <filter id="fieldGlow" x="-20%" y="-20%" width="140%" height="140%">
@@ -427,7 +427,7 @@ export const CamUngSimulation = ({ onBack }: { onBack: () => void }) => {
       </div>
 
       {/* RIGHT PANEL : SIDEBAR */}
-      <div className="w-[450px] bg-slate-900 border-l border-slate-800 flex flex-col z-30 shadow-2xl shrink-0 text-slate-200">
+      <div className="w-112.5 bg-slate-900 border-l border-slate-800 flex flex-col z-30 shadow-2xl shrink-0 text-slate-200">
         
         {/* Tabs */}
         <div className="flex border-b border-slate-800 shrink-0 bg-slate-900">
@@ -458,7 +458,7 @@ export const CamUngSimulation = ({ onBack }: { onBack: () => void }) => {
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                     Biểu đồ dòng điện I(t)
                   </h3>
-                  <div className="h-[200px] w-full">
+                  <div className="h-50 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                         <YAxis domain={[-100, 100]} hide={true} />

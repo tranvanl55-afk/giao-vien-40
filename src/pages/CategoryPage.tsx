@@ -158,7 +158,7 @@ export default function CategoryPage() {
               <div
                 key={sub.id}
                 onClick={() => handleSelectSub(sub)}
-                className="relative bg-white/80 backdrop-blur-2xl rounded-[2.5rem] p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/80 overflow-hidden flex flex-col sm:flex-row items-center justify-between group cursor-pointer hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.12)] transition-all duration-500 min-h-[220px] animate-in zoom-in-95"
+                className="relative bg-white/80 backdrop-blur-2xl rounded-[2.5rem] p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/80 overflow-hidden flex flex-col sm:flex-row items-center justify-between group cursor-pointer hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.12)] transition-all duration-500 min-h-55 animate-in zoom-in-95"
                 style={{ animationDelay: `${index * 30}ms` }}
               >
                 <div className={`absolute -top-24 -right-10 w-64 h-64 rounded-full ${colors.blob} opacity-50 group-hover:opacity-80 group-hover:scale-125 transition-all duration-700 pointer-events-none`}></div>

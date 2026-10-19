@@ -159,7 +159,7 @@ export function ChemHoaQuaGame({ questions, onBack }: { questions: Question[]; o
               <div className={`flex flex-col items-center gap-1 p-2 rounded-2xl border-2 transition-all
                 ${fruit.slashed ? 'border-green-400 bg-green-500/30' : fruit.wrong ? 'border-red-400 bg-red-500/30' : 'border-white/30 bg-black/20 hover:border-yellow-400 hover:bg-yellow-500/10 hover:scale-110 active:scale-95'}`}>
                 <span className="text-5xl leading-none">{fruit.emoji}</span>
-                <span className="text-xs font-bold text-white bg-black/40 px-2 py-0.5 rounded-full max-w-[120px] text-center leading-tight line-clamp-2">{fruit.label}</span>
+                <span className="text-xs font-bold text-white bg-black/40 px-2 py-0.5 rounded-full max-w-30 text-center leading-tight line-clamp-2">{fruit.label}</span>
               </div>
             </motion.div>
           ))}

@@ -179,7 +179,7 @@ export function GameHub({ onBack }: { onBack: () => void }) {
                 </button>
               </div>
               {scanStatus && (
-                <div className={`text-xs font-semibold px-3 py-1.5 rounded-xl border max-w-[280px] transition-all shadow-md ${
+                <div className={`text-xs font-semibold px-3 py-1.5 rounded-xl border max-w-70 transition-all shadow-md ${
                   scanStatus.startsWith('❌') 
                     ? 'bg-red-500/15 border-red-500/30 text-red-400 font-bold' 
                     : scanStatus.startsWith('✅')
@@ -247,7 +247,7 @@ export function GameHub({ onBack }: { onBack: () => void }) {
             )}
           </div>
           
-          <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-3 max-h-[500px] relative z-10">
+          <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-3 max-h-125 relative z-10">
             {questions.length === 0 ? (
               <div className="text-center py-16 text-slate-500 bg-black/20 border border-white/5 rounded-3xl border-dashed">
                 <QuestionIcon size={64} weight="duotone" className="mx-auto mb-4 text-slate-600 opacity-50" />

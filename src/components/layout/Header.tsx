@@ -278,14 +278,14 @@ export function Header({
             <div className="w-px h-8 bg-indigo-200/40 mx-2"></div>
 
             {/* Action Items */}
-            <li className="flex justify-center items-center w-[60px] h-[56px]">
+            <li className="flex justify-center items-center w-15 h-14">
               <a onClick={onReviewClick} title="Đánh giá" className="cursor-pointer">
                 <span className="icon"><Star className="w-5 h-5 icon-shadow text-indigo-900 hover:text-orange-600 transition-colors duration-500" /></span>
               </a>
             </li>
 
             {currentUser && (
-              <li id="tour-notifications" className="flex justify-center items-center w-[60px] h-[56px] relative">
+              <li id="tour-notifications" className="flex justify-center items-center w-15 h-14 relative">
                 <a onClick={() => setShowNotifDropdown(!showNotifDropdown)} title="Thông báo" className="cursor-pointer relative">
                   <span className="icon"><Bell className="w-5 h-5 icon-shadow text-indigo-900 hover:text-orange-600 transition-colors duration-500" /></span>
                   {unreadCount > 0 && (
@@ -344,7 +344,7 @@ export function Header({
             )}
 
             {currentUser && (
-              <li className="flex justify-center items-center w-[60px] h-[56px]">
+              <li className="flex justify-center items-center w-15 h-14">
                 <a onClick={toggleTheme} title="Giao diện" className="cursor-pointer">
                   <span className="icon">
                     {theme === 'dark' ? <Sun className="w-5 h-5 icon-shadow text-indigo-900 hover:text-orange-600 transition-colors duration-500" /> : <Moon className="w-5 h-5 icon-shadow text-indigo-900 hover:text-orange-600 transition-colors duration-500" />}

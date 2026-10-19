@@ -266,7 +266,7 @@ const AtomicStructure = ({ shells, number, mass }: { shells: number[], number: n
   }, [shells]);
 
   return (
-    <div className="relative w-full h-[280px] bg-slate-950/80 rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center my-6">
+    <div className="relative w-full h-70 bg-slate-950/80 rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center my-6">
       <Canvas camera={{ position: [0, 0, 7.0], fov: 42 }} className="w-full h-full cursor-grab active:cursor-grabbing">
         <ambientLight intensity={0.8} />
         <directionalLight position={[5, 5, 5]} intensity={1.8} />

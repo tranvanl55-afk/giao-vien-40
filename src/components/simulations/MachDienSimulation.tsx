@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Send, CheckCircle2, XCircle, MessageCircle, X, Zap, Settings, BookOpen } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, Send, CheckCircle2, XCircle, MessageCircle, X, Zap, Settings, BookOpen, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
+import ReactMarkdown from 'react-markdown';
+import { askGemini } from '../../lib/gemini';
 
 const quizData = [
   {
@@ -99,9 +101,15 @@ export const MachDienSimulation = ({ onBack }: { onBack: () => void }) => {
 
   // Chat State
   const [chatInput, setChatInput] = useState('');
+  const [isAiThinking, setIsAiThinking] = useState(false);
+  const chatMessagesEndRef = useRef<HTMLDivElement>(null);
   const [chatMessages, setChatMessages] = useState<{role: 'user'|'ai', content: React.ReactNode}[]>([
     { role: 'ai', content: 'Xin chào! Thầy là Trợ lý Vật lý ở đây. Em cứ tự do thay đổi mạch điện, hiệu điện thế hay điện trở nhé. Cần giúp gì cứ hỏi thầy!' }
   ]);
+
+  useEffect(() => {
+    chatMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages, isAiThinking]);
 
   // Quiz State
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number | null>>({});
@@ -119,44 +127,45 @@ export const MachDienSimulation = ({ onBack }: { onBack: () => void }) => {
     });
   };
 
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || isAiThinking) return;
     
     const userMsg = chatInput.trim();
     setChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setChatInput('');
+    setIsAiThinking(true);
     
-    setTimeout(() => {
-      let reply: React.ReactNode = "";
-      
-      if (userMsg.toLowerCase().includes('nối tiếp')) {
-        reply = (
-          <span>
-            Trong đoạn mạch mắc <strong>nối tiếp</strong>, cường độ dòng điện đi qua các điện trở là như nhau.<br/>
-            Điện trở tương đương của mạch hiện tại là <strong><InlineMath math={`R_{tđ} = ${req.toFixed(1)}\\Omega`} /></strong>.<br/>
-            Cường độ dòng điện là <strong><InlineMath math={`I = ${currentI.toFixed(2)}A`} /></strong>.
-          </span>
-        );
-      } else if (userMsg.toLowerCase().includes('song song')) {
-        reply = (
-          <span>
-            Trong đoạn mạch mắc <strong>song song</strong>, hiệu điện thế giữa hai đầu các điện trở là như nhau và bằng hiệu điện thế nguồn.<br/>
-            Điện trở tương đương của mạch hiện tại là <strong><InlineMath math={`R_{tđ} = ${req.toFixed(1)}\\Omega`} /></strong>.<br/>
-            Cường độ dòng điện mạch chính là <strong><InlineMath math={`I = ${currentI.toFixed(2)}A`} /></strong>.
-          </span>
-        );
-      } else {
-        reply = (
-          <span>
-            Với hiệu điện thế <InlineMath math={`U = ${voltage}V`} /> và {numResistors} điện trở mắc {circuitType === 'series' ? 'nối tiếp' : 'song song'}.<br/>
-            Tổng điện trở tương đương của mạch là <strong><InlineMath math={`R_{tđ} = ${req.toFixed(1)} \\Omega`} /></strong>.<br/>
-            Dòng điện qua mạch chính là <InlineMath math={`I = ${currentI.toFixed(2)} A`} />.
-          </span>
-        );
-      }
-      
+    try {
+      const systemInstruction = `Bạn là "Trợ lý Vật lý" thân thiện, chuẩn kiến thức, đóng vai thầy giáo hỗ trợ học sinh học phần Điện học (Định luật Ôm, Mạch nối tiếp, Mạch song song).
+Thông số thực nghiệm thời gian thực trong mô phỏng hiện tại:
+- Loại mạch: Mắc ${circuitType === 'series' ? 'Nối tiếp' : 'Song song'} với ${numResistors} điện trở
+- Giá trị các điện trở: R1 = ${r1}Ω, R2 = ${r2}Ω${numResistors === 3 ? `, R3 = ${r3}Ω` : ''}
+- Hiệu điện thế nguồn U: ${voltage}V
+- Điện trở tương đương của toàn mạch Rtđ: ${req.toFixed(2)}Ω
+- Cường độ dòng điện trong mạch chính I: ${currentI.toFixed(2)}A
+
+Quy tắc trả lời:
+1. Giải thích chính xác, rõ ràng bản chất vật lý (Định luật Ôm, công thức tính Rtđ, hiệu điện thế, cường độ dòng điện trong từng nhánh).
+2. Khi câu hỏi liên quan đến mạch đang hiển thị, hãy liên hệ ngay với các giá trị thông số thực nghiệm (U=${voltage}V, Rtđ=${req.toFixed(1)}Ω, I=${currentI.toFixed(2)}A).
+3. Xưng hô: "Thầy - em" hoặc thân thiện gần gũi, khích lệ học tập.
+4. Trình bày bằng tiếng Việt, định dạng markdown rõ ràng, độ dài ngắn gọn (khoảng 2-4 câu).`;
+
+      const reply = await askGemini(userMsg, systemInstruction);
       setChatMessages(prev => [...prev, { role: 'ai', content: reply }]);
-    }, 600);
+    } catch (error) {
+      console.error("AI error:", error);
+      let replyText = "";
+      if (userMsg.toLowerCase().includes('nối tiếp')) {
+        replyText = `Trong đoạn mạch mắc nối tiếp, cường độ dòng điện đi qua các điện trở là như nhau. Điện trở tương đương của mạch hiện tại là Rtđ = ${req.toFixed(1)}Ω, dòng điện I = ${currentI.toFixed(2)}A.`;
+      } else if (userMsg.toLowerCase().includes('song song')) {
+        replyText = `Trong đoạn mạch mắc song song, hiệu điện thế giữa hai đầu các điện trở là như nhau và bằng hiệu điện thế nguồn U = ${voltage}V. Điện trở tương đương Rtđ = ${req.toFixed(1)}Ω, dòng điện mạch chính I = ${currentI.toFixed(2)}A.`;
+      } else {
+        replyText = `Với hiệu điện thế U = ${voltage}V và ${numResistors} điện trở mắc ${circuitType === 'series' ? 'nối tiếp' : 'song song'}, điện trở tương đương Rtđ = ${req.toFixed(1)}Ω, dòng điện qua mạch I = ${currentI.toFixed(2)}A.`;
+      }
+      setChatMessages(prev => [...prev, { role: 'ai', content: replyText }]);
+    } finally {
+      setIsAiThinking(false);
+    }
   };
 
   // Helper for drawing dashed line animation
@@ -193,9 +202,9 @@ export const MachDienSimulation = ({ onBack }: { onBack: () => void }) => {
         </button>
         
         {/* Canvas Area Container - Glassmorphism */}
-        <div className="relative w-[85%] max-w-[900px] aspect-video bg-slate-800/40 backdrop-blur-md rounded-2xl border border-slate-700/50 shadow-2xl overflow-hidden flex flex-col items-center justify-center p-8">
+        <div className="relative w-[85%] max-w-225 aspect-video bg-slate-800/40 backdrop-blur-md rounded-2xl border border-slate-700/50 shadow-2xl overflow-hidden flex flex-col items-center justify-center p-8">
           
-          <div className="w-full flex-grow flex justify-center items-center relative">
+          <div className="w-full grow flex justify-center items-center relative">
              <svg width="100%" height="100%" viewBox="0 0 800 400" className="overflow-visible">
                
                {/* ---------------- DRAWING CIRCUIT ---------------- */}
@@ -315,7 +324,7 @@ export const MachDienSimulation = ({ onBack }: { onBack: () => void }) => {
       </div>
 
       {/* RIGHT PANEL : SIDEBAR */}
-      <div className="w-[450px] bg-slate-50 border-l border-slate-200 flex flex-col z-30 shadow-2xl shrink-0">
+      <div className="w-112.5 bg-slate-50 border-l border-slate-200 flex flex-col z-30 shadow-2xl shrink-0">
         
         {/* Tabs */}
         <div className="flex border-b border-slate-200 shrink-0 bg-white">
@@ -524,7 +533,7 @@ export const MachDienSimulation = ({ onBack }: { onBack: () => void }) => {
       </div>
 
       {/* FLOATING CHAT WIDGET */}
-      <div className="fixed bottom-6 right-[480px] z-50 flex flex-col items-end">
+      <div className="fixed bottom-6 right-120 z-50 flex flex-col items-end">
         
         {/* Chat Window Popup */}
         <AnimatePresence>
@@ -534,7 +543,7 @@ export const MachDienSimulation = ({ onBack }: { onBack: () => void }) => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="bg-white/95 backdrop-blur-xl w-[350px] h-[500px] mb-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 flex flex-col overflow-hidden"
+              className="bg-white/95 backdrop-blur-xl w-87.5 h-125 mb-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 flex flex-col overflow-hidden"
             >
               {/* Header */}
               <div className="bg-amber-500 p-4 flex items-center justify-between shrink-0">
@@ -564,11 +573,30 @@ export const MachDienSimulation = ({ onBack }: { onBack: () => void }) => {
                         <img src="https://api.dicebear.com/7.x/micah/svg?seed=Teacher&backgroundColor=transparent" alt="Avatar" className="w-6 h-6 object-cover" />
                       </div>
                     )}
-                    <div className={`max-w-[80%] px-4 py-2.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-amber-500 text-white rounded-[20px] rounded-tr-sm font-medium' : 'bg-white text-slate-700 rounded-[20px] border border-slate-100 rounded-tl-sm whitespace-pre-wrap'}`}>
-                      {msg.content}
+                    <div className={`max-w-[85%] px-4 py-2.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-amber-500 text-white rounded-[20px] rounded-tr-sm font-medium' : 'bg-white text-slate-700 rounded-[20px] border border-slate-100 rounded-tl-sm'}`}>
+                      {typeof msg.content === 'string' ? (
+                        <div className="prose prose-sm max-w-none text-slate-700 leading-relaxed font-sans [&>p]:m-0 [&>p+p]:mt-1.5 [&>ul]:my-1 [&>ul]:pl-4 [&>ol]:my-1 [&>ol]:pl-4">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        msg.content
+                      )}
                     </div>
                   </div>
                 ))}
+                {isAiThinking && (
+                  <div className="flex justify-start items-center">
+                    <div className="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center mr-2 shrink-0 shadow-sm overflow-hidden">
+                      <img src="https://api.dicebear.com/7.x/micah/svg?seed=Teacher&backgroundColor=transparent" alt="Avatar" className="w-6 h-6 object-cover" />
+                    </div>
+                    <div className="bg-white border border-slate-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-1.5">
+                      <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                      <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                      <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" />
+                    </div>
+                  </div>
+                )}
+                <div ref={chatMessagesEndRef} />
               </div>
 
               {/* Input Box */}
@@ -579,15 +607,16 @@ export const MachDienSimulation = ({ onBack }: { onBack: () => void }) => {
                      value={chatInput}
                      onChange={e => setChatInput(e.target.value)}
                      onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-                     placeholder="Hỏi gì đó..."
-                     className="w-full bg-transparent border-none outline-none py-2 px-4 text-sm text-slate-700 placeholder-slate-400"
+                     placeholder={isAiThinking ? "Đang suy nghĩ..." : "Hỏi gì đó..."}
+                     disabled={isAiThinking}
+                     className="w-full bg-transparent border-none outline-none py-2 px-4 text-sm text-slate-700 placeholder-slate-400 disabled:opacity-50"
                    />
                    <button 
                      onClick={handleSendMessage}
-                     disabled={!chatInput.trim()}
+                     disabled={!chatInput.trim() || isAiThinking}
                      className="w-9 h-9 rounded-full bg-amber-500 hover:bg-amber-600 disabled:bg-slate-300 flex items-center justify-center text-white transition-colors shrink-0 shadow-sm"
                    >
-                     <Send className="w-4 h-4 ml-[-2px]" />
+                     <Send className="w-4 h-4 -ml-0.5" />
                    </button>
                  </div>
               </div>

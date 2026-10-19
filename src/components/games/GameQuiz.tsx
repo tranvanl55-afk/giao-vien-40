@@ -651,7 +651,7 @@ export function GameQuiz({ questions, onBack }: { questions: Question[]; onBack:
             exit={{ opacity: 0, scale: 0.9 }}
             className="flex-1 flex flex-col items-center justify-center p-6 z-10"
           >
-            <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-[32px] p-8 text-center shadow-2xl relative overflow-hidden">
+            <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-4xl p-8 text-center shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-red-600"></div>
               <div className="w-20 h-20 bg-red-600/10 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Heart className="w-10 h-10 text-red-500" />

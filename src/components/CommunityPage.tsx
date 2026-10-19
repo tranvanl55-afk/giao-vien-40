@@ -540,8 +540,8 @@ export function CommunityPage({ onBack }: CommunityPageProps) {
 
                     {/* Image */}
                     {post.image && (
-                      <div className="w-full rounded-2xl overflow-hidden border border-slate-800/60 bg-slate-950 mb-4 select-none relative group max-h-[400px]">
-                        <img src={post.image} alt="Post attachment" className="w-full h-full object-cover max-h-[400px] transition-transform duration-500 group-hover:scale-102" />
+                      <div className="w-full rounded-2xl overflow-hidden border border-slate-800/60 bg-slate-950 mb-4 select-none relative group max-h-100">
+                        <img src={post.image} alt="Post attachment" className="w-full h-full object-cover max-h-100 transition-transform duration-500 group-hover:scale-102" />
                         <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent pointer-events-none"></div>
                       </div>
                     )}

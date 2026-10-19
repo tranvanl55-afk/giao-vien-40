@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, X, Send, Sparkles, Loader2, Maximize2, Minimize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getGeminiClient } from '../lib/gemini';
+import { getGeminiClient, askGemini } from '../lib/gemini';
 import ReactMarkdown from 'react-markdown';
 import { AIConnectionBadge } from './AIConnectionBadge';
 
@@ -94,21 +94,36 @@ Hãy trả lời ngắn gọn, súc tích, dễ hiểu đối với học sinh c
         await initChat();
       }
 
-      const response = await chatSessionRef.current.sendMessage({
-         message: userMessage
-      });
+      let replyText = '';
+      if (chatSessionRef.current) {
+        try {
+          const response = await chatSessionRef.current.sendMessage({
+            message: userMessage
+          });
+          replyText = (response.text || '').trim();
+        } catch (chatError) {
+          console.warn('chatSession sendMessage failed, trying askGemini fallback...', chatError);
+        }
+      }
+
+      if (!replyText) {
+        const fallbackSystemPrompt = `Bạn là một trợ giảng AI thân thiện, chuyên môn cao về Khoa học tự nhiên (Vật lý, Hóa học, Sinh học).
+Người dùng đang học bài: "${contextTitle}". Mô tả: "${contextDescription}".
+Trả lời ngắn gọn, chuẩn xác, dễ hiểu bằng tiếng Việt theo định dạng markdown.`;
+        replyText = await askGemini(userMessage, fallbackSystemPrompt);
+      }
       
       setMessages(prev => [...prev, { 
         id: (Date.now() + 1).toString(), 
         role: 'model', 
-        content: response.text || 'Tôi không thể trả lời câu hỏi này.'
+        content: replyText || 'Tôi không thể trả lời câu hỏi này.'
       }]);
     } catch (error) {
       console.error('Lỗi gửi tin nhắn AI:', error);
       setMessages(prev => [...prev, { 
         id: (Date.now() + 1).toString(), 
         role: 'model', 
-        content: 'Xin lỗi, có lỗi xảy ra khi xử lý yêu cầu của bạn.' 
+        content: 'Xin lỗi, có lỗi xảy ra khi xử lý yêu cầu của bạn. Vui lòng kiểm tra lại kết nối mạng hoặc API Key.' 
       }]);
     } finally {
       setIsLoading(false);
@@ -153,7 +168,7 @@ Hãy trả lời ngắn gọn, súc tích, dễ hiểu đối với học sinh c
             className={`fixed z-50 bg-slate-900/95 backdrop-blur-xl border border-slate-700 shadow-2xl flex flex-col overflow-hidden transition-all duration-300 ${
               isExpanded 
                 ? 'inset-4 md:inset-10 rounded-3xl' 
-                : 'bottom-4 right-4 md:bottom-6 md:right-6 w-[90vw] md:w-[400px] h-[550px] max-h-[85vh] rounded-3xl'
+                : 'bottom-4 right-4 md:bottom-6 md:right-6 w-[90vw] md:w-100 h-137.5 max-h-[85vh] rounded-3xl'
             }`}
           >
             {/* Header */}
@@ -175,7 +190,7 @@ Hãy trả lời ngắn gọn, súc tích, dễ hiểu đối với học sinh c
                     <Sparkles className="w-3.5 h-3.5 text-orange-400" />
                     <AIConnectionBadge />
                   </h3>
-                  <p className="text-[10px] text-cyan-400 font-semibold truncate max-w-[200px]">
+                  <p className="text-[10px] text-cyan-400 font-semibold truncate max-w-50">
                     Hỗ trợ: {contextTitle}
                   </p>
                 </div>

@@ -607,7 +607,7 @@ Bạn PHẢI trả về JSON với cấu trúc sau:
                               </div>
 
                               {/* Right: Illustration Box and Actions */}
-                              <div className="w-full md:w-[280px] shrink-0 flex flex-col items-center gap-3">
+                              <div className="w-full md:w-70 shrink-0 flex flex-col items-center gap-3">
                                 {/* Illustration Box */}
                                 {section.illustration_url && (
                                   <div className="p-2 bg-white hand-drawn-border-box shadow-[2px_3px_0_rgba(0,0,0,0.05)] w-full flex items-center justify-center rotate-1 group hover:-rotate-1 transition-transform overflow-hidden">

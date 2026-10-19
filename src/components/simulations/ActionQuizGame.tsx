@@ -207,7 +207,7 @@ export function ActionQuizGame({ initialQuestions, onBack }: ActionQuizGameProps
             </button>
 
             <div className="max-w-4xl mx-auto">
-              <div className="bg-white/90 backdrop-blur-2xl border border-white/60 rounded-[32px] p-8 shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
+              <div className="bg-white/90 backdrop-blur-2xl border border-white/60 rounded-4xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
                 <div className="flex items-center gap-4 mb-8">
                   <div className="w-16 h-16 rounded-2xl bg-rose-50 flex items-center justify-center border border-rose-100">
                     <BookOpen className="w-8 h-8 text-rose-500" />
@@ -307,7 +307,7 @@ export function ActionQuizGame({ initialQuestions, onBack }: ActionQuizGameProps
             <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center justify-start p-4 pt-6 gap-3 md:gap-4 w-full max-w-7xl mx-auto min-h-0">
               
               {/* Question Card */}
-              <div className="w-full max-w-6xl bg-white rounded-[32px] py-4 md:py-6 px-6 md:px-12 shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-slate-100 relative shrink-0 flex items-center justify-center min-h-[100px] md:min-h-[120px]">
+              <div className="w-full max-w-6xl bg-white rounded-4xl py-4 md:py-6 px-6 md:px-12 shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-slate-100 relative shrink-0 flex items-center justify-center min-h-25 md:min-h-30">
                 {/* Decorative Top Border */}
                 <div className="absolute top-0 left-4 right-4 h-2.5 bg-[linear-gradient(90deg,#22d3ee,#a855f7,#3b82f6)] rounded-b-lg opacity-90 mx-auto max-w-[95%]"></div>
                 
@@ -317,7 +317,7 @@ export function ActionQuizGame({ initialQuestions, onBack }: ActionQuizGameProps
                 </div>
  
                 <div 
-                  className="text-xl md:text-3xl text-center text-[#9b2cdd] leading-relaxed font-bold max-h-[120px] overflow-y-auto custom-scrollbar w-full mt-2"
+                  className="text-xl md:text-3xl text-center text-[#9b2cdd] leading-relaxed font-bold max-h-30 overflow-y-auto custom-scrollbar w-full mt-2"
                   style={{ fontFamily: '"Times New Roman", Times, serif' }}
                 >
                   {questions[currentIdx].question}
@@ -349,7 +349,7 @@ export function ActionQuizGame({ initialQuestions, onBack }: ActionQuizGameProps
                       </div>
  
                       {/* Answer Box */}
-                      <div className={`w-full min-h-[110px] md:min-h-[140px] pt-8 md:pt-10 flex-1 ${ACTION_ICONS[optIdx].bgColor} bg-linear-to-b rounded-2xl md:rounded-[32px] p-4 md:p-6 flex flex-col items-center justify-center text-center shadow-[0_8px_16px_rgba(0,0,0,0.1)] relative transition-all duration-500 overflow-hidden ${isCorrect ? 'ring-4 ring-emerald-400 z-10 shadow-[0_0_30px_rgba(16,185,129,0.3)]' : ''} ${showWrong ? 'ring-4 ring-rose-500 bg-red-600 grayscale-0 opacity-100' : ''}`}>
+                      <div className={`w-full min-h-27.5 md:min-h-35 pt-8 md:pt-10 flex-1 ${ACTION_ICONS[optIdx].bgColor} bg-linear-to-b rounded-2xl md:rounded-4xl p-4 md:p-6 flex flex-col items-center justify-center text-center shadow-[0_8px_16px_rgba(0,0,0,0.1)] relative transition-all duration-500 overflow-hidden ${isCorrect ? 'ring-4 ring-emerald-400 z-10 shadow-[0_0_30px_rgba(16,185,129,0.3)]' : ''} ${showWrong ? 'ring-4 ring-rose-500 bg-red-600 grayscale-0 opacity-100' : ''}`}>
                         <div className="absolute top-3 left-3 w-6 h-6 md:w-8 md:h-8 bg-white/20 rounded-full flex items-center justify-center text-white font-black text-xs md:text-base backdrop-blur-md">
                           {['A', 'B', 'C', 'D'][optIdx]}
                         </div>
@@ -367,7 +367,7 @@ export function ActionQuizGame({ initialQuestions, onBack }: ActionQuizGameProps
             </div>
  
             {/* Bottom Controls & Teacher */}
-            <div className="p-4 md:p-6 pt-0 flex justify-between items-end relative min-h-[80px] md:min-h-[110px] py-2 md:py-4 shrink-0 z-30">
+            <div className="p-4 md:p-6 pt-0 flex justify-between items-end relative min-h-20 md:min-h-27.5 py-2 md:py-4 shrink-0 z-30">
               {/* Teacher Avatar */}
               <div className="flex items-end gap-6 relative">
                 <div className="relative">
@@ -380,7 +380,7 @@ export function ActionQuizGame({ initialQuestions, onBack }: ActionQuizGameProps
                      <motion.div 
                      initial={{ opacity: 0, scale: 0.5, y: 20 }}
                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                     className="absolute -top-16 -right-10 md:-top-20 md:-right-20 lg:-right-32 bg-white border border-slate-100 text-rose-500 font-black px-6 py-3 md:px-8 md:py-4 rounded-3xl rounded-bl-none shadow-[0_10px_30px_rgba(0,0,0,0.1)] whitespace-normal max-w-[200px] md:max-w-none md:whitespace-nowrap text-lg md:text-2xl text-center leading-tight z-40"
+                     className="absolute -top-16 -right-10 md:-top-20 md:-right-20 lg:-right-32 bg-white border border-slate-100 text-rose-500 font-black px-6 py-3 md:px-8 md:py-4 rounded-3xl rounded-bl-none shadow-[0_10px_30px_rgba(0,0,0,0.1)] whitespace-normal max-w-50 md:max-w-none md:whitespace-nowrap text-lg md:text-2xl text-center leading-tight z-40"
                    >
                      {praise}
                    </motion.div>
@@ -389,7 +389,7 @@ export function ActionQuizGame({ initialQuestions, onBack }: ActionQuizGameProps
               </div>
 
               {/* Teacher Controls */}
-              <div className="flex bg-white/80 backdrop-blur-xl border border-slate-200 rounded-[24px] p-2 md:p-3 shadow-lg mb-2 relative">
+              <div className="flex bg-white/80 backdrop-blur-xl border border-slate-200 rounded-3xl p-2 md:p-3 shadow-lg mb-2 relative">
                  <button 
                    onClick={nextQuestion}
                    className="px-6 py-3 md:px-8 md:py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl md:rounded-2xl font-black flex items-center gap-3 transition-all active:scale-95 shadow-md shadow-emerald-500/30 text-base md:text-xl"

@@ -59,34 +59,46 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
     if (!selectedImage) return;
     setIsAnalyzing(true);
     try {
-      const match = selectedImage.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
-      if (!match) throw new Error("Invalid image format");
+      const match = selectedImage.match(/^data:([^;]+);base64,(.+)$/);
+      if (!match) throw new Error("Định dạng ảnh không hợp lệ (cần base64 image)");
       
       const mimeType = match[1];
       const base64Data = match[2];
 
-      const apiKey = getGeminiApiKey();
-      if (!apiKey) {
-        alert("Tài khoản của bạn yêu cầu nhập Gemini API Key để sử dụng tính năng AI này. Vui lòng đăng nhập lại!");
-        setIsAnalyzing(false);
-        return;
-      }
-      const ai = getGeminiClient();
+      const currentKey = getGeminiApiKey();
+      const systemKey = (import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY || '').trim();
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: {
-          parts: [
-            { text: "Trích xuất toàn bộ văn bản có ý nghĩa (bao gồm cả bảng) trong hình ảnh này. Chỉ trả về phần văn bản, không cần thêm lời bình." },
-            { inlineData: { data: base64Data, mimeType } }
-          ]
+      const callGenAI = async (key: string) => {
+        if (!key) throw new Error("Chưa cấu hình API Key. Vui lòng kiểm tra lại!");
+        const client = getGeminiClient(key);
+        return await client.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: {
+            parts: [
+              { text: "Trích xuất toàn bộ văn bản có ý nghĩa (bao gồm cả bảng, công thức, đề mục) trong hình ảnh này. Chỉ trả về phần văn bản, không cần thêm lời bình." },
+              { inlineData: { data: base64Data, mimeType } }
+            ]
+          }
+        });
+      };
+
+      let response;
+      try {
+        response = await callGenAI(currentKey);
+      } catch (err) {
+        if (systemKey && currentKey !== systemKey) {
+          console.warn("User key failed in OCR, falling back to system key...", err);
+          response = await callGenAI(systemKey);
+        } else {
+          throw err;
         }
-      });
+      }
+
       setParsedText(response.text || "");
       setStep(3);
-    } catch (e) {
+    } catch (e: any) {
       console.error("OCR Error:", e);
-      alert("Lỗi khi phân tích ảnh. Vui lòng thử lại.");
+      alert("Lỗi khi phân tích ảnh: " + (e?.message || "Vui lòng thử lại."));
     } finally {
       setIsAnalyzing(false);
     }
@@ -99,73 +111,91 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
     }
     setIsGenerating(true);
     try {
-      const apiKey = getGeminiApiKey();
-      if (!apiKey) {
-        alert("Tài khoản của bạn yêu cầu nhập Gemini API Key để sử dụng tính năng AI này. Vui lòng đăng nhập lại!");
-        setIsGenerating(false);
-        return;
-      }
-      const ai = getGeminiClient();
+      const currentKey = getGeminiApiKey();
+      const systemKey = (import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY || '').trim();
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
-        contents: `Tạo đề thi dựa vào nội dung văn bản sau đây:\n\n${parsedText}\n\nYêu cầu phân bổ:\n- Số câu trắc nghiệm (1 đáp án đúng): ${mcqCount}\n- Số câu Đúng/Sai (mỗi câu 4 phát biểu): ${tfCount}\n- Số câu tự luận: ${essayCount}\n\nTất cả câu hỏi PHẢI dựa trực tiếp trên nội dung được cung cấp. Không sử dụng kiến thức bên ngoài. Các phương án phải mang ý nghĩa.`,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              mcq: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    question: { type: Type.STRING },
-                    options: {
-                      type: Type.ARRAY,
-                      items: { type: Type.STRING },
-                      description: "Phải có đúng 4 phương án"
-                    },
-                    correctAnswerIndex: { type: Type.INTEGER, description: "Index của phương án đúng (0-3)" }
-                  }
-                }
-              },
-              tf: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    question: { type: Type.STRING },
-                    statements: {
-                      type: Type.ARRAY,
-                      items: {
-                        type: Type.OBJECT,
-                        properties: {
-                          text: { type: Type.STRING },
-                          isTrue: { type: Type.BOOLEAN, description: "Phát biểu này đúng hay sai?" }
-                        }
+      const callGenerateTest = async (key: string) => {
+        if (!key) throw new Error("Chưa cấu hình API Key. Vui lòng kiểm tra lại!");
+        const client = getGeminiClient(key);
+        return await client.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: `Tạo đề thi dựa vào nội dung văn bản sau đây:\n\n${parsedText}\n\nYêu cầu phân bổ:\n- Số câu trắc nghiệm (1 đáp án đúng): ${mcqCount}\n- Số câu Đúng/Sai (mỗi câu 4 phát biểu): ${tfCount}\n- Số câu tự luận: ${essayCount}\n\nTất cả câu hỏi PHẢI dựa trực tiếp trên nội dung được cung cấp. Không sử dụng kiến thức bên ngoài. Các phương án phải mang ý nghĩa.`,
+          config: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                mcq: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      question: { type: Type.STRING },
+                      options: {
+                        type: Type.ARRAY,
+                        items: { type: Type.STRING },
+                        description: "Phải có đúng 4 phương án"
                       },
-                      description: "Phải có đúng 4 phát biểu"
+                      correctAnswerIndex: { type: Type.INTEGER, description: "Index của phương án đúng (0-3)" }
                     }
                   }
-                }
-              },
-              essay: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    question: { type: Type.STRING },
-                    suggestedAnswer: { type: Type.STRING }
+                },
+                tf: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      question: { type: Type.STRING },
+                      statements: {
+                        type: Type.ARRAY,
+                        items: {
+                          type: Type.OBJECT,
+                          properties: {
+                            text: { type: Type.STRING },
+                            isTrue: { type: Type.BOOLEAN, description: "Phát biểu này đúng hay sai?" }
+                          }
+                        },
+                        description: "Phải có đúng 4 phát biểu"
+                      }
+                    }
+                  }
+                },
+                essay: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      question: { type: Type.STRING },
+                      suggestedAnswer: { type: Type.STRING }
+                    }
                   }
                 }
               }
             }
           }
+        });
+      };
+
+      let response;
+      try {
+        response = await callGenerateTest(currentKey);
+      } catch (err) {
+        if (systemKey && currentKey !== systemKey) {
+          console.warn("User key failed in test generation, falling back to system key...", err);
+          response = await callGenerateTest(systemKey);
+        } else {
+          throw err;
         }
-      });
-      const jsonStr = response.text || "{}";
-      const parsedData = JSON.parse(jsonStr);
+      }
+
+      let cleanJson = (response.text || "{}").trim();
+      cleanJson = cleanJson.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
+      const firstBrace = cleanJson.indexOf('{');
+      const lastBrace = cleanJson.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1) {
+        cleanJson = cleanJson.substring(firstBrace, lastBrace + 1);
+      }
+      const parsedData = JSON.parse(cleanJson);
 
       setGeneratedTest({
         mcq: parsedData.mcq || [],
@@ -178,9 +208,9 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
       setIsSubmitted(false);
       setScore(0);
       setStep(4);
-    } catch (e) {
+    } catch (e: any) {
       console.error("Generate error:", e);
-      alert("Lỗi khi tạo đề. Vui lòng thử lại.");
+      alert("Lỗi khi tạo đề: " + (e?.message || "Vui lòng thử lại."));
     } finally {
       setIsGenerating(false);
     }
@@ -339,7 +369,7 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
                 )}
               </div>
 
-              <div className="hidden lg:block relative h-full min-h-[500px]">
+              <div className="hidden lg:block relative h-full min-h-125">
                 <div className="absolute inset-0 bg-linear-to-tr from-purple-100 to-orange-50 rounded-[40px] transform rotate-3 scale-105 opacity-70"></div>
                 <div className="relative h-full w-full rounded-[40px] overflow-hidden shadow-2xl border-4 border-white">
                   <img 
@@ -375,7 +405,7 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
               animate={{ opacity: 1, scale: 1 }}
               className="max-w-3xl mx-auto w-full pt-8"
             >
-              <div className="bg-white rounded-[32px] shadow-xl p-8 md:p-12 border border-slate-100">
+              <div className="bg-white rounded-4xl shadow-xl p-8 md:p-12 border border-slate-100">
                 <div className="flex items-center space-x-4 mb-8 pb-8 border-b border-slate-100">
                   <div className="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center shrink-0">
                     <Settings className="w-8 h-8" />
@@ -548,7 +578,7 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
               animate={{ opacity: 1, y: 0 }}
               className="max-w-4xl mx-auto w-full pt-8 pb-16"
             >
-              <div className="bg-white rounded-[32px] shadow-xl p-8 md:p-12 border border-slate-100 mb-8">
+              <div className="bg-white rounded-4xl shadow-xl p-8 md:p-12 border border-slate-100 mb-8">
                 <div className="flex items-center justify-between mb-8 pb-8 border-b border-slate-100">
                   <div className="flex items-center space-x-4">
                     <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
@@ -677,7 +707,7 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
                             disabled={isSubmitted}
                             value={studentAnswersEssay[i] || ""}
                             onChange={(e) => setStudentAnswersEssay({...studentAnswersEssay, [i]: e.target.value})}
-                            className="bg-white rounded-xl border border-slate-200 w-full p-4 text-slate-700 focus:ring-2 focus:ring-purple-500 outline-none resize-y min-h-[120px]"
+                            className="bg-white rounded-xl border border-slate-200 w-full p-4 text-slate-700 focus:ring-2 focus:ring-purple-500 outline-none resize-y min-h-30"
                             placeholder="Nhập câu trả lời của bạn vào đây..."
                           />
                           {isSubmitted && q.suggestedAnswer && (
@@ -702,7 +732,7 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
                       </button>
                     </div>
                   ) : (
-                    <div className="mt-8 pt-8 border-t border-slate-100 bg-slate-50 -mx-8 sm:-mx-12 px-8 sm:px-12 pb-8 rounded-b-[32px]">
+                    <div className="mt-8 pt-8 border-t border-slate-100 bg-slate-50 -mx-8 sm:-mx-12 px-8 sm:px-12 pb-8 rounded-b-4xl">
                       <div className="bg-white shadow-xl rounded-2xl p-6 md:p-8 flex items-center justify-between border-2 border-purple-100">
                         <div>
                           <h3 className="text-2xl font-black text-slate-800">Kết quả bài làm</h3>

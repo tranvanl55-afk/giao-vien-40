@@ -928,7 +928,7 @@ Bạn BẮT BUỘC trả về ĐÚNG MỘT MẢNG JSON, không giải thích gì
             </div>
 
             {/* CỘT PHẢI: FORM CHỈNH SỬA CÂU HỎI HOẶC DANH SÁCH */}
-            <div className="w-full lg:w-[400px] p-6 overflow-y-auto custom-scrollbar flex flex-col shrink-0 text-left bg-slate-900/40">
+            <div className="w-full lg:w-100 p-6 overflow-y-auto custom-scrollbar flex flex-col shrink-0 text-left bg-slate-900/40">
               
               {/* 1. NẾU ĐANG CHỈNH SỬA / TẠO CÂU HỎI MỚI */}
               {editingQuestionId !== null ? (

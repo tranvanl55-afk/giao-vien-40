@@ -95,7 +95,7 @@ export default function HomePage() {
                 key={`${cat.id}-${index}`}
                 id={index < categories.length ? `tour-${cat.id}` : undefined}
                 onClick={() => navigate(`/category/${cat.id}`)}
-                className="group relative flex flex-col items-center cursor-pointer transition-all duration-300 w-[70px] sm:w-[90px] md:w-[100px] shrink-0 z-10 hover:z-50"
+                className="group relative flex flex-col items-center cursor-pointer transition-all duration-300 w-17.5 sm:w-22.5 md:w-25 shrink-0 z-10 hover:z-50"
                 style={{ animationDelay: `${(index % categories.length) * 50}ms` }}
               >
                 <div className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center group-hover:-translate-y-3 group-hover:scale-110 md:group-hover:scale-[1.15] transition-all duration-300 relative shrink-0`}>
@@ -117,7 +117,7 @@ export default function HomePage() {
                   )}
                 </div>
                 <div className="mt-3 flex flex-col items-center w-full text-center transition-all duration-300 group-hover:translate-y-1 z-20">
-                  <h3 className="text-[11px] sm:text-xs font-extrabold text-indigo-900 group-hover:text-orange-600 transition-colors leading-tight max-w-[80px] sm:max-w-[100px] wrap-break-word">{cat.title}</h3>
+                  <h3 className="text-[11px] sm:text-xs font-extrabold text-indigo-900 group-hover:text-orange-600 transition-colors leading-tight max-w-20 sm:max-w-25 wrap-break-word">{cat.title}</h3>
                 </div>
               </div>
             ))}
@@ -244,7 +244,7 @@ export default function HomePage() {
                     <div
                       key={tool.subId}
                       onClick={() => handleHotToolClick(tool)}
-                      className="relative flex flex-col items-center justify-start shrink-0 cursor-pointer group transition-all duration-300 w-[70px] sm:w-[80px]"
+                      className="relative flex flex-col items-center justify-start shrink-0 cursor-pointer group transition-all duration-300 w-17.5 sm:w-20"
                     >
                       <div className="relative">
                         {isTop && (
@@ -268,7 +268,7 @@ export default function HomePage() {
                         </div>
                       </div>
                       <div className="mt-3 flex flex-col items-center w-full text-center transition-all duration-300 group-hover:translate-y-1 z-20">
-                        <h3 className="text-[10px] sm:text-[11px] font-extrabold text-indigo-900 group-hover:text-orange-600 transition-colors leading-tight max-w-[70px] sm:max-w-[80px] line-clamp-2">{displayTitle}</h3>
+                        <h3 className="text-[10px] sm:text-[11px] font-extrabold text-indigo-900 group-hover:text-orange-600 transition-colors leading-tight max-w-17.5 sm:max-w-20 line-clamp-2">{displayTitle}</h3>
                       </div>
                     </div>
                   );

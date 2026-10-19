@@ -730,7 +730,7 @@ Lưu ý: TRẢ VỀ DUY NHẤT MẢNG JSON, KHÔNG THÊM BẤT KỲ VĂN BẢN N
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 min-h-[100px] mb-8">
+                <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 min-h-25 mb-8">
                   <p 
                     className="text-xl md:text-4xl font-bold leading-relaxed drop-shadow-sm text-slate-100"
                     style={{ fontFamily: '"Times New Roman", Times, serif' }}

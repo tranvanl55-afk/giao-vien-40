@@ -84,7 +84,7 @@ export const MLRegressionSimulation: React.FC<{ onBack: () => void }> = ({ onBac
     <div className="w-full h-screen bg-slate-950 flex flex-col md:flex-row relative overflow-hidden font-sans">
       {/* Background Decor */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-black pointer-events-none"></div>
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-150 h-150 bg-blue-600/5 rounded-full blur-[150px] pointer-events-none"></div>
 
       {/* Sidebar Controls */}
       <div className="w-full md:w-80 h-auto md:h-full bg-slate-900/60 backdrop-blur-xl border-b md:border-b-0 md:border-r border-white/10 p-6 flex flex-col z-10 shrink-0">
@@ -144,7 +144,7 @@ export const MLRegressionSimulation: React.FC<{ onBack: () => void }> = ({ onBac
       </div>
 
       {/* Main Canvas Area */}
-      <div className="flex-1 flex flex-col p-4 md:p-8 relative z-10 min-h-[500px]">
+      <div className="flex-1 flex flex-col p-4 md:p-8 relative z-10 min-h-125">
         {/* Helper Badge */}
         {points.length === 0 && (
           <motion.div
