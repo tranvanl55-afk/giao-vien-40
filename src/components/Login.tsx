@@ -218,12 +218,12 @@ export function Login() {
     setGoogleLoading(true);
     try {
       await loginWithGoogle({
-        allowNewUser: mode === 'register',
-        additionalData: mode === 'register' ? {
+        allowNewUser: true,
+        additionalData: {
           birthYear: birthYear.trim() || null,
-          role,
+          role: role || 'Học sinh',
           provider: 'google',
-        } : undefined,
+        },
         validate: (userEmail) => {
           if (userEmail?.toLowerCase() !== ADMIN_EMAIL && !typedKey && !storedKey) {
             return 'auth/gemini-required';
