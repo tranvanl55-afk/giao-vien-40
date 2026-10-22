@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Calendar, Briefcase, Key, Mail, Lock, Eye, EyeOff, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -385,7 +385,7 @@ export function Login() {
       </div>
 
       {/* Nút đăng nhập chính thức từ Google (Không qua trung gian firebaseapp.com/__/auth/handler) */}
-      <div id={`gsi-btn-${mode}`} className="w-full flex justify-center mb-1 min-h-[44px]" />
+      <div id={`gsi-btn-${mode}`} className="w-full flex justify-center mb-1 min-h-11" />
 
       {/* Nút đăng nhập dự phòng */}
       <button
