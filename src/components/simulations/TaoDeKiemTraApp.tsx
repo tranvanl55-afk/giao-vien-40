@@ -85,11 +85,20 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
       let response;
       try {
         response = await callGenAI(currentKey);
-      } catch (err) {
+      } catch (err: any) {
+        const isKeyInvalid = err?.message?.includes('API key not valid') || 
+                             err?.message?.includes('API_KEY_INVALID') ||
+                             err?.status === 400;
+        if (isKeyInvalid && typeof window !== 'undefined' && localStorage.getItem('user_gemini_api_key')) {
+          localStorage.removeItem('user_gemini_api_key');
+        }
         if (systemKey && currentKey !== systemKey) {
           console.warn("User key failed in OCR, falling back to system key...", err);
           response = await callGenAI(systemKey);
         } else {
+          if (isKeyInvalid) {
+            throw new Error("Khóa API Gemini không hợp lệ hoặc đã bị vô hiệu hóa. Vui lòng kiểm tra lại API Key mới.");
+          }
           throw err;
         }
       }
@@ -179,11 +188,20 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
       let response;
       try {
         response = await callGenerateTest(currentKey);
-      } catch (err) {
+      } catch (err: any) {
+        const isKeyInvalid = err?.message?.includes('API key not valid') || 
+                             err?.message?.includes('API_KEY_INVALID') ||
+                             err?.status === 400;
+        if (isKeyInvalid && typeof window !== 'undefined' && localStorage.getItem('user_gemini_api_key')) {
+          localStorage.removeItem('user_gemini_api_key');
+        }
         if (systemKey && currentKey !== systemKey) {
           console.warn("User key failed in test generation, falling back to system key...", err);
           response = await callGenerateTest(systemKey);
         } else {
+          if (isKeyInvalid) {
+            throw new Error("Khóa API Gemini không hợp lệ hoặc đã bị vô hiệu hóa. Vui lòng kiểm tra lại API Key mới.");
+          }
           throw err;
         }
       }

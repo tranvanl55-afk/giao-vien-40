@@ -7,9 +7,13 @@ import {
   signInWithEmailAndPassword,
   updateProfile,
   setPersistence,
-  browserLocalPersistence
+  browserLocalPersistence,
+  GoogleAuthProvider,
+  signInWithPopup,
+  getAdditionalUserInfo,
+  deleteUser
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 interface AuthContextType {
@@ -17,6 +21,11 @@ interface AuthContextType {
   loading: boolean;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   registerWithEmail: (email: string, pass: string, displayName: string, additionalData?: any) => Promise<void>;
+  loginWithGoogle: (options: {
+    allowNewUser: boolean;
+    additionalData?: any;
+    validate?: (email: string | null) => string | null;
+  }) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -150,10 +159,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  /**
+   * Đăng nhập bằng tài khoản Google (Gmail).
+   * - allowNewUser=false: nếu là tài khoản Google mới (chưa đăng ký) thì xoá và báo lỗi 'auth/google-not-registered'.
+   * - validate: kiểm tra bổ sung sau khi biết email (VD: yêu cầu Gemini API Key); trả về mã lỗi để huỷ đăng nhập.
+   */
+  const loginWithGoogle: AuthContextType['loginWithGoogle'] = async ({ allowNewUser, additionalData, validate }) => {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    const result = await signInWithPopup(auth, provider);
+    const isNewUser = getAdditionalUserInfo(result)?.isNewUser ?? false;
+    const userRef = doc(db, 'users', result.user.uid);
+
+    const fail = async (code: string) => {
+      if (isNewUser) {
+        try { await deleteDoc(userRef); } catch { /* ignore */ }
+        try { await deleteUser(result.user); } catch { await signOut(auth); }
+      } else {
+        await signOut(auth);
+      }
+      const err: any = new Error(code);
+      err.code = code;
+      throw err;
+    };
+
+    if (isNewUser && !allowNewUser) {
+      await fail('auth/google-not-registered');
+    }
+
+    const validationError = validate?.(result.user.email) ?? null;
+    if (validationError) {
+      await fail(validationError);
+    }
+
+    if (isNewUser) {
+      await setDoc(userRef, {
+        uid: result.user.uid,
+        displayName: result.user.displayName,
+        email: result.user.email,
+        photoURL: result.user.photoURL,
+        lastLogin: serverTimestamp(),
+        ...additionalData
+      }, { merge: true });
+    }
+  };
+
   const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ currentUser, loading, loginWithEmail, registerWithEmail, logout }}>
+    <AuthContext.Provider value={{ currentUser, loading, loginWithEmail, registerWithEmail, loginWithGoogle, logout }}>
       {!loading && children}
     </AuthContext.Provider>
   );

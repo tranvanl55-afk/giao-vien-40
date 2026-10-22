@@ -40,6 +40,17 @@ const translations = {
     helloFriendDesc: "Đăng ký tài khoản để bắt đầu hành trình học tập thú vị cùng chúng tôi",
     signUpBtn: "ĐĂNG KÝ",
     validationError: "Vui lòng điền đầy đủ tất cả các trường bắt buộc!",
+    orDivider: "hoặc",
+    googleLogin: "Đăng nhập bằng Google",
+    googleReg: "Đăng ký bằng Google",
+    googleNotRegistered: "Tài khoản Google này chưa được đăng ký. Vui lòng chuyển sang mục Đăng ký, nhập mã giới thiệu rồi chọn \"Đăng ký bằng Google\".",
+    googleGeminiReq: "Vui lòng nhập Gemini API Key vào ô bên dưới rồi bấm lại nút Google.",
+    googleRefReq: "Vui lòng nhập đúng Mã giới thiệu trước khi đăng ký bằng Google!",
+    googleFail: "Đăng nhập Google thất bại. Vui lòng thử lại!",
+    googlePopupBlocked: "Trình duyệt đã chặn cửa sổ đăng nhập Google. Vui lòng cho phép popup và thử lại.",
+    googleDomain: "Tên miền này chưa được cấp phép đăng nhập Google trong Firebase (Authorized domains).",
+    googleProviderOff: "Đăng nhập Google chưa được bật trong Firebase Authentication.",
+    googleExists: "Email này đã được đăng ký bằng mật khẩu. Vui lòng đăng nhập bằng email và mật khẩu.",
   },
   en: {
     title: "TEACHER 4.0",
@@ -77,15 +88,28 @@ const translations = {
     helloFriendDesc: "Register an account to start your amazing learning journey with us",
     signUpBtn: "SIGN UP",
     validationError: "Please fill in all required fields!",
+    orDivider: "or",
+    googleLogin: "Sign in with Google",
+    googleReg: "Sign up with Google",
+    googleNotRegistered: "This Google account is not registered yet. Please go to Sign Up, enter the referral code, then choose \"Sign up with Google\".",
+    googleGeminiReq: "Please enter your Gemini API Key below, then click the Google button again.",
+    googleRefReq: "Please enter a valid referral code before signing up with Google!",
+    googleFail: "Google sign-in failed. Please try again!",
+    googlePopupBlocked: "The browser blocked the Google sign-in popup. Please allow popups and try again.",
+    googleDomain: "This domain is not authorized for Google sign-in in Firebase (Authorized domains).",
+    googleProviderOff: "Google sign-in is not enabled in Firebase Authentication.",
+    googleExists: "This email is already registered with a password. Please sign in with email and password.",
   }
 };
 
 export function Login() {
-  const { loginWithEmail, registerWithEmail } = useAuth();
+  const { loginWithEmail, registerWithEmail, loginWithGoogle } = useAuth();
   const [isRegistering, setIsRegistering] = useState(false);
   const [errorStatus, setErrorStatus] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
+  const [googleNeedsKey, setGoogleNeedsKey] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const [lang, setLangState] = useState<'vi' | 'en'>(() => {
     return document.cookie.includes('googtrans=/vi/en') ? 'en' : 'vi';
@@ -144,8 +168,14 @@ export function Login() {
         localStorage.setItem('user_gemini_api_key', geminiApiKey.trim());
       }
     } catch (error: any) {
-      console.error('Lỗi Firebase chi tiết:', error.code);
-      setErrorStatus(t.loginFail);
+      console.error('Lỗi Firebase chi tiết:', error.code, error.message);
+      if (error.code === 'auth/invalid-api-key' || error.code === 'auth/api-key-not-found' || error.message?.includes('API key')) {
+        setErrorStatus("Khóa Firebase API Key không hợp lệ hoặc đã bị xóa. Vui lòng kiểm tra lại cấu hình Firebase!");
+      } else if (error.code === 'auth/too-many-requests') {
+        setErrorStatus("Bạn đã thử đăng nhập quá nhiều lần. Vui lòng thử lại sau ít phút.");
+      } else {
+        setErrorStatus(t.loginFail);
+      }
     }
   };
 
@@ -183,8 +213,106 @@ export function Login() {
     }
   };
 
-  const needsGeminiLogin = email.trim() && email.trim() !== "tranvanl55@gmail.com";
-  const needsGeminiReg = email.trim() && email.trim() !== "tranvanl55@gmail.com";
+  const ADMIN_EMAIL = "tranvanl55@gmail.com";
+
+  const handleGoogle = async (mode: 'login' | 'register') => {
+    setErrorStatus("");
+
+    if (mode === 'register' && referralCode.trim() !== "29010912") {
+      setErrorStatus(t.googleRefReq);
+      return;
+    }
+
+    const typedKey = geminiApiKey.trim();
+    const storedKey = localStorage.getItem('user_gemini_api_key') || "";
+
+    setGoogleLoading(true);
+    try {
+      await loginWithGoogle({
+        allowNewUser: mode === 'register',
+        additionalData: mode === 'register' ? {
+          birthYear: birthYear.trim() || null,
+          role,
+          provider: 'google',
+        } : undefined,
+        validate: (userEmail) => {
+          if (userEmail?.toLowerCase() !== ADMIN_EMAIL && !typedKey && !storedKey) {
+            return 'auth/gemini-required';
+          }
+          return null;
+        },
+      });
+      if (typedKey) {
+        localStorage.setItem('user_gemini_api_key', typedKey);
+      }
+    } catch (error: any) {
+      console.error('Lỗi đăng nhập Google:', error.code, error.message);
+      switch (error.code) {
+        case 'auth/gemini-required':
+          setGoogleNeedsKey(true);
+          setErrorStatus(t.googleGeminiReq);
+          break;
+        case 'auth/google-not-registered':
+          setErrorStatus(t.googleNotRegistered);
+          break;
+        case 'auth/popup-closed-by-user':
+        case 'auth/cancelled-popup-request':
+          break;
+        case 'auth/popup-blocked':
+          setErrorStatus(t.googlePopupBlocked);
+          break;
+        case 'auth/unauthorized-domain':
+          setErrorStatus(t.googleDomain);
+          break;
+        case 'auth/operation-not-allowed':
+          setErrorStatus(t.googleProviderOff);
+          break;
+        case 'auth/account-exists-with-different-credential':
+          setErrorStatus(t.googleExists);
+          break;
+        default:
+          setErrorStatus(t.googleFail);
+      }
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const needsGeminiLogin = googleNeedsKey || (email.trim() && email.trim() !== ADMIN_EMAIL);
+  const needsGeminiReg = googleNeedsKey || (email.trim() && email.trim() !== ADMIN_EMAIL);
+
+  const GoogleIcon = () => (
+    <svg className="w-4 h-4" viewBox="0 0 48 48" aria-hidden="true">
+      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/>
+      <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+      <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
+      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/>
+    </svg>
+  );
+
+  const renderGoogleButton = (mode: 'login' | 'register') => (
+    <>
+      <div className="flex items-center gap-3 my-3">
+        <div className="flex-1 h-px bg-slate-200" />
+        <span className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">{t.orDivider}</span>
+        <div className="flex-1 h-px bg-slate-200" />
+      </div>
+      <button
+        id={`google-${mode}-btn`}
+        type="button"
+        onClick={() => handleGoogle(mode)}
+        disabled={googleLoading}
+        className="w-full flex items-center justify-center gap-2.5 bg-white border border-slate-200 text-slate-700 font-bold text-sm rounded-xl py-2.5 shadow-sm hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-wait"
+      >
+        {googleLoading ? (
+          <span className="w-4 h-4 border-2 border-slate-300 border-t-violet-500 rounded-full animate-spin" />
+        ) : (
+          <GoogleIcon />
+        )}
+        {mode === 'login' ? t.googleLogin : t.googleReg}
+      </button>
+    </>
+  );
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 relative bg-[#0a0520]">
@@ -327,6 +455,8 @@ export function Login() {
             </button>
           </form>
 
+          <div className="w-full">{renderGoogleButton('login')}</div>
+
           {/* Mobile switch */}
           <p className="mt-5 text-xs text-slate-500 md:hidden">
             {t.noAccount}{' '}
@@ -454,6 +584,8 @@ export function Login() {
               {t.btnReg}
             </button>
           </form>
+
+          <div className="w-full">{renderGoogleButton('register')}</div>
 
           {/* Mobile switch */}
           <p className="mt-4 text-xs text-slate-500 md:hidden">

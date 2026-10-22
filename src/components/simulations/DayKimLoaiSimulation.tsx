@@ -36,6 +36,67 @@ const SOLUTIONS: Record<Solution, { id: Solution, formula: string, color: string
   FeSO4: { id: 'FeSO4', formula: 'FeSO_4', color: 'rgba(163,230,53,0.15)' },
 };
 
+const PRACTICE_QUESTIONS: { id: number; level: string; question: string; options: string[]; answer: number; explanation: string }[] = [
+  {
+    id: 1,
+    level: 'Nhận biết',
+    question: 'Dãy kim loại nào sau đây được sắp xếp theo chiều hoạt động hóa học GIẢM dần?',
+    options: ['K, Mg, Fe, Cu, Ag', 'Ag, Cu, Fe, Mg, K', 'Fe, K, Cu, Mg, Ag', 'Mg, K, Fe, Ag, Cu'],
+    answer: 0,
+    explanation: 'Theo dãy hoạt động hóa học: K > Na > Ba > Ca > Mg > Al > Zn > Fe > ... > (H) > Cu > Ag > Au. Vậy K, Mg, Fe, Cu, Ag giảm dần.',
+  },
+  {
+    id: 2,
+    level: 'Nhận biết',
+    question: 'Kim loại nào sau đây KHÔNG tác dụng với dung dịch HCl?',
+    options: ['Zn', 'Fe', 'Cu', 'Mg'],
+    answer: 2,
+    explanation: 'Chỉ những kim loại đứng TRƯỚC H trong dãy hoạt động mới đẩy được H khỏi axit. Cu đứng sau H nên không phản ứng với HCl.',
+  },
+  {
+    id: 3,
+    level: 'Thông hiểu',
+    question: 'Nhúng đinh sắt vào dung dịch CuSO₄. Hiện tượng quan sát được là:',
+    options: [
+      'Không có hiện tượng gì',
+      'Có kim loại màu đỏ bám vào đinh sắt, màu xanh của dung dịch nhạt dần',
+      'Có khí không màu thoát ra',
+      'Có kết tủa trắng xuất hiện',
+    ],
+    answer: 1,
+    explanation: 'Fe đứng trước Cu nên đẩy Cu ra khỏi muối: Fe + CuSO₄ → FeSO₄ + Cu. Cu màu đỏ bám vào đinh, ion Cu²⁺ (màu xanh) giảm dần.',
+  },
+  {
+    id: 4,
+    level: 'Thông hiểu',
+    question: 'Kim loại nào tác dụng được với nước ở nhiệt độ thường?',
+    options: ['Fe', 'Al', 'Na', 'Cu'],
+    answer: 2,
+    explanation: 'Các kim loại mạnh K, Na, Ba, Ca tác dụng với nước ở nhiệt độ thường tạo dung dịch bazơ và giải phóng H₂: 2Na + 2H₂O → 2NaOH + H₂↑.',
+  },
+  {
+    id: 5,
+    level: 'Vận dụng',
+    question: 'Cho mẩu Na vào dung dịch CuSO₄. Hiện tượng xảy ra là:',
+    options: [
+      'Có Cu màu đỏ bám lên mẩu Na',
+      'Không có phản ứng',
+      'Có khí thoát ra và xuất hiện kết tủa xanh lam',
+      'Dung dịch chuyển sang màu vàng',
+    ],
+    answer: 2,
+    explanation: 'Na phản ứng với nước trước: 2Na + 2H₂O → 2NaOH + H₂↑ (sủi bọt khí). Sau đó 2NaOH + CuSO₄ → Cu(OH)₂↓ (xanh lam) + Na₂SO₄. Na không đẩy Cu ra khỏi muối!',
+  },
+  {
+    id: 6,
+    level: 'Vận dụng',
+    question: 'Để làm sạch dung dịch FeSO₄ có lẫn tạp chất CuSO₄, ta nên dùng kim loại nào?',
+    options: ['Zn', 'Fe', 'Cu', 'Mg'],
+    answer: 1,
+    explanation: 'Dùng Fe dư: Fe + CuSO₄ → FeSO₄ + Cu. Lọc bỏ Cu và Fe dư thu được FeSO₄ tinh khiết. Nếu dùng Zn hay Mg sẽ tạo thêm tạp chất ZnSO₄, MgSO₄.',
+  },
+];
+
 interface ReactionConfig {
   hasReaction: boolean;
   equation: string | null;
@@ -213,6 +274,9 @@ export function DayKimLoaiSimulation({ onBack }: DayKimLoaiSimulationProps) {
   const [activeTab, setActiveTab] = useState<'controls' | 'practice'>('controls');
   const [selectedTubeId, setSelectedTubeId] = useState<string>('t1');
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
+  const quizScore = PRACTICE_QUESTIONS.filter(q => quizAnswers[q.id] === q.answer).length;
+  const quizDone = Object.keys(quizAnswers).length === PRACTICE_QUESTIONS.length;
 
   const activeTubeIndex = tubes.findIndex(t => t.id === selectedTubeId);
   const activeTube = tubes[activeTubeIndex];
@@ -271,7 +335,7 @@ export function DayKimLoaiSimulation({ onBack }: DayKimLoaiSimulationProps) {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left/Middle Column: Experiment Area */}
-        <div className="flex-1 relative flex flex-col items-center justify-center p-8 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-800/30 via-slate-950 to-slate-950">
+        <div className="flex-1 relative flex flex-col items-center justify-center p-8 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-slate-800/30 via-slate-950 to-slate-950">
            
            {/* Test Tube Rack */}
            <div className="relative flex gap-8 items-end justify-center h-80 w-full max-w-4xl shrink-0 z-10">
@@ -312,9 +376,9 @@ export function DayKimLoaiSimulation({ onBack }: DayKimLoaiSimulationProps) {
                      
                      {/* Glass Tube Container */}
                      <div 
-                        className={`relative w-10 h-56 rounded-b-full border-b-[3px] border-x-[3px] shadow-[inset_0_0_15px_rgba(255,255,255,0.1),_0_20px_40px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col justify-end
+                        className={`relative w-10 h-56 rounded-b-full border-b-[3px] border-x-[3px] shadow-[inset_0_0_15px_rgba(255,255,255,0.1),0_20px_40px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col justify-end
                            ${isSelected ? 'border-orange-500/50' : 'border-white/20 group-hover:border-white/30'} 
-                           transition-colors duration-300 backdrop-blur-[2px] bg-gradient-to-b from-white/5 to-white/0
+                           transition-colors duration-300 backdrop-blur-[2px] bg-linear-to-b from-white/5 to-white/0
                         `}
                         onClick={(e) => {
                           if (tube.metal && tube.solution && tube.isReactionStarted) toggleEquation(tube.id, e);
@@ -394,7 +458,7 @@ export function DayKimLoaiSimulation({ onBack }: DayKimLoaiSimulationProps) {
                      </div>
 
                      {/* Glass lip */}
-                     <div className="w-12 h-2 rounded-[100%] border-[2px] border-b-0 border-white/30 absolute -top-1 pointer-events-none"></div>
+                     <div className="w-12 h-2 rounded-[100%] border-2 border-b-0 border-white/30 absolute -top-1 pointer-events-none"></div>
 
                      {/* Labels */}
                      <div className="absolute -bottom-14 flex flex-col items-center pointer-events-none">
@@ -440,7 +504,7 @@ export function DayKimLoaiSimulation({ onBack }: DayKimLoaiSimulationProps) {
            <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
                <button 
                   onClick={startAllReactions}
-                  className="px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white font-bold rounded-full shadow-lg shadow-orange-500/20 active:scale-95 transition-transform flex items-center gap-2"
+                  className="px-6 py-3 bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white font-bold rounded-full shadow-lg shadow-orange-500/20 active:scale-95 transition-transform flex items-center gap-2"
                >
                  <Play className="w-5 h-5 fill-current" /> Tiến hành tất cả
                </button>
@@ -448,7 +512,7 @@ export function DayKimLoaiSimulation({ onBack }: DayKimLoaiSimulationProps) {
         </div>
 
         {/* Right Column: Controls & Practice */}
-        <div className="w-[340px] lg:w-[380px] bg-slate-900/80 border-l border-slate-800 flex flex-col backdrop-blur-md z-20 shrink-0">
+        <div className="w-85 lg:w-95 bg-slate-900/80 border-l border-slate-800 flex flex-col backdrop-blur-md z-20 shrink-0">
            {/* Tabs */}
            <div className="flex border-b border-slate-800/80">
               <button 
@@ -501,7 +565,7 @@ export function DayKimLoaiSimulation({ onBack }: DayKimLoaiSimulationProps) {
                               <button 
                                 key={s}
                                 onClick={() => handleSetSolution(s)}
-                                className={`py-1.5 px-1 rounded-lg border transition-all text-xs flex items-center justify-center min-h-[36px] ${
+                                className={`py-1.5 px-1 rounded-lg border transition-all text-xs flex items-center justify-center min-h-9 ${
                                   activeTube.solution === s 
                                   ? 'bg-slate-800 border-cyan-500 text-cyan-300 shadow-[inset_0_0_10px_rgba(6,182,212,0.1)]' 
                                   : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-500 hover:bg-slate-800 hover:text-slate-300'
@@ -535,10 +599,69 @@ export function DayKimLoaiSimulation({ onBack }: DayKimLoaiSimulationProps) {
                          K, Na, Ba, Ca, Mg, Al, Zn, Fe, Ni, Sn, Pb, (H), Cu, Hg, Ag, Pt, Au
                        </div>
                     </div>
-                    {/* Placeholder for practice feature */}
-                    <div className="text-center text-slate-500 text-sm mt-10">
-                       Tính năng luyện tập đang được cập nhật...
+                    {/* Practice quiz */}
+                    <div className="flex items-center justify-between px-1">
+                       <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Trắc nghiệm</span>
+                       <span className="text-xs font-bold text-cyan-400 bg-cyan-950/60 border border-cyan-800/50 px-2.5 py-1 rounded-full">
+                         Đúng {quizScore}/{PRACTICE_QUESTIONS.length}
+                       </span>
                     </div>
+
+                    {PRACTICE_QUESTIONS.map((q, qi) => {
+                      const picked = quizAnswers[q.id];
+                      const answered = picked !== undefined;
+                      return (
+                        <div key={q.id} className="p-4 bg-slate-900 border border-slate-700/70 rounded-xl">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-800 text-cyan-400 rounded uppercase tracking-wider">{q.level}</span>
+                            <span className="text-[10px] text-slate-500 font-bold">Câu {qi + 1}</span>
+                          </div>
+                          <p className="text-slate-200 text-sm font-medium leading-relaxed mb-3">{q.question}</p>
+                          <div className="grid gap-1.5">
+                            {q.options.map((opt, idx) => {
+                              let cls = 'bg-slate-800/60 border-slate-700 text-slate-300 hover:border-cyan-500/50 hover:bg-slate-800';
+                              if (answered) {
+                                if (idx === q.answer) cls = 'bg-emerald-900/30 border-emerald-500/60 text-emerald-300';
+                                else if (idx === picked) cls = 'bg-rose-900/30 border-rose-500/60 text-rose-300';
+                                else cls = 'bg-slate-800/40 border-slate-800 text-slate-500';
+                              }
+                              return (
+                                <button
+                                  key={idx}
+                                  id={`daykimloai-q${q.id}-opt${idx}`}
+                                  disabled={answered}
+                                  onClick={() => setQuizAnswers(prev => ({ ...prev, [q.id]: idx }))}
+                                  className={`text-left text-xs p-2.5 rounded-lg border transition-all flex items-start gap-2 ${cls} ${answered ? 'cursor-default' : 'active:scale-[0.98]'}`}
+                                >
+                                  <span className="font-bold shrink-0 w-5 h-5 rounded-full bg-slate-950/60 border border-slate-700 inline-flex items-center justify-center text-[10px]">{String.fromCharCode(65 + idx)}</span>
+                                  <span className="pt-0.5">{opt}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                          {answered && (
+                            <div className={`mt-3 p-3 rounded-lg text-xs leading-relaxed border ${picked === q.answer ? 'bg-emerald-950/40 border-emerald-800/50 text-emerald-200' : 'bg-rose-950/40 border-rose-800/50 text-rose-200'}`}>
+                              <span className="font-bold">{picked === q.answer ? '✓ Chính xác! ' : '✗ Chưa đúng. '}</span>
+                              {q.explanation}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    {quizDone && (
+                      <div className="p-4 rounded-xl bg-linear-to-br from-cyan-900/40 to-slate-900 border border-cyan-700/40 text-center">
+                        <p className="text-cyan-300 font-bold mb-1">Hoàn thành: {quizScore}/{PRACTICE_QUESTIONS.length} câu đúng</p>
+                        <p className="text-slate-400 text-xs mb-3">{quizScore === PRACTICE_QUESTIONS.length ? 'Xuất sắc! Em đã nắm vững dãy hoạt động hóa học.' : 'Hãy làm thí nghiệm ở tab Điều khiển rồi thử lại nhé!'}</p>
+                        <button
+                          id="daykimloai-quiz-reset"
+                          onClick={() => setQuizAnswers({})}
+                          className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" /> Làm lại
+                        </button>
+                      </div>
+                    )}
                  </div>
               )}
            </div>
@@ -546,7 +669,7 @@ export function DayKimLoaiSimulation({ onBack }: DayKimLoaiSimulationProps) {
       </div>
 
       {/* Floating Chatbot Guide */}
-      <div className="absolute bottom-4 right-[360px] lg:right-[400px] z-50">
+      <div className="absolute bottom-4 right-90 lg:right-100 z-50">
          <AnimatePresence>
             {isChatOpen && (
                <motion.div 

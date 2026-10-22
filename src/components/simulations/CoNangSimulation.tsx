@@ -380,9 +380,9 @@ Quy tắc:
                  </div>
 
                 {/* Chart */}
-                <div className="bg-white rounded-2xl border border-slate-200 p-3 shadow-sm flex-1 min-h-32.5 flex flex-col mt-4">
+                <div className="bg-white rounded-2xl border border-slate-200 p-3 shadow-sm flex flex-col mt-2">
                    <h3 className="font-bold text-[11px] text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-100 pb-1.5">Đồ thị Năng lượng</h3>
-                   <div className="w-full flex-1">
+                   <div className="w-full h-44">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={chartData} margin={{ top: 5, right: 10, bottom: -5, left: -25 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -394,16 +394,6 @@ Quy tắc:
                           <Line type="monotone" dataKey="Thế năng" stroke="#3b82f6" strokeWidth={2} dot={false} isAnimationActive={false} />
                           <Line type="monotone" dataKey="Động năng" stroke="#f97316" strokeWidth={2} dot={false} isAnimationActive={false} />
                           <Line type="monotone" dataKey="Cơ năng" stroke="#a855f7" strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={false} />
-                          
-                          {/* Live Indicator Point */}
-                          <Line 
-                              type="monotone" 
-                              dataKey={(data) => data.time === time.toFixed(2) ? data['Cơ năng'] : null} 
-                              stroke="#64748b" 
-                              strokeWidth={0} 
-                              dot={{ r: 3, fill: "#64748b", stroke: "#fff", strokeWidth: 1.5 }} 
-                              isAnimationActive={false}
-                          />
                         </LineChart>
                       </ResponsiveContainer>
                    </div>

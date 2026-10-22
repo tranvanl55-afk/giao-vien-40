@@ -41,11 +41,24 @@ export async function askGemini(
 
   try {
     return await callModel(currentKey);
-  } catch (primaryErr) {
-    // If the call failed and currentKey was different from systemKey, attempt fallback to systemKey
+  } catch (primaryErr: any) {
+    const isKeyInvalid = primaryErr?.message?.includes('API key not valid') || 
+                         primaryErr?.message?.includes('API_KEY_INVALID') ||
+                         primaryErr?.status === 400;
+                         
+    if (isKeyInvalid && typeof window !== 'undefined' && localStorage.getItem('user_gemini_api_key')) {
+      console.warn("Detected invalid user API key in localStorage, clearing it...");
+      localStorage.removeItem('user_gemini_api_key');
+    }
+
+    // If currentKey was different from systemKey, attempt fallback to systemKey
     if (systemKey && currentKey !== systemKey) {
       console.warn("User API key failed, falling back to system key...", primaryErr);
       return await callModel(systemKey);
+    }
+    
+    if (isKeyInvalid) {
+      throw new Error("Khóa API Gemini không hợp lệ hoặc đã bị vô hiệu hóa. Vui lòng kiểm tra API Key mới.");
     }
     throw primaryErr;
   }
