@@ -135,7 +135,6 @@ export function Login() {
   const [fullName, setFullName] = useState("");
   const [birthYear, setBirthYear] = useState("");
   const [role, setRole] = useState("Học sinh");
-  const [referralCode, setReferralCode] = useState("");
 
   const switchToRegister = () => {
     setIsRegistering(true);
@@ -183,18 +182,13 @@ export function Login() {
     e.preventDefault();
 
     // Validate all required fields
-    if (!fullName.trim() || !email.trim() || !password.trim() || !birthYear.trim() || !referralCode.trim()) {
+    if (!fullName.trim() || !email.trim() || !password.trim() || !birthYear.trim()) {
       setErrorStatus(t.validationError);
       return;
     }
 
     if (email.trim() !== "tranvanl55@gmail.com" && !geminiApiKey.trim()) {
       setErrorStatus(t.validationError);
-      return;
-    }
-
-    if (referralCode !== "29010912") {
-      setErrorStatus(t.invalidRef);
       return;
     }
 
@@ -217,11 +211,6 @@ export function Login() {
 
   const handleGoogle = async (mode: 'login' | 'register') => {
     setErrorStatus("");
-
-    if (mode === 'register' && referralCode.trim() !== "29010912") {
-      setErrorStatus(t.googleRefReq);
-      return;
-    }
 
     const typedKey = geminiApiKey.trim();
     const storedKey = localStorage.getItem('user_gemini_api_key') || "";
@@ -566,16 +555,7 @@ export function Login() {
               </select>
             </div>
 
-            <div className="relative">
-              <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-              <input
-                type="text"
-                value={referralCode}
-                onChange={(e) => setReferralCode(e.target.value)}
-                placeholder={t.refCode}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400/50 focus:border-violet-400 transition-all"
-              />
-            </div>
+
 
             <button
               type="submit"
