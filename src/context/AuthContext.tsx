@@ -10,6 +10,7 @@ import {
   browserLocalPersistence,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithCredential,
   browserPopupRedirectResolver,
   getAdditionalUserInfo,
   deleteUser
@@ -24,6 +25,10 @@ interface AuthContextType {
   registerWithEmail: (email: string, pass: string, displayName: string, additionalData?: any) => Promise<void>;
   loginWithGoogle: (options: {
     allowNewUser: boolean;
+    additionalData?: any;
+    validate?: (email: string | null) => string | null;
+  }) => Promise<void>;
+  loginWithGoogleCredential: (idToken: string, options?: {
     additionalData?: any;
     validate?: (email: string | null) => string | null;
   }) => Promise<void>;
@@ -206,10 +211,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  /**
+   * Đăng nhập trực tiếp bằng Google ID Token (Google Identity Services - GSI).
+   * Không đi qua firebaseapp.com/__/auth/handler nên không bao giờ bị lỗi 'The requested action is invalid'.
+   */
+  const loginWithGoogleCredential: AuthContextType['loginWithGoogleCredential'] = async (idToken, options) => {
+    const credential = GoogleAuthProvider.credential(idToken);
+    const result = await signInWithCredential(auth, credential);
+    const isNewUser = getAdditionalUserInfo(result)?.isNewUser ?? false;
+    const userRef = doc(db, 'users', result.user.uid);
+
+    const validationError = options?.validate?.(result.user.email) ?? null;
+    if (validationError) {
+      if (isNewUser) {
+        try { await deleteDoc(userRef); } catch { /* ignore */ }
+        try { await deleteUser(result.user); } catch { await signOut(auth); }
+      } else {
+        await signOut(auth);
+      }
+      const err: any = new Error(validationError);
+      err.code = validationError;
+      throw err;
+    }
+
+    if (isNewUser) {
+      await setDoc(userRef, {
+        uid: result.user.uid,
+        displayName: result.user.displayName,
+        email: result.user.email,
+        photoURL: result.user.photoURL,
+        lastLogin: serverTimestamp(),
+        role: 'Học sinh',
+        provider: 'google',
+        ...options?.additionalData
+      }, { merge: true });
+    } else {
+      await setDoc(userRef, {
+        lastLogin: serverTimestamp(),
+      }, { merge: true });
+    }
+  };
+
   const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ currentUser, loading, loginWithEmail, registerWithEmail, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ currentUser, loading, loginWithEmail, registerWithEmail, loginWithGoogle, loginWithGoogleCredential, logout }}>
       {!loading && children}
     </AuthContext.Provider>
   );

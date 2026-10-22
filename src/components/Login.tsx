@@ -103,7 +103,7 @@ const translations = {
 };
 
 export function Login() {
-  const { loginWithEmail, registerWithEmail, loginWithGoogle } = useAuth();
+  const { loginWithEmail, registerWithEmail, loginWithGoogle, loginWithGoogleCredential } = useAuth();
   const [isRegistering, setIsRegistering] = useState(false);
   const [errorStatus, setErrorStatus] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -208,10 +208,107 @@ export function Login() {
   };
 
   const ADMIN_EMAIL = "tranvanl55@gmail.com";
+  const GOOGLE_CLIENT_ID = "55853613187-5ikc7j1cmcn4d64onvea7jlb23pkc7t1.apps.googleusercontent.com";
+
+  // Xử lý đăng nhập trực tiếp từ Google Identity Services (bỏ qua hoàn toàn __/auth/handler)
+  const handleCredentialResponse = async (response: any) => {
+    if (!response?.credential) return;
+    setErrorStatus("");
+    const typedKey = geminiApiKey.trim();
+    const storedKey = localStorage.getItem('user_gemini_api_key') || "";
+
+    setGoogleLoading(true);
+    try {
+      await loginWithGoogleCredential(response.credential, {
+        additionalData: {
+          birthYear: birthYear.trim() || null,
+          role: role || 'Học sinh',
+          provider: 'google',
+        },
+        validate: (userEmail) => {
+          if (userEmail?.toLowerCase() !== ADMIN_EMAIL && !typedKey && !storedKey) {
+            return 'auth/gemini-required';
+          }
+          return null;
+        },
+      });
+      if (typedKey) {
+        localStorage.setItem('user_gemini_api_key', typedKey);
+      }
+    } catch (error: any) {
+      console.error('Lỗi đăng nhập Google Credential:', error);
+      if (error.code === 'auth/gemini-required') {
+        setGoogleNeedsKey(true);
+        setErrorStatus(t.googleGeminiReq);
+      } else {
+        setErrorStatus(t.googleFail);
+      }
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const initGsi = () => {
+      const g = (window as any).google;
+      if (!g?.accounts?.id) return;
+
+      try {
+        g.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleCredentialResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        });
+
+        const targetId = isRegistering ? 'gsi-btn-register' : 'gsi-btn-login';
+        const btnContainer = document.getElementById(targetId);
+        if (btnContainer) {
+          btnContainer.innerHTML = '';
+          g.accounts.id.renderButton(btnContainer, {
+            theme: 'outline',
+            size: 'large',
+            width: 320,
+            text: isRegistering ? 'signup_with' : 'signin_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+          });
+        }
+      } catch (err) {
+        console.warn('GSI render warning:', err);
+      }
+    };
+
+    initGsi();
+    const timer = setInterval(() => {
+      if ((window as any).google?.accounts?.id) {
+        initGsi();
+        clearInterval(timer);
+      }
+    }, 300);
+
+    return () => clearInterval(timer);
+  }, [isRegistering, lang, geminiApiKey, birthYear, role]);
 
   const handleGoogle = async (mode: 'login' | 'register') => {
     setErrorStatus("");
 
+    // Nếu Google Identity Services đã nạp, ưu tiên mở Google One Tap prompt
+    const g = (window as any).google;
+    if (g?.accounts?.id) {
+      g.accounts.id.prompt((notification: any) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          // Fallback sang Firebase popup thông thường nếu người dùng từ chối prompt
+          runFirebasePopup();
+        }
+      });
+      return;
+    }
+
+    await runFirebasePopup();
+  };
+
+  const runFirebasePopup = async () => {
     const typedKey = geminiApiKey.trim();
     const storedKey = localStorage.getItem('user_gemini_api_key') || "";
 
@@ -286,19 +383,24 @@ export function Login() {
         <span className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">{t.orDivider}</span>
         <div className="flex-1 h-px bg-slate-200" />
       </div>
+
+      {/* Nút đăng nhập chính thức từ Google (Không qua trung gian firebaseapp.com/__/auth/handler) */}
+      <div id={`gsi-btn-${mode}`} className="w-full flex justify-center mb-1 min-h-[44px]" />
+
+      {/* Nút đăng nhập dự phòng */}
       <button
         id={`google-${mode}-btn`}
         type="button"
         onClick={() => handleGoogle(mode)}
         disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-2.5 bg-white border border-slate-200 text-slate-700 font-bold text-sm rounded-xl py-2.5 shadow-sm hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-wait"
+        className="w-full flex items-center justify-center gap-2 bg-slate-50 border border-slate-200 text-slate-600 font-semibold text-xs rounded-xl py-2 shadow-xs hover:bg-slate-100 transition-all disabled:opacity-60"
       >
         {googleLoading ? (
-          <span className="w-4 h-4 border-2 border-slate-300 border-t-violet-500 rounded-full animate-spin" />
+          <span className="w-3.5 h-3.5 border-2 border-slate-300 border-t-violet-500 rounded-full animate-spin" />
         ) : (
           <GoogleIcon />
         )}
-        {mode === 'login' ? t.googleLogin : t.googleReg}
+        {mode === 'login' ? `${t.googleLogin} (Cách 2)` : `${t.googleReg} (Cách 2)`}
       </button>
     </>
   );
