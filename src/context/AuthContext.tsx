@@ -10,6 +10,7 @@ import {
   browserLocalPersistence,
   GoogleAuthProvider,
   signInWithPopup,
+  browserPopupRedirectResolver,
   getAdditionalUserInfo,
   deleteUser
 } from 'firebase/auth';
@@ -168,7 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
-    const result = await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, provider, browserPopupRedirectResolver);
     const isNewUser = getAdditionalUserInfo(result)?.isNewUser ?? false;
     const userRef = doc(db, 'users', result.user.uid);
 
