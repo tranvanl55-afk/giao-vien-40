@@ -225,12 +225,6 @@ export function Login() {
           role: role || 'Học sinh',
           provider: 'google',
         },
-        validate: (userEmail) => {
-          if (userEmail?.toLowerCase() !== ADMIN_EMAIL && !typedKey && !storedKey) {
-            return 'auth/gemini-required';
-          }
-          return null;
-        },
       });
       if (typedKey) {
         localStorage.setItem('user_gemini_api_key', typedKey);
@@ -320,12 +314,6 @@ export function Login() {
           birthYear: birthYear.trim() || null,
           role: role || 'Học sinh',
           provider: 'google',
-        },
-        validate: (userEmail) => {
-          if (userEmail?.toLowerCase() !== ADMIN_EMAIL && !typedKey && !storedKey) {
-            return 'auth/gemini-required';
-          }
-          return null;
         },
       });
       if (typedKey) {
