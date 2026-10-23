@@ -259,10 +259,12 @@ export function Login() {
         const btnContainer = document.getElementById(targetId);
         if (btnContainer) {
           btnContainer.innerHTML = '';
+          const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+          const calculatedWidth = isMobile ? Math.min(280, Math.max(220, window.innerWidth - 64)) : 320;
           g.accounts.id.renderButton(btnContainer, {
             theme: 'outline',
             size: 'large',
-            width: 320,
+            width: calculatedWidth,
             text: isRegistering ? 'signup_with' : 'signin_with',
             shape: 'rectangular',
             logo_alignment: 'left',
@@ -425,28 +427,52 @@ export function Login() {
       {/* Language Toggle */}
       <button
         onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}
-        className="absolute top-5 right-5 z-50 flex items-center gap-1.5 text-xs font-semibold text-white/80 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full border border-white/20 backdrop-blur-sm"
+        className="absolute top-3 right-3 sm:top-5 sm:right-5 z-50 flex items-center gap-1.5 text-xs font-semibold text-white/80 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full border border-white/20 backdrop-blur-sm"
       >
         <Globe className="w-3.5 h-3.5" />
         {t.langToggle}
       </button>
 
       {/* Title */}
-      <div className="relative z-30 text-center mb-6">
-        <h1 className="font-heading text-4xl sm:text-5xl font-black tracking-tighter bg-clip-text text-transparent bg-linear-to-r from-cyan-300 via-blue-400 to-fuchsia-500 uppercase italic drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] pr-2">
+      <div className="relative z-30 text-center mb-4 sm:mb-6 px-2">
+        <h1 className="font-heading text-3xl sm:text-5xl font-black tracking-tighter bg-clip-text text-transparent bg-linear-to-r from-cyan-300 via-blue-400 to-fuchsia-500 uppercase italic drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] pr-2">
           {t.title}
         </h1>
-        <p className="text-cyan-300 font-bold text-xs tracking-[0.3em] uppercase mt-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+        <p className="text-cyan-300 font-bold text-[10px] sm:text-xs tracking-[0.25em] sm:tracking-[0.3em] uppercase mt-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
           {t.subtitle}
         </p>
       </div>
 
       {/* Sliding Container */}
-      <div className="relative z-30 w-full max-w-200 min-h-135 bg-white rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.5)] overflow-hidden flex">
+      <div className="relative z-30 w-full max-w-md md:max-w-200 bg-white rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col md:flex-row md:min-h-135">
 
-        {/* ===== SIGN IN FORM (left side) ===== */}
+        {/* Mobile Tab Switch (Hiển thị riêng cho điện thoại) */}
+        <div className="flex md:hidden w-full bg-slate-100 p-1.5 rounded-t-3xl border-b border-slate-200">
+          <button
+            type="button"
+            onClick={switchToLogin}
+            className={`flex-1 py-2.5 text-xs font-black rounded-2xl transition-all ${
+              !isRegistering ? 'bg-white text-violet-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            {t.loginHeader}
+          </button>
+          <button
+            type="button"
+            onClick={switchToRegister}
+            className={`flex-1 py-2.5 text-xs font-black rounded-2xl transition-all ${
+              isRegistering ? 'bg-white text-violet-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            {t.regHeader}
+          </button>
+        </div>
+
+        {/* ===== SIGN IN FORM ===== */}
         <div
-          className="absolute top-0 left-0 w-1/2 h-full flex flex-col items-center justify-center px-8 py-10 transition-all duration-700 ease-in-out"
+          className={`${
+            isRegistering ? 'hidden md:flex' : 'flex'
+          } w-full md:w-1/2 md:h-full flex-col items-center justify-center px-6 py-6 sm:px-8 sm:py-8 md:px-8 md:py-10 md:absolute md:top-0 md:left-0 transition-all duration-700 ease-in-out`}
           style={{
             transform: isRegistering ? 'translateX(-100%)' : 'translateX(0)',
             opacity: isRegistering ? 0 : 1,
@@ -454,8 +480,8 @@ export function Login() {
             zIndex: isRegistering ? 1 : 5,
           }}
         >
-          <h2 className="text-2xl font-black text-slate-800 mb-1">{t.loginHeader}</h2>
-          <p className="text-slate-400 text-xs mb-5 text-center">{t.loginDesc}</p>
+          <h2 className="text-xl sm:text-2xl font-black text-slate-800 mb-1">{t.loginHeader}</h2>
+          <p className="text-slate-400 text-xs mb-4 text-center">{t.loginDesc}</p>
 
           {errorStatus && !isRegistering && (
             <div className="w-full mb-3 p-2.5 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs text-center font-semibold">
@@ -537,7 +563,7 @@ export function Login() {
           <div className="w-full">{renderGoogleButton('login')}</div>
 
           {/* Mobile switch */}
-          <p className="mt-5 text-xs text-slate-500 md:hidden">
+          <p className="mt-4 text-xs text-slate-500 md:hidden">
             {t.noAccount}{' '}
             <button onClick={switchToRegister} className="text-violet-600 font-bold hover:underline">
               {t.regHeader}
@@ -545,9 +571,11 @@ export function Login() {
           </p>
         </div>
 
-        {/* ===== SIGN UP FORM (right side, hidden by default) ===== */}
+        {/* ===== SIGN UP FORM ===== */}
         <div
-          className="absolute top-0 right-0 w-1/2 h-full flex flex-col items-center justify-center px-8 py-6 overflow-y-auto transition-all duration-700 ease-in-out"
+          className={`${
+            !isRegistering ? 'hidden md:flex' : 'flex'
+          } w-full md:w-1/2 md:h-full flex-col items-center justify-center px-6 py-6 sm:px-8 sm:py-8 md:px-8 md:py-6 md:overflow-y-auto md:absolute md:top-0 md:right-0 transition-all duration-700 ease-in-out`}
           style={{
             transform: isRegistering ? 'translateX(0)' : 'translateX(100%)',
             opacity: isRegistering ? 1 : 0,
@@ -555,7 +583,7 @@ export function Login() {
             zIndex: isRegistering ? 5 : 1,
           }}
         >
-          <h2 className="text-2xl font-black text-slate-800 mb-1">{t.regHeader}</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-slate-800 mb-1">{t.regHeader}</h2>
           <p className="text-slate-400 text-xs mb-4 text-center">{t.regDesc}</p>
 
           {errorStatus && isRegistering && (
@@ -645,8 +673,6 @@ export function Login() {
               </select>
             </div>
 
-
-
             <button
               type="submit"
               className="w-full bg-linear-to-r from-violet-600 to-indigo-600 text-white font-black text-sm rounded-xl py-3 shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 hover:-translate-y-0.5 transition-all tracking-widest mt-1"
@@ -666,7 +692,7 @@ export function Login() {
           </p>
         </div>
 
-        {/* ===== OVERLAY PANEL (sliding violet panel) ===== */}
+        {/* ===== OVERLAY PANEL (sliding violet panel on desktop only) ===== */}
         <div
           className="hidden md:block absolute top-0 w-1/2 h-full transition-all duration-700 ease-in-out z-10"
           style={{
@@ -721,9 +747,9 @@ export function Login() {
           </div>
         </div>
 
-        {/* Placeholder divs to set min-height on both halves */}
-        <div className="w-1/2 min-h-135 invisible" aria-hidden="true" />
-        <div className="w-1/2 min-h-135 invisible" aria-hidden="true" />
+        {/* Placeholder divs to set min-height on desktop only */}
+        <div className="hidden md:block w-1/2 min-h-135 invisible" aria-hidden="true" />
+        <div className="hidden md:block w-1/2 min-h-135 invisible" aria-hidden="true" />
       </div>
     </div>
   );
