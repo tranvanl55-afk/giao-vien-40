@@ -9,7 +9,7 @@ export function Footer({ onProfileClick }: FooterProps) {
   const { currentUser } = useAuth();
   
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/60 backdrop-blur-2xl border-t border-white/10 py-4 px-4 shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
+    <footer className="w-full mt-auto bg-slate-950/70 backdrop-blur-2xl border-t border-white/10 py-4 px-4 shadow-[0_-10px_30px_rgba(0,0,0,0.3)] mb-16 md:mb-0 z-30 transition-colors">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center md:justify-between text-xs md:text-sm font-medium text-slate-400 space-y-2 md:space-y-0">
         <p 
           onClick={onProfileClick}

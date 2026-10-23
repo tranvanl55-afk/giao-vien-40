@@ -167,8 +167,8 @@ Trả lời ngắn gọn, chuẩn xác, dễ hiểu bằng tiếng Việt theo �
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className={`fixed z-50 bg-slate-900/95 backdrop-blur-xl border border-slate-700 shadow-2xl flex flex-col overflow-hidden transition-all duration-300 ${
               isExpanded 
-                ? 'inset-4 md:inset-10 rounded-3xl' 
-                : 'bottom-4 right-4 md:bottom-6 md:right-6 w-[90vw] md:w-100 h-137.5 max-h-[85vh] rounded-3xl'
+                ? 'inset-2 sm:inset-4 md:inset-10 rounded-3xl' 
+                : 'bottom-16 right-2 sm:right-4 md:bottom-6 md:right-6 w-[calc(100vw-1rem)] sm:w-[90vw] md:w-100 h-[70vh] sm:h-137.5 max-h-[85vh] rounded-3xl'
             }`}
           >
             {/* Header */}

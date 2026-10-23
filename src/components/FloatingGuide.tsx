@@ -131,7 +131,7 @@ export function FloatingGuide() {
   return (
     <>
       {/* Floating Button */}
-      <div className="fixed bottom-8 right-8 md:bottom-10 md:right-12 z-9998 flex flex-col items-end gap-3">
+      <div className="fixed bottom-18 right-4 sm:bottom-8 sm:right-8 md:bottom-10 md:right-12 z-9998 flex flex-col items-end gap-3">
         {/* Tooltip */}
         <AnimatePresence>
           {showTooltip && (

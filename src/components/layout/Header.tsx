@@ -5,7 +5,7 @@ import { useUserProgress } from '../../context/UserProgressContext';
 import { 
   Sun, Moon, Bell, Check, Trash2, Award, UserCircle, LogOut, Star,
   FlaskConical, ClipboardCheck, Gamepad2, BookOpen, Sparkles, ChevronRight,
-  Home, Users, Info, Map
+  Home, Users, Info, Map, Menu
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
@@ -32,6 +32,7 @@ interface HeaderProps {
   onTourClick?: () => void;
   onLeaderboardClick?: () => void;
   onReviewClick?: () => void;
+  onMenuClick?: () => void;
 }
 
 interface NotificationItem {
@@ -55,6 +56,7 @@ export function Header({
   onTourClick,
   onLeaderboardClick,
   onReviewClick,
+  onMenuClick,
 }: HeaderProps) {
   const { currentUser } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -202,11 +204,11 @@ export function Header({
   }, [showUserDropdown]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/30 backdrop-blur-xl border-b border-white/50 select-none shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/40 dark:bg-slate-900/80 backdrop-blur-xl border-b border-white/50 dark:border-white/10 select-none shadow-sm transition-colors duration-500">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <div onClick={onLogoClick} className="logo-container cursor-pointer flex items-center group">
-          <span className="text-xl md:text-2xl font-black tracking-tighter text-indigo-950 uppercase group-hover:text-orange-600 transition-colors drop-shadow-sm">
+          <span className="text-xl md:text-2xl font-black tracking-tighter text-indigo-950 dark:text-white uppercase group-hover:text-orange-500 transition-colors drop-shadow-sm">
             Lĩnh TV
           </span>
         </div>
@@ -356,8 +358,36 @@ export function Header({
           </ul>
         </nav>
 
-        {/* User profile */}
-        <div className="flex items-center space-x-3">
+        {/* User profile & Mobile Actions */}
+        <div className="flex items-center space-x-1.5 sm:space-x-3">
+          {/* Mobile Theme Toggle Button */}
+          {currentUser && (
+            <button
+              onClick={toggleTheme}
+              title="Đổi giao diện"
+              className="md:hidden p-2 rounded-full bg-white/50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-white/10 text-indigo-950 dark:text-amber-400 hover:text-orange-500 transition-all shadow-xs cursor-pointer"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          )}
+
+          {/* Mobile Notifications Button */}
+          {currentUser && (
+            <div className="md:hidden relative">
+              <button
+                onClick={() => setShowNotifDropdown(!showNotifDropdown)}
+                title="Thông báo"
+                className="p-2 rounded-full bg-white/50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-white/10 text-indigo-950 dark:text-slate-200 hover:text-orange-500 transition-all shadow-xs cursor-pointer relative"
+              >
+                <Bell className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white font-extrabold text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+            </div>
+          )}
 
           {/* User avatar & points with dropdown */}
           <div 
@@ -368,7 +398,7 @@ export function Header({
           >
             <button
               onClick={handleProfileClick}
-              className="user-action-item flex items-center space-x-2 px-2.5 py-1.5 rounded-full bg-white/40 hover:bg-white/60 border border-white/60 transition-all text-indigo-900 hover:text-orange-600 group backdrop-blur-md shadow-sm cursor-pointer"
+              className="user-action-item flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-2.5 py-1.5 rounded-full bg-white/40 dark:bg-slate-800/60 hover:bg-white/60 dark:hover:bg-slate-800 border border-white/60 dark:border-white/10 transition-all text-indigo-900 dark:text-slate-100 hover:text-orange-500 group backdrop-blur-md shadow-sm cursor-pointer"
             >
               <UserCircle className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform" />
               <span className="text-xs font-extrabold hidden sm:block pr-1 tracking-wide whitespace-nowrap">
@@ -492,6 +522,17 @@ export function Header({
               )}
             </div>
           </div>
+
+          {/* Hamburger Menu button for mobile */}
+          {onMenuClick && (
+            <button
+              onClick={onMenuClick}
+              title="Danh mục & Menu"
+              className="md:hidden p-2 rounded-full bg-white/50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-white/10 text-indigo-950 dark:text-white hover:text-orange-500 transition-all shadow-xs cursor-pointer"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
     </header>
