@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { ArrowLeft, Info, RotateCcw, Eye, Sun, Moon, Sparkles, Check } from 'lucide-react';
+import { ArrowLeft, Sun, Moon, Sparkles } from 'lucide-react';
 
 type LensType = 'convex' | 'concave';
 
@@ -719,7 +719,7 @@ export function ThauKinhSimulation({ onBack }: { onBack: () => void }) {
           </div>
 
           {/* Interactive Canvas */}
-          <div className="relative w-full max-w-3xl aspect-[16/9] max-h-[460px] rounded-3xl overflow-hidden shadow-2xl border border-slate-800 flex items-center justify-center bg-slate-900">
+          <div className="relative w-full max-w-3xl aspect-video max-h-115 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 flex items-center justify-center bg-slate-900">
             <canvas
               ref={canvasRef}
               width={760}
