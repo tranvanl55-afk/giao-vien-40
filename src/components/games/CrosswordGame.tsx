@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Play, Settings, Trash2, Plus, ChevronRight, RotateCcw, Trophy, Sparkles, Volume2, VolumeX, Check, X, HelpCircle, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Play, Settings, Trash2, Plus, ChevronRight, RotateCcw, Trophy, Sparkles, Volume2, VolumeX, Check, X, HelpCircle, Eye, EyeOff, Download } from 'lucide-react';
 import { Question } from './GameHub';
 import confetti from 'canvas-confetti';
+import { exportOfflineGameHtml } from '../../utils/exportOfflineGameHtml';
 
 // ── Types ──
 interface CrosswordRow {
@@ -601,15 +602,31 @@ function SetupPhase({
           </div>
 
           {/* ── Start Button ── */}
-          <div className="flex gap-4 pb-6">
+          <div className="flex flex-wrap gap-4 pb-6">
             <button onClick={onBack}
-              className="flex-1 py-4 bg-white/10 hover:bg-white/20 rounded-2xl font-bold text-white transition-all border border-white/10">
+              className="flex-1 min-w-36 py-4 bg-white/10 hover:bg-white/20 rounded-2xl font-bold text-white transition-all border border-white/10 cursor-pointer">
               ← Quay lại
+            </button>
+            <button
+              onClick={() => {
+                const cfg: CrosswordConfig = { keyword: keywordNorm, rows };
+                onSave(cfg);
+                exportOfflineGameHtml({
+                  gameId: 'game-crossword',
+                  gameTitle: 'Giải ô chữ KHTN',
+                  questions,
+                  crosswordConfig: cfg,
+                });
+              }}
+              disabled={questions.length === 0}
+              className="flex-1 min-w-48 py-4 bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-2xl font-black text-base shadow-lg hover:-translate-y-1 transition-all disabled:opacity-40 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Download className="w-5 h-5" /> XUẤT HTML OFFLINE
             </button>
             <button
               onClick={handleSaveAndStart}
               disabled={!canStart}
-              className="flex-1 py-4 bg-linear-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-purple-950 rounded-2xl font-black text-lg shadow-lg hover:-translate-y-1 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-3"
+              className="flex-1 min-w-48 py-4 bg-linear-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-purple-950 rounded-2xl font-black text-lg shadow-lg hover:-translate-y-1 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-3 cursor-pointer"
             >
               <Play className="w-6 h-6 fill-purple-950" /> BẮT ĐẦU CHƠI
             </button>

@@ -254,7 +254,7 @@ Quy tắc trả lời:
             <polygon 
               points="-8,-12 8,-12 0,0" 
               fill="#fbbf24" 
-              transform={`translate(${-L/2 * Math.sin(iRad)}, ${-L/2 * Math.cos(iRad)}) rotate(${angleI})`} 
+              transform={`translate(${-L/2 * Math.sin(iRad)}, ${-L/2 * Math.cos(iRad)}) rotate(${-angleI})`} 
             />
 
             {/* Outgoing Ray (Refracted or Reflected) */}
@@ -271,7 +271,7 @@ Quy tắc trả lời:
               fill={isTIR ? "#fbbf24" : "#ef4444"} 
               transform={
                 isTIR 
-                  ? `translate(${L/2 * Math.sin(iRad)}, ${-L/2 * Math.cos(iRad)}) rotate(${-angleI + 180})` 
+                  ? `translate(${L/2 * Math.sin(iRad)}, ${-L/2 * Math.cos(iRad)}) rotate(${angleI + 180})` 
                   : `translate(${L/2 * Math.sin(rRad)}, ${L/2 * Math.cos(rRad)}) rotate(${-angleR})`
               } 
             />

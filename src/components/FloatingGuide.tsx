@@ -111,6 +111,8 @@ export function FloatingGuide() {
     }
   }, []);
 
+  const [isMinimized, setIsMinimized] = useState(false);
+
   const openGuide = () => {
     setIsOpen(true);
     setStep(0);
@@ -131,53 +133,84 @@ export function FloatingGuide() {
   return (
     <>
       {/* Floating Button */}
-      <div className="fixed bottom-18 right-4 sm:bottom-8 sm:right-8 md:bottom-10 md:right-12 z-9998 flex flex-col items-end gap-3">
+      <div className="fixed bottom-16 left-4 sm:bottom-8 sm:left-8 md:bottom-8 md:left-8 z-30 flex flex-col items-start gap-3 pointer-events-auto">
         {/* Tooltip */}
         <AnimatePresence>
-          {showTooltip && (
+          {showTooltip && !isMinimized && (
             <motion.div
-              initial={{ opacity: 0, x: 16, scale: 0.9 }}
+              initial={{ opacity: 0, x: -16, scale: 0.9 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: 16, scale: 0.9 }}
+              exit={{ opacity: 0, x: -16, scale: 0.9 }}
               className="relative bg-slate-900/95 border border-white/20 rounded-2xl px-4 py-3 shadow-2xl max-w-52.5 backdrop-blur-xl"
             >
               <p className="text-white font-bold text-sm leading-snug">👋 Bạn cần hướng dẫn không?</p>
               <p className="text-slate-300 text-xs mt-1 leading-relaxed">Nhấn vào đây để xem hướng dẫn sử dụng!</p>
-              <div className="absolute -bottom-1.5 right-7 w-3 h-3 bg-slate-900 border-b border-r border-white/20 rotate-45" />
+              <div className="absolute -bottom-1.5 left-7 w-3 h-3 bg-slate-900 border-b border-l border-white/20 rotate-45" />
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Button */}
-        <motion.button
-          onClick={openGuide}
-          animate={{ 
-            y: [0, -20, 0],
-            x: [0, -15, 10, 0],
-            rotate: [0, -5, 5, 0]
-          }}
-          transition={{ 
-            duration: 6, 
-            repeat: Infinity, 
-            ease: "easeInOut" 
-          }}
-          whileHover={{ scale: 1.15 }}
-          whileTap={{ scale: 0.95 }}
-          title="Hướng dẫn sử dụng"
-          className="relative flex items-center justify-center cursor-pointer hover:z-50"
-        >
-          {isFirstVisit && (
-            <>
-              <span className="absolute inset-4 rounded-full bg-cyan-400/50 animate-ping -z-10" />
-              <span className="absolute inset-4 rounded-full bg-cyan-300/20 animate-pulse -z-10" />
-            </>
-          )}
-          <img
-            src="https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fimg1.gif?alt=media&token=22c2ec59-d851-45c7-943d-7bc406be92f1"
-            alt="Trợ lý hướng dẫn"
-            className="w-32 sm:w-40 h-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
-          />
-        </motion.button>
+        {/* Minimized Pill vs Full Mascot */}
+        {isMinimized ? (
+          <motion.button
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsMinimized(false)}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-slate-900/90 hover:bg-slate-800 text-cyan-300 border border-cyan-500/40 shadow-xl backdrop-blur-md cursor-pointer transition-all group"
+            title="Mở lại trợ lý hướng dẫn"
+          >
+            <Rocket size={16} className="text-cyan-400 group-hover:rotate-12 transition-transform" />
+            <span className="text-xs font-bold text-slate-200">Trợ lý</span>
+          </motion.button>
+        ) : (
+          <div className="relative group">
+            {/* Nút thu nhỏ trợ lý (X) */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMinimized(true);
+                setShowTooltip(false);
+              }}
+              className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-slate-900/90 hover:bg-red-500 text-slate-400 hover:text-white border border-slate-700/80 flex items-center justify-center shadow-lg transition-all opacity-80 sm:opacity-0 sm:group-hover:opacity-100 z-20 cursor-pointer"
+              title="Tạm ẩn trợ lý"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Button */}
+            <motion.button
+              onClick={openGuide}
+              animate={{ 
+                y: [0, -14, 0],
+                x: [0, -10, 8, 0],
+                rotate: [0, -4, 4, 0]
+              }}
+              transition={{ 
+                duration: 6, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              title="Hướng dẫn sử dụng (Click để xem)"
+              className="relative flex items-center justify-center cursor-pointer"
+            >
+              {isFirstVisit && (
+                <>
+                  <span className="absolute inset-4 rounded-full bg-cyan-400/50 animate-ping -z-10" />
+                  <span className="absolute inset-4 rounded-full bg-cyan-300/20 animate-pulse -z-10" />
+                </>
+              )}
+              <img
+                src="https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fimg1.gif?alt=media&token=22c2ec59-d851-45c7-943d-7bc406be92f1"
+                alt="Trợ lý hướng dẫn"
+                className="w-24 sm:w-28 md:w-32 h-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
+              />
+            </motion.button>
+          </div>
+        )}
       </div>
 
       {/* Modal */}
@@ -197,7 +230,7 @@ export function FloatingGuide() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.88, y: 48 }}
               transition={{ type: 'spring', bounce: 0.28, duration: 0.5 }}
-              className="fixed inset-x-4 bottom-4 md:inset-auto md:bottom-24 md:right-6 md:w-107.5
+              className="fixed inset-x-4 bottom-4 md:inset-auto md:bottom-24 md:left-8 md:w-107.5
                 z-10000 bg-slate-900/95 backdrop-blur-xl border border-white/12
                 rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden"
             >

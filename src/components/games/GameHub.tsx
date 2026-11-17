@@ -1,9 +1,10 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { ArrowLeft, Plus, Trash2, Image, Sparkles, Check } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Image, Sparkles, Check, Download } from 'lucide-react';
 import { Robot, Question as QuestionIcon } from '@phosphor-icons/react';
-import { getGeminiClient, getGeminiApiKey } from '../../lib/gemini';
+import { getGeminiClient, ensureGeminiApiKey } from '../../lib/gemini';
 import { Type } from '@google/genai';
 import { AIConnectionBadge } from '../AIConnectionBadge';
+import { exportOfflineGameHtml } from '../../utils/exportOfflineGameHtml';
 
 export interface QuestionType {
   id: string;
@@ -43,16 +44,16 @@ export function GameHub({ onBack }: { onBack: () => void }) {
     setScanning(true);
     setScanStatus('Khởi chạy tiến trình AI...');
     try {
-      setScanStatus('Đang kết kết nối Gemini Client...');
-      const AI = getGeminiClient();
-      const apiKey = getGeminiApiKey();
-      if (!apiKey) {
-        const errMsg = 'Tài khoản của bạn yêu cầu nhập Gemini API Key để sử dụng tính năng AI này. Vui lòng cấu hình API Key!';
-        setScanStatus('❌ Lỗi: Thiếu API Key');
-        alert(errMsg);
+      setScanStatus('Đang kết nối Gemini AI...');
+      let apiKey = '';
+      try {
+        apiKey = await ensureGeminiApiKey();
+      } catch {
         setScanning(false);
+        setScanStatus('');
         return;
       }
+      const AI = getGeminiClient(apiKey);
       
       setScanStatus('Đang đọc dữ liệu ảnh...');
       const reader = new FileReader();
@@ -238,12 +239,27 @@ export function GameHub({ onBack }: { onBack: () => void }) {
         <div className="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-3xl p-6 shadow-2xl flex-1 flex flex-col relative overflow-hidden">
           <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
-          <div className="flex justify-between items-center mb-6 relative z-10">
+          <div className="flex justify-between items-center mb-6 relative z-10 flex-wrap gap-3">
             <h2 className="text-xl font-black text-white flex items-center gap-2">Danh sách câu hỏi</h2>
             {questions.length > 0 && (
-              <button onClick={() => { if(confirm('Xóa toàn bộ câu hỏi?')) saveQuestions([]); }} className="text-sm text-red-400 hover:text-red-300 font-bold bg-red-400/10 hover:bg-red-400/20 px-4 py-2 rounded-xl transition-all flex items-center gap-2">
-                <Trash2 className="w-4 h-4" /> Làm trống kho
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() =>
+                    exportOfflineGameHtml({
+                      gameId: 'game-star-race',
+                      gameTitle: 'Bộ Trò Chơi KHTN (Tất cả chế độ)',
+                      gameDescription: 'Tích hợp đầy đủ 14 chế độ trò chơi KHTN chạy offline 100%',
+                      questions,
+                    })
+                  }
+                  className="text-sm text-emerald-300 hover:text-emerald-200 font-bold bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <Download className="w-4 h-4" /> Xuất Game HTML Offline
+                </button>
+                <button onClick={() => { if(confirm('Xóa toàn bộ câu hỏi?')) saveQuestions([]); }} className="text-sm text-red-400 hover:text-red-300 font-bold bg-red-400/10 hover:bg-red-400/20 px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer">
+                  <Trash2 className="w-4 h-4" /> Làm trống kho
+                </button>
+              </div>
             )}
           </div>
           

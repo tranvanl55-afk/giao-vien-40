@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { ArrowLeft, RotateCcw, Upload, Link, Play, X } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Upload, Link, Play, X, Download } from 'lucide-react';
 import { Question } from './GameHub';
 import { motion, AnimatePresence } from 'motion/react';
 import { soundClick, soundCorrect, soundWrong, soundStart, soundEnd } from '../../hooks/useGameSounds';
+import { exportOfflineGameHtml } from '../../utils/exportOfflineGameHtml';
 
 const OPTS = ['A', 'B', 'C', 'D'];
 const GRID_COLS = 3;
@@ -188,9 +189,23 @@ export function PuzzleFlipGame({ questions, onBack }: { questions: Question[]; o
           <button
             onClick={startGame}
             disabled={!imageUrl || questions.length === 0}
-            className="w-full flex items-center justify-center gap-2 py-3.5 bg-linear-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 rounded-2xl font-black text-lg shadow-[0_0_30px_rgba(192,38,211,0.4)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 py-3.5 bg-linear-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 rounded-2xl font-black text-lg shadow-[0_0_30px_rgba(192,38,211,0.4)] transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             <Play className="w-5 h-5 fill-current" /> Bắt đầu!
+          </button>
+          <button
+            onClick={() =>
+              exportOfflineGameHtml({
+                gameId: 'game-puzzle-flip',
+                gameTitle: 'Lật mảnh ghép',
+                questions,
+                customImageUrl: imageUrl,
+              })
+            }
+            disabled={questions.length === 0}
+            className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-600/90 hover:bg-emerald-500 rounded-2xl font-bold text-sm text-white shadow-lg transition-all disabled:opacity-40 cursor-pointer"
+          >
+            <Download className="w-4 h-4" /> Xuất HTML Offline (Kèm ảnh này)
           </button>
           {!imageUrl && <p className="text-xs text-red-400 text-center">Vui lòng chọn ảnh trước</p>}
           {questions.length === 0 && <p className="text-xs text-red-400 text-center">Vui lòng thêm câu hỏi</p>}

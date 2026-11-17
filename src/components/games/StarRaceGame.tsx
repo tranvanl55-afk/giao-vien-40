@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Star, RotateCcw } from 'lucide-react';
 import { Question } from './GameHub';
+import { DEFAULT_GAME_QUESTIONS } from '../../data/defaultGameQuestions';
 import { motion, AnimatePresence } from 'motion/react';
 import { soundClick, soundCorrect, soundWrong, soundStart, soundEnd, soundNextQuestion } from '../../hooks/useGameSounds';
 
@@ -16,7 +17,15 @@ const TEAMS = [
 
 type Phase = 'countdown' | 'answering' | 'reveal' | 'result';
 
-export function StarRaceGame({ questions, onBack }: { questions: Question[]; onBack: () => void }) {
+export function StarRaceGame({
+  questions = DEFAULT_GAME_QUESTIONS,
+  roomId: _roomId,
+  onBack,
+}: {
+  questions?: Question[];
+  roomId?: string;
+  onBack: () => void;
+}) {
   const [scores, setScores] = useState([0, 0]);
   const [qIdx, setQIdx] = useState(0);
   // teamAnswers[ti] = option index chosen, or -1 = timed out, null = not yet

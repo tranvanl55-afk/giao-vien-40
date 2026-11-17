@@ -3,7 +3,7 @@ import { AIConnectionBadge } from '../AIConnectionBadge';
 import { motion } from 'motion/react';
 import { UploadCloud, Loader2, Sparkles, NotebookPen, PenTool, Star, Printer, Plus, Link as LinkIcon, X, ArrowLeft } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
-import { getGeminiClient, getGeminiApiKey } from '../../lib/gemini';
+import { getGeminiClient, ensureGeminiApiKey } from '../../lib/gemini';
 import { toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
 
@@ -253,12 +253,15 @@ const handleRemoveSectionImage = (chapterIdx: number, sectionIdx: number) => {
     setError(null);
     setData(null);
 
-    const AI = getGeminiClient();
-    if (!getGeminiApiKey()) {
-      setError("Tài khoản của bạn yêu cầu nhập Gemini API Key để sử dụng tính năng AI này. Vui lòng đăng nhập lại!");
+    let apiKey = '';
+    try {
+      apiKey = await ensureGeminiApiKey();
+    } catch {
       setLoading(false);
       return;
     }
+
+    const AI = getGeminiClient(apiKey);
 
     try {
       const base64Data = textbookFile.base64.split(',')[1];

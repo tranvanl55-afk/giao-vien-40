@@ -1,5 +1,5 @@
 // src/components/games/Lobby.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMultiplayer } from '../../context/MultiplayerContext';
 import { motion } from 'motion/react';
@@ -7,7 +7,7 @@ import { Star } from 'lucide-react';
 
 export const Lobby = () => {
   const navigate = useNavigate();
-  const { createRoom, roomId, isHost } = useMultiplayer();
+  const { createRoom } = useMultiplayer();
   const [creating, setCreating] = useState(false);
 
   const handleCreate = async () => {
@@ -35,6 +35,7 @@ export const Lobby = () => {
           Tạo một phòng để mời bạn bè tham gia và bắt đầu cuộc đua trả lời câu hỏi.
         </p>
         <button
+          type="button"
           onClick={handleCreate}
           disabled={creating}
           className="px-6 py-3 bg-linear-to-r from-purple-600 to-pink-500 rounded-xl font-bold hover:from-purple-500 hover:to-pink-400 transition-colors disabled:opacity-50"

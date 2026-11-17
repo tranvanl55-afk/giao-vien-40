@@ -6,7 +6,7 @@ import {
   Check, Info, Sparkles, RefreshCw, Maximize, Minimize, Loader2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { getGeminiClient, getGeminiApiKey } from '../../lib/gemini';
+import { getGeminiClient, ensureGeminiApiKey } from '../../lib/gemini';
 import { AIConnectionBadge } from '../AIConnectionBadge';
 
 // ----------------------------------------------------
@@ -143,15 +143,16 @@ export function VideoTuongTac({ onBack }: { onBack: () => void }) {
       return;
     }
     
-    const apiKey = getGeminiApiKey();
-    if (!apiKey) {
-      alert("Tài khoản của bạn yêu cầu cấu hình Gemini API Key để sử dụng tính năng này!");
+    let apiKey = '';
+    try {
+      apiKey = await ensureGeminiApiKey();
+    } catch {
       return;
     }
 
     setIsGeneratingAI(true);
     try {
-      const client = getGeminiClient();
+      const client = getGeminiClient(apiKey);
       const prompt = `Bạn là một chuyên gia giáo dục xuất sắc. Hãy quét và phân tích video YouTube tại đường link sau: ${youtubeUrl}.
 (Nếu bạn không thể xem trực tiếp video, hãy đọc URL và suy luận nội dung dựa trên tiêu đề/chủ đề của video).
 Nhiệm vụ của bạn là tạo ra một bài giảng tương tác bằng cách đặt ra từ 4 đến 6 câu hỏi trắc nghiệm sẽ hiện ra ở các mốc thời gian khác nhau trong video. Hãy phân bổ thời gian (giây) một cách hợp lý xuyên suốt từ 15s đến cuối video (khoảng 300s).

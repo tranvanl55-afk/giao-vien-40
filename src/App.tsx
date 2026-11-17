@@ -22,10 +22,17 @@ import { Leaderboard } from './components/Leaderboard';
 import { LessonRenderer } from './components/LessonRenderer';
 import { AIAssistant } from './components/AIAssistant';
 import { FloatingGuide } from './components/FloatingGuide';
+import { ApiKeyModal } from './components/ApiKeyModal';
 
 import { MultiplayerComponents } from './config/lessonRegistry';
 import { categories } from './data';
 const { Lobby, Room, StarRaceGame } = MultiplayerComponents;
+
+const PublicTinhBotElearning = lazy(() =>
+  import('./components/simulations/TinhBotCelluloseElearning').then((m) => ({
+    default: m.TinhBotCelluloseElearning,
+  }))
+);
 
 function LessonWrapper() {
   const { simId } = useParams<{ simId: string }>();
@@ -75,6 +82,7 @@ export default function App() {
   const { currentUser } = useAuth();
   const { theme } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const toggleFullscreen = () => {
@@ -92,6 +100,17 @@ export default function App() {
   const isFullscreenPage = location.pathname.startsWith('/lesson') || location.pathname.startsWith('/subcategory');
 
   if (!currentUser) {
+    if (location.pathname === '/lesson/du-an-tinh-bot-cellulose') {
+      return (
+        <ErrorBoundary onBack={() => navigate('/')}>
+          <Suspense fallback={<CatLoader />}>
+            <div className="h-screen w-full overflow-y-auto relative z-10 bg-slate-50">
+              <PublicTinhBotElearning onBack={() => navigate('/')} />
+            </div>
+          </Suspense>
+        </ErrorBoundary>
+      );
+    }
     return (
       <div className="min-h-screen bg-slate-200 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200 transition-colors duration-500">
         <Login />
@@ -123,6 +142,7 @@ export default function App() {
       )}
 
       {location.pathname === '/' && <FloatingGuide />}
+      <ApiKeyModal />
 
       <MultiplayerProvider>
         <ErrorBoundary onBack={() => window.location.href = '/'}>

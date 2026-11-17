@@ -76,5 +76,20 @@ service cloud.firestore {
       }
     }
 
+    // ── KHTN 9 Bài 30 (Tinh bột & Cellulose): Kiểm tra & Đánh giá Rubric ─────
+    match /khtn9_bai30_stage2_tests/{docId} {
+      allow read, delete: if true;
+      allow create: if request.resource.data.studentName is string
+        && request.resource.data.studentName.size() > 0
+        && request.resource.data.score is number;
+    }
+
+    match /khtn9_bai30_stage3_rubrics/{docId} {
+      allow read, delete: if true;
+      allow create: if request.resource.data.evaluatorGroup is string
+        && request.resource.data.targetGroup is string
+        && request.resource.data.totalPoints is number;
+    }
+
   }
 }

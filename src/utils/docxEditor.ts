@@ -1,6 +1,6 @@
 import mammoth from 'mammoth';
 import JSZip from 'jszip';
-import { getGeminiClient } from '../lib/gemini';
+import { getGeminiClient, ensureGeminiApiKey } from '../lib/gemini';
 import { Type } from '@google/genai';
 
 export async function extractTextFromDocx(file: File): Promise<string> {
@@ -10,7 +10,8 @@ export async function extractTextFromDocx(file: File): Promise<string> {
 }
 
 export async function generateAICompetencies(lessonText: string) {
-  const client = getGeminiClient();
+  const apiKey = await ensureGeminiApiKey();
+  const client = getGeminiClient(apiKey);
   const prompt = `Bạn là một chuyên gia giáo dục sư phạm và chuyên gia công nghệ thông tin.
 Dưới đây là một phần hoặc toàn bộ nội dung giáo án (kế hoạch bài dạy) của giáo viên:
 

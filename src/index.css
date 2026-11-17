@@ -19,6 +19,7 @@ body {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-heading: "Montserrat", ui-sans-serif, system-ui, sans-serif;
   --font-hand: "Sriracha", cursive;
+  --font-serif: "Times New Roman", Times, "Noto Serif", serif;
 }
 
 body {

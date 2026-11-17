@@ -204,7 +204,7 @@ export function Header({
   }, [showUserDropdown]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/40 dark:bg-slate-900/80 backdrop-blur-xl border-b border-white/50 dark:border-white/10 select-none shadow-sm transition-colors duration-500">
+    <header className="fixed top-0 left-0 right-0 z-100 bg-white/40 dark:bg-slate-900/80 backdrop-blur-xl border-b border-white/50 dark:border-white/10 select-none shadow-sm transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <div onClick={onLogoClick} className="logo-container cursor-pointer flex items-center group">
@@ -410,7 +410,7 @@ export function Header({
             <div
               ref={userDropdownRef}
               style={{ display: 'none' }}
-              className="absolute right-0 mt-2.5 w-64 bg-white/95 dark:bg-slate-900/95 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-2xl backdrop-blur-xl z-50 overflow-visible py-1.5"
+              className="absolute right-0 mt-2.5 w-64 bg-white/95 dark:bg-slate-900/95 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-2xl backdrop-blur-xl z-110 overflow-visible py-1.5"
             >
               {categories.map((cat, index) => {
                 const isLast = index === categories.length - 1;
@@ -450,7 +450,7 @@ export function Header({
                     
                     {/* Subcategories Flyout */}
                     {cat.subCategories && cat.subCategories.length > 0 && (
-                      <div className="hidden md:block absolute top-0 right-[98%] mr-1 w-64 max-h-[80vh] overflow-y-auto custom-scrollbar bg-white/95 dark:bg-slate-900/95 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-2xl backdrop-blur-xl z-50 opacity-0 invisible group-hover/navitem:opacity-100 group-hover/navitem:visible transition-all duration-200 py-1.5">
+                      <div className="hidden md:block absolute top-0 right-[98%] mr-1 w-64 max-h-[80vh] overflow-y-auto custom-scrollbar bg-white/95 dark:bg-slate-900/95 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-2xl backdrop-blur-xl z-120 opacity-0 invisible group-hover/navitem:opacity-100 group-hover/navitem:visible transition-all duration-200 py-1.5">
                         {cat.subCategories.map(sub => (
                           <button
                             key={sub.id}

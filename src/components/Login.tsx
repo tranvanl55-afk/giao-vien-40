@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { User, Calendar, Briefcase, Key, Mail, Lock, Eye, EyeOff, Globe } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { User, Calendar, Briefcase, Key, Mail, Lock, Eye, EyeOff, Globe, Sparkles, ArrowRight, BookOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { isPrivilegedAccount } from '../lib/gemini';
 
 const translations = {
   vi: {
@@ -10,9 +12,9 @@ const translations = {
     loginDesc: "Điền thông tin để tiếp nhận tín hiệu",
     emailPlaceholder: "Email của bạn",
     passwordPlaceholder: "Mật khẩu",
-    geminiPlaceholder: "Gemini API Key của bạn (AIzaSy...)",
-    geminiReqLogin: "Tài khoản này yêu cầu nhập Gemini API Key để tiếp tục sử dụng các tính năng AI!",
-    geminiReqReg: "Tài khoản này yêu cầu nhập Gemini API Key để đăng ký và sử dụng các tính năng AI!",
+    geminiPlaceholder: "Gemini API Key (Tùy chọn - có thể nhập khi dùng tính năng AI)",
+    geminiReqLogin: "Tài khoản này có thể nhập Gemini API Key ngay hoặc nhập sau khi dùng tính năng AI!",
+    geminiReqReg: "Tài khoản này có thể nhập Gemini API Key ngay hoặc nhập sau khi dùng tính năng AI!",
     loginFail: "Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu!",
     regFail: "Đăng ký thất bại. Email có thể đã tồn tại hoặc mật khẩu quá ngắn!",
     invalidRef: "Mã giới thiệu không đúng!",
@@ -28,7 +30,7 @@ const translations = {
     roleTeacher: "Giáo viên",
     roleParent: "Phụ huynh",
     refCode: "Mã giới thiệu (Bắt buộc)",
-    geminiReq: "Gemini API Key (Bắt buộc)",
+    geminiReq: "Gemini API Key (Tùy chọn - AIzaSy...)",
     noAccount: "Chưa có tài khoản?",
     hasAccount: "Đã có tài khoản?",
     langToggle: "English",
@@ -59,9 +61,9 @@ const translations = {
     loginDesc: "Enter details to receive signal",
     emailPlaceholder: "Your email",
     passwordPlaceholder: "Password",
-    geminiPlaceholder: "Your Gemini API Key (AIzaSy...)",
-    geminiReqLogin: "This account requires a Gemini API Key to continue using AI features!",
-    geminiReqReg: "This account requires a Gemini API Key to register and use AI features!",
+    geminiPlaceholder: "Gemini API Key (Optional - can be entered when using AI)",
+    geminiReqLogin: "You can enter your Gemini API Key now or later when using AI features!",
+    geminiReqReg: "You can enter your Gemini API Key now or later when using AI features!",
     loginFail: "Login failed. Please check your email and password!",
     regFail: "Registration failed. Email may already exist or password is too short!",
     invalidRef: "Invalid referral code!",
@@ -77,7 +79,7 @@ const translations = {
     roleTeacher: "Teacher",
     roleParent: "Parent",
     refCode: "Referral Code (Required)",
-    geminiReq: "Gemini API Key (Required)",
+    geminiReq: "Gemini API Key (Optional)",
     noAccount: "Don't have an account?",
     hasAccount: "Already have an account?",
     langToggle: "Tiếng Việt",
@@ -103,6 +105,7 @@ const translations = {
 };
 
 export function Login() {
+  const navigate = useNavigate();
   const { loginWithEmail, registerWithEmail, loginWithGoogle, loginWithGoogleCredential } = useAuth();
   const [isRegistering, setIsRegistering] = useState(false);
   const [errorStatus, setErrorStatus] = useState("");
@@ -156,14 +159,11 @@ export function Login() {
       return;
     }
 
-    if (email.trim() !== "tranvanl55@gmail.com" && !geminiApiKey.trim()) {
-      setErrorStatus(t.geminiReqLogin);
-      return;
-    }
+    const isPrivileged = isPrivilegedAccount(email);
 
     try {
       await loginWithEmail(email, password);
-      if (email.trim() !== "tranvanl55@gmail.com") {
+      if (!isPrivileged && geminiApiKey.trim()) {
         localStorage.setItem('user_gemini_api_key', geminiApiKey.trim());
       }
     } catch (error: any) {
@@ -187,10 +187,7 @@ export function Login() {
       return;
     }
 
-    if (email.trim() !== "tranvanl55@gmail.com" && !geminiApiKey.trim()) {
-      setErrorStatus(t.validationError);
-      return;
-    }
+    const isPrivileged = isPrivilegedAccount(email);
 
     setErrorStatus("");
     try {
@@ -198,7 +195,7 @@ export function Login() {
         birthYear,
         role: lang === 'en' ? (role === 'Student' ? 'Học sinh' : role === 'Teacher' ? 'Giáo viên' : 'Phụ huynh') : role,
       });
-      if (email.trim() !== "tranvanl55@gmail.com") {
+      if (!isPrivileged && geminiApiKey.trim()) {
         localStorage.setItem('user_gemini_api_key', geminiApiKey.trim());
       }
     } catch (error: any) {
@@ -354,8 +351,8 @@ export function Login() {
     }
   };
 
-  const needsGeminiLogin = googleNeedsKey || (email.trim() && email.trim() !== ADMIN_EMAIL);
-  const needsGeminiReg = googleNeedsKey || (email.trim() && email.trim() !== ADMIN_EMAIL);
+  const needsGeminiLogin = googleNeedsKey || (email.trim() && !isPrivilegedAccount(email));
+  const needsGeminiReg = googleNeedsKey || (email.trim() && !isPrivilegedAccount(email));
 
   const GoogleIcon = () => (
     <svg className="w-4 h-4" viewBox="0 0 48 48" aria-hidden="true">
@@ -443,8 +440,10 @@ export function Login() {
         </p>
       </div>
 
-      {/* Sliding Container */}
-      <div className="relative z-30 w-full max-w-md md:max-w-200 bg-white rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col md:flex-row md:min-h-135">
+      {/* Main Layout: Login Box + Right Open-Access E-Learning Panel */}
+      <div className="relative z-30 w-full max-w-6xl flex flex-col lg:flex-row items-center lg:items-stretch justify-center gap-5">
+        {/* Sliding Container */}
+        <div className="relative w-full max-w-md md:max-w-200 bg-white rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col md:flex-row md:min-h-135">
 
         {/* Mobile Tab Switch (Hiển thị riêng cho điện thoại) */}
         <div className="flex md:hidden w-full bg-slate-100 p-1.5 rounded-t-3xl border-b border-slate-200">
@@ -750,6 +749,50 @@ export function Login() {
         {/* Placeholder divs to set min-height on desktop only */}
         <div className="hidden md:block w-1/2 min-h-135 invisible" aria-hidden="true" />
         <div className="hidden md:block w-1/2 min-h-135 invisible" aria-hidden="true" />
+        </div>
+
+        {/* Lối tắt bên phải: Nguồn mở - Không cần đăng nhập */}
+        <div className="w-full max-w-md md:max-w-200 lg:w-80 shrink-0 flex">
+          <button
+            type="button"
+            onClick={() => navigate('/lesson/du-an-tinh-bot-cellulose')}
+            className="w-full group flex flex-col justify-between gap-5 p-6 rounded-3xl bg-linear-to-br from-emerald-600/95 via-teal-700/95 to-cyan-800/95 hover:from-emerald-500 hover:via-teal-600 hover:to-cyan-700 text-white border-2 border-emerald-300/40 shadow-[0_20px_60px_rgba(16,185,129,0.4)] backdrop-blur-md cursor-pointer transition-all duration-300 hover:-translate-y-1 text-left"
+          >
+            <div className="space-y-4">
+              {/* Tiêu đề nguồn mở, không cần đăng nhập */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-300 text-amber-950 font-black text-[11px] uppercase tracking-wider shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                <span>
+                  {lang === 'vi'
+                    ? 'Nguồn mở • Không cần đăng nhập'
+                    : 'Open Resource • No Login'}
+                </span>
+              </div>
+
+              <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center shadow-inner">
+                <BookOpen className="w-6 h-6 text-white" />
+              </div>
+
+              <div>
+                <h3 className="text-lg sm:text-xl font-black leading-snug text-white">
+                  {lang === 'vi'
+                    ? 'Elearning dự án "bắt đầu từ sự kết thúc"'
+                    : 'E-learning Project: "Begin with the End"'}
+                </h3>
+                <p className="text-xs text-emerald-100/90 font-medium mt-2 leading-relaxed">
+                  {lang === 'vi'
+                    ? 'Bài 30: Tinh bột & Cellulose (KHTN 9). Học sinh và giáo viên có thể truy cập học tập trực tiếp ngay lập tức.'
+                    : 'Lesson 30: Starch & Cellulose (Science 9). Direct open access for students and teachers.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="w-full px-4 py-3 rounded-2xl bg-white text-teal-900 font-black text-sm flex items-center justify-center gap-2 shadow-md group-hover:scale-[1.02] transition-transform">
+              <span>{lang === 'vi' ? 'Vào học ngay' : 'Start Learning'}</span>
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   );

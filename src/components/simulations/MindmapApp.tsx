@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { Camera, Image as ImageIcon, Upload, FileText, Loader2, Download, AlertCircle, Share2, Expand, ZoomIn, ZoomOut, CheckCircle, Brain, Target, Sparkles, Map, X, Zap, Beaker, Dna, Rocket, Leaf, BookOpen, Lightbulb, Bot, GraduationCap, ArrowLeft } from 'lucide-react';
-import { getGeminiClient, getGeminiApiKey } from '../../lib/gemini';
+import { getGeminiClient, ensureGeminiApiKey } from '../../lib/gemini';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toPng } from 'html-to-image';
 import { AIConnectionBadge } from '../AIConnectionBadge';
@@ -440,12 +440,14 @@ export default function MindmapApp({ onBack }: { onBack?: () => void }) {
     setError(null);
 
     try {
-      const ai = getGeminiClient();
-      if (!getGeminiApiKey()) {
-        setError('Tài khoản của bạn yêu cầu nhập Gemini API Key để sử dụng tính năng AI này. Vui lòng đăng nhập lại!');
+      let apiKey = '';
+      try {
+        apiKey = await ensureGeminiApiKey();
+      } catch {
         setIsProcessing(false);
         return;
       }
+      const ai = getGeminiClient(apiKey);
 
       // Chuẩn bị ảnh base64 cho API
       const base64Data = imagePreview.split(',')[1];

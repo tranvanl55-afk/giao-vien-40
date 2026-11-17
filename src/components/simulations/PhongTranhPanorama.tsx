@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   ArrowLeft, Upload, Trash2, Edit3, Check, X, Play, Pause, 
   Volume2, VolumeX, Maximize2, Minimize2, Eye, Compass, 
-  Sparkles, Palette, Layers, Image as ImageIcon, User, FileText, ChevronRight
+  Sparkles, Palette, Layers, Image as ImageIcon, User, FileText, ChevronRight,
+  ChevronLeft, ArrowUp, Plus, Navigation
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import gsap from 'gsap';
@@ -64,6 +65,437 @@ const DEFAULT_PAINTINGS: PaintingData[] = [
     desc: 'Mô phỏng sự đổi màu của dung dịch chỉ thị màu axit-bazơ khi xảy ra phản ứng trung hòa trong phòng thí nghiệm.'
   }
 ];
+
+// ----------------------------------------------------
+// HÌNH HỌC PHÒNG TRIỂN LÃM 3D (TƯỜNG, SÀN, TRẦN)
+// ----------------------------------------------------
+type GalleryLayout = 'cylinder' | 'hallway' | 'cube' | 'galaxy';
+type GalleryTheme = 'museum' | 'technology' | 'galaxy' | 'ocean';
+
+const ROOM_PERSPECTIVE = 950;   // perspective dùng cho chế độ "đứng trong phòng"
+const ROOM_CAMERA_BACK = 0;     // camera đặt ngay tâm phòng để xoay chuẩn 360°, không lệch trục hay xiêu vẹo
+const ROOM_HEIGHT = 700;
+const ROOM_SLOT = 330;          // khoảng cách giữa 2 bức tranh trên cùng một bức tường
+const HALL_RADIUS = 820;        // bán kính bức tường cong
+
+const isRoomLayout = (l: GalleryLayout) => l === 'hallway' || l === 'cube';
+const getRoomHalf = (count: number) => Math.max(820, (Math.ceil(count / 4) * ROOM_SLOT + 260) / 2);
+const getHallSpan = (count: number) => (count > 1 ? Math.min(150, (count - 1) * 24) : 0);
+
+/** Vị trí 3D của từng bức tranh + góc cần xoay để đưa tranh ra chính diện */
+const getCardPlacement = (layout: GalleryLayout, idx: number, count: number) => {
+  if (layout === 'hallway') {
+    const span = getHallSpan(count);
+    const a = count > 1 ? span / 2 - (idx / (count - 1)) * span : 0;
+    return { focusAngle: a, transform: `rotateY(${a}deg) translateZ(${-HALL_RADIUS}px)` };
+  }
+  if (layout === 'cube') {
+    const half = getRoomHalf(count);
+    const wall = idx % 4;
+    const slot = Math.floor(idx / 4);
+    const onWall = Math.floor((count - wall - 1) / 4) + 1;
+    const offset = (slot - (onWall - 1) / 2) * ROOM_SLOT;
+    const a = wall * 90;
+    const focusAngle = a + (Math.atan2(offset, half) * 180) / Math.PI;
+    return { focusAngle, transform: `rotateY(${a}deg) translateZ(${-half}px) translateX(${offset}px)` };
+  }
+  const R = Math.max(450, (count * 310) / (2 * Math.PI));
+  const a = (idx / count) * 360;
+  return { focusAngle: a, transform: `rotateY(${a}deg) translateZ(${R}px)` };
+};
+
+const ROOM_THEMES: Record<GalleryTheme, {
+  name: string;
+  wall: string;
+  pattern: string;
+  trim: string;
+  floor: string;
+  grid: string;
+  ceiling: string;
+  spot: string;
+  isLight: boolean;
+}> = {
+  museum: {
+    name: 'Bảo tàng Trắng Hiện đại',
+    wall: 'linear-gradient(180deg, #ffffff 0%, #fbfbfc 40%, #f4f4f7 100%)',
+    pattern: 'radial-gradient(circle, rgba(0,0,0,0.02) 1px, transparent 1.5px)',
+    trim: '#e2e8f0',
+    floor: 'repeating-linear-gradient(90deg, #fafafa, #fafafa 58px, #e4e4e7 59px, #f4f4f5 60px)', // Sàn ván gỗ trắng sáng bóng
+    grid: 'rgba(0,0,0,0.03)',
+    ceiling: 'linear-gradient(180deg, #ffffff, #f4f4f6)',
+    spot: 'rgba(254, 240, 138, 0.45)', // Đèn rọi spotlight vàng ấm của bảo tàng nghệ thuật
+    isLight: true,
+  },
+  technology: {
+    name: 'Công nghệ Tương lai',
+    wall: 'linear-gradient(180deg, #13223a 0%, #0c1729 55%, #08111f 100%)',
+    pattern: 'linear-gradient(to right, rgba(34,211,238,0.06) 1px, transparent 1px)',
+    trim: '#22d3ee',
+    floor: 'radial-gradient(ellipse at center, #12263f 0%, #07101d 70%)',
+    grid: 'rgba(34,211,238,0.10)',
+    ceiling: 'linear-gradient(180deg, #060c18, #0a1424)',
+    spot: 'rgba(165,243,252,0.22)',
+    isLight: false,
+  },
+  galaxy: {
+    name: 'Vũ trụ Thiên hà',
+    wall: 'linear-gradient(180deg, #1d1a48 0%, #15123a 55%, #0d0b26 100%)',
+    pattern: 'radial-gradient(circle, rgba(196,181,253,0.10) 1px, transparent 1.5px)',
+    trim: '#a78bfa',
+    floor: 'radial-gradient(ellipse at center, #1a1640 0%, #0a081c 70%)',
+    grid: 'rgba(129,140,248,0.10)',
+    ceiling: 'linear-gradient(180deg, #08061a, #110e2e)',
+    spot: 'rgba(221,214,254,0.22)',
+    isLight: false,
+  },
+  ocean: {
+    name: 'Đại dương Sâu thẳm',
+    wall: 'linear-gradient(180deg, #0f3a4d 0%, #0b2e3e 55%, #072230 100%)',
+    pattern: 'linear-gradient(to right, rgba(45,212,191,0.06) 1px, transparent 1px)',
+    trim: '#2dd4bf',
+    floor: 'radial-gradient(ellipse at center, #11404d 0%, #061a24 70%)',
+    grid: 'rgba(45,212,191,0.10)',
+    ceiling: 'linear-gradient(180deg, #04151e, #0a2a38)',
+    spot: 'rgba(153,246,228,0.22)',
+    isLight: false,
+  },
+};
+
+const centeredBox = (w: number, h: number): React.CSSProperties => ({
+  position: 'absolute',
+  left: '50%',
+  top: '50%',
+  width: w,
+  height: h,
+  marginLeft: -w / 2,
+  marginTop: -h / 2,
+  pointerEvents: 'none',
+});
+
+const WallTrim = ({ color, isLight }: { color: string; isLight: boolean }) => (
+  <>
+    {/* Phào chỉ trần thạch cao giật 2 cấp */}
+    <div 
+      className="absolute inset-x-0 top-0 h-10 pointer-events-none" 
+      style={{ 
+        background: isLight 
+          ? 'linear-gradient(180deg, #ffffff 0%, #f1f5f9 60%, rgba(0,0,0,0.06) 100%)' 
+          : 'linear-gradient(180deg, rgba(255,255,255,0.10), rgba(0,0,0,0.25))',
+        borderBottom: `2px solid ${isLight ? '#cbd5e1' : `${color}55`}`,
+        boxShadow: isLight ? '0 4px 12px rgba(0,0,0,0.05)' : 'none'
+      }} 
+    >
+      <div className="absolute inset-x-4 top-2 h-4 border-b border-slate-300/60" />
+    </div>
+
+    {/* Phào chỉ tường trang trí nổi (Molding panels) */}
+    {isLight && (
+      <div className="absolute inset-x-12 inset-y-16 pointer-events-none border border-slate-200/80 rounded-sm shadow-[inset_0_0_20px_rgba(0,0,0,0.02)]" />
+    )}
+
+    {/* Len chân tường (Baseboard molding) */}
+    <div 
+      className="absolute inset-x-0 bottom-0 h-9 pointer-events-none" 
+      style={{ 
+        background: isLight 
+          ? 'linear-gradient(0deg, #e2e8f0 0%, #ffffff 80%, #cbd5e1 100%)' 
+          : 'linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0.15))', 
+        borderTop: `2px solid ${isLight ? '#94a3b8' : color}`, 
+        boxShadow: isLight ? '0 -4px 10px rgba(0,0,0,0.03)' : `0 -6px 22px ${color}55` 
+      }} 
+    />
+  </>
+);
+
+/** Vỏ phòng 3D: tường + sàn + trần + cột trụ kiến trúc + vách ngăn */
+const RoomShell = ({ 
+  layout, 
+  theme, 
+  count,
+  paintings,
+  onCardClick 
+}: { 
+  layout: GalleryLayout; 
+  theme: GalleryTheme; 
+  count: number;
+  paintings: PaintingData[];
+  onCardClick: (p: PaintingData, angle: number) => void;
+}) => {
+  const t = ROOM_THEMES[theme];
+  const isLight = t.isLight;
+
+  const wallBg: React.CSSProperties = {
+    backgroundImage: `${t.pattern}, ${t.wall}`,
+    backgroundSize: theme === 'galaxy' ? '28px 28px, 100% 100%' : '90px 100%, 100% 100%',
+    boxShadow: isLight ? 'inset 0 0 80px rgba(0,0,0,0.04)' : 'inset 0 0 120px rgba(0,0,0,0.55)',
+  };
+
+  const floorBg: React.CSSProperties = {
+    backgroundImage: theme === 'museum'
+      ? t.floor
+      : `linear-gradient(to right, ${t.grid} 1px, transparent 1px), linear-gradient(to bottom, ${t.grid} 1px, transparent 1px), ${t.floor}`,
+    backgroundSize: theme === 'museum' ? '60px 100%' : '110px 110px, 110px 110px, 100% 100%',
+    boxShadow: isLight ? 'inset 0 0 120px rgba(0,0,0,0.06)' : 'none',
+  };
+
+  if (layout === 'cube') {
+    const half = getRoomHalf(count);
+    const W = half * 2;
+    const pillarWidth = 75;
+
+    return (
+      <>
+        {/* 4 BỨC TƯỜNG CHÍNH (BẮC, ĐÔNG, NAM, TÂY) */}
+        {[0, 1, 2, 3].map(w => (
+          <div
+            key={`wall-${w}`}
+            style={{
+              ...centeredBox(W, ROOM_HEIGHT),
+              ...wallBg,
+              transform: `rotateY(${w * 90}deg) translateZ(${-(half + 6)}px)`,
+              backfaceVisibility: 'hidden',
+            }}
+          >
+            <WallTrim color={t.trim} isLight={isLight} />
+
+            {/* CỘT TRỤ KIẾN TRÚC TRÊN MỖI TƯỜNG (như ảnh của người dùng) */}
+            {isLight && (
+              <>
+                {/* Cột trụ trái */}
+                <div 
+                  className="absolute top-0 bottom-0 pointer-events-none"
+                  style={{
+                    left: W * 0.18,
+                    width: pillarWidth,
+                    background: 'linear-gradient(90deg, #f1f5f9 0%, #ffffff 40%, #e2e8f0 100%)',
+                    boxShadow: '10px 0 25px rgba(0,0,0,0.06), -6px 0 15px rgba(0,0,0,0.03)',
+                    transform: 'translateZ(18px)',
+                    borderLeft: '1px solid #e2e8f0',
+                    borderRight: '1px solid #cbd5e1'
+                  }}
+                >
+                  <div className="absolute inset-x-0 top-0 h-10 bg-slate-100 border-b-2 border-slate-300 shadow-sm" />
+                  <div className="absolute inset-x-0 bottom-0 h-9 bg-slate-200 border-t-2 border-slate-400" />
+                </div>
+
+                {/* Cột trụ phải */}
+                <div 
+                  className="absolute top-0 bottom-0 pointer-events-none"
+                  style={{
+                    right: W * 0.18,
+                    width: pillarWidth,
+                    background: 'linear-gradient(90deg, #e2e8f0 0%, #ffffff 60%, #f1f5f9 100%)',
+                    boxShadow: '-10px 0 25px rgba(0,0,0,0.06), 6px 0 15px rgba(0,0,0,0.03)',
+                    transform: 'translateZ(18px)',
+                    borderLeft: '1px solid #cbd5e1',
+                    borderRight: '1px solid #e2e8f0'
+                  }}
+                >
+                  <div className="absolute inset-x-0 top-0 h-10 bg-slate-100 border-b-2 border-slate-300 shadow-sm" />
+                  <div className="absolute inset-x-0 bottom-0 h-9 bg-slate-200 border-t-2 border-slate-400" />
+                </div>
+              </>
+            )}
+          </div>
+        ))}
+
+        {/* VÁCH NGĂN CHIA GIAN TRIỂN LÃM (ALCOVE PARTITIONS) NẰM GIỮA CÁC GIAN TRANH */}
+        {isLight && (
+          <>
+            {/* Vách ngăn chia gian trên tường Bắc (Wall 0) */}
+            <div
+              style={{
+                ...centeredBox(220, ROOM_HEIGHT * 0.72),
+                transform: `rotateY(0deg) translateZ(${-(half - 110)}px) translateX(0px) rotateY(90deg)`,
+                background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%)',
+                border: '2px solid #cbd5e1',
+                boxShadow: '0 15px 35px rgba(0,0,0,0.12), -15px 0 25px rgba(0,0,0,0.04)',
+                pointerEvents: 'none',
+                transformStyle: 'preserve-3d',
+              }}
+            >
+              <div className="absolute inset-2 border border-slate-300/70 rounded-xs" />
+              <div className="absolute inset-x-0 top-0 h-3 bg-slate-200/90 border-b border-slate-300" />
+              <div className="absolute inset-x-0 bottom-0 h-5 bg-slate-300 border-t border-slate-400" />
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-slate-800 text-[8px] font-bold text-amber-200 tracking-wider uppercase shadow whitespace-nowrap">
+                Gian Triển Lãm 1
+              </div>
+            </div>
+
+            {/* Vách ngăn chia gian trên tường Đông (Wall 1) */}
+            <div
+              style={{
+                ...centeredBox(220, ROOM_HEIGHT * 0.72),
+                transform: `rotateY(90deg) translateZ(${-(half - 110)}px) translateX(0px) rotateY(90deg)`,
+                background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%)',
+                border: '2px solid #cbd5e1',
+                boxShadow: '0 15px 35px rgba(0,0,0,0.12), -15px 0 25px rgba(0,0,0,0.04)',
+                pointerEvents: 'none',
+                transformStyle: 'preserve-3d',
+              }}
+            >
+              <div className="absolute inset-2 border border-slate-300/70 rounded-xs" />
+              <div className="absolute inset-x-0 top-0 h-3 bg-slate-200/90 border-b border-slate-300" />
+              <div className="absolute inset-x-0 bottom-0 h-5 bg-slate-300 border-t border-slate-400" />
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-slate-800 text-[8px] font-bold text-amber-200 tracking-wider uppercase shadow whitespace-nowrap">
+                Gian Triển Lãm 2
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* SÀN PHÒNG TRIỂN LÃM */}
+        <div 
+          style={{ 
+            ...centeredBox(W, W), 
+            ...floorBg, 
+            transform: `translateY(${ROOM_HEIGHT / 2}px) rotateX(90deg)`,
+            transformStyle: 'preserve-3d',
+          }} 
+        >
+          {/* Lớp bóng kính phản chiếu sàn */}
+          {isLight && (
+            <div 
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: 'radial-gradient(circle at center, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.2) 60%, transparent 100%)',
+              }}
+            />
+          )}
+
+          {/* DẤU MŨI TÊN THAM QUAN TRÊN SÀN (FLOOR WAYPOINT ARROWS) CHO TỪNG BỨC TRANH */}
+          {paintings.map((p, idx) => {
+            const { focusAngle } = getCardPlacement(layout, idx, count);
+            const rad = (focusAngle * Math.PI) / 180;
+            const dist = half * 0.58; // khoảng cách từ tâm đến mũi tên
+            const arrowX = W / 2 + Math.sin(rad) * dist;
+            const arrowY = W / 2 - Math.cos(rad) * dist;
+
+            return (
+              <div
+                key={`floor-arrow-${p.id}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCardClick(p, focusAngle);
+                }}
+                className="absolute z-10 cursor-pointer group pointer-events-auto"
+                style={{
+                  left: arrowX - 44,
+                  top: arrowY - 44,
+                  width: 88,
+                  height: 88,
+                  transform: `rotate(${focusAngle}deg)`,
+                }}
+                title={`Bước tới ngắm tranh: ${p.title}`}
+              >
+                {/* Vòng tròn nhấp nháy phát sáng trên sàn */}
+                <div 
+                  className={`w-full h-full rounded-full flex flex-col items-center justify-center transition-all duration-300 group-hover:scale-115 ${
+                    isLight 
+                      ? 'bg-white/95 border-2 border-amber-400 shadow-[0_4px_25px_rgba(251,191,36,0.65)] hover:border-amber-500 hover:bg-amber-50' 
+                      : 'bg-slate-900/90 border-2 border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.6)] hover:border-cyan-300'
+                  }`}
+                >
+                  {/* Mũi tên chỉ hướng */}
+                  <ArrowUp 
+                    className={`w-5 h-5 animate-bounce mb-0.5 ${
+                      isLight ? 'text-amber-600' : 'text-cyan-400'
+                    }`} 
+                  />
+                  <span 
+                    className={`text-[8.5px] font-black uppercase tracking-wider text-center px-1 ${
+                      isLight ? 'text-slate-800' : 'text-cyan-200'
+                    }`}
+                  >
+                    Vách {idx + 1}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* TRẦN THẠCH CAO GIẬT CẤP + ĐÈN SPOTLIGHT TRẦN */}
+        <div 
+          style={{ 
+            ...centeredBox(W, W), 
+            background: t.ceiling, 
+            transform: `translateY(${-ROOM_HEIGHT / 2}px) rotateX(-90deg)`,
+            boxShadow: isLight ? 'inset 0 0 100px rgba(0,0,0,0.06)' : 'none',
+          }}
+        >
+          {isLight ? (
+            /* Trần giật cấp 2 lớp thạch cao trắng có khe hắt sáng như ảnh mẫu */
+            <div className="absolute inset-16 border-4 border-slate-200 bg-white/90 shadow-[inset_0_0_40px_rgba(0,0,0,0.06)] flex items-center justify-center">
+              <div className="w-[75%] h-[75%] border-2 border-slate-300/80 bg-slate-50/50 shadow-inner" />
+              {/* Cụm đèn spotlight trần */}
+              {[0.25, 0.5, 0.75].map(x => (
+                [0.25, 0.75].map(y => (
+                  <div 
+                    key={`light-${x}-${y}`} 
+                    className="absolute w-5 h-5 rounded-full bg-amber-100 border border-amber-300 shadow-[0_0_25px_8px_rgba(254,240,138,0.8)]"
+                    style={{ left: `${x * 100}%`, top: `${y * 100}%`, marginLeft: -10, marginTop: -10 }}
+                  />
+                ))
+              ))}
+            </div>
+          ) : (
+            [0.3, 0.5, 0.7].map(p => (
+              <div 
+                key={p} 
+                className="absolute inset-y-[18%] w-2.5 rounded-full" 
+                style={{ 
+                  left: `${p * 100}%`, 
+                  background: t.trim, 
+                  opacity: 0.35, 
+                  boxShadow: `0 0 30px 6px ${t.trim}66` 
+                }} 
+              />
+            ))
+          )}
+        </div>
+      </>
+    );
+  }
+
+  // Hallway: bức tường cong nghệ thuật
+  const span = getHallSpan(count) + 56;
+  const step = 6;
+  const R = HALL_RADIUS + 6;
+  const segW = 2 * R * Math.tan(((step / 2) * Math.PI) / 180) + 2;
+  const segments: number[] = [];
+  for (let a = -span / 2; a <= span / 2 + 0.001; a += step) segments.push(a);
+  const floorSize = R * 2 + 500;
+
+  return (
+    <>
+      {segments.map(a => (
+        <div
+          key={`seg-${a}`}
+          style={{
+            ...centeredBox(segW, ROOM_HEIGHT),
+            backgroundImage: t.wall,
+            boxShadow: isLight ? 'inset 0 0 40px rgba(0,0,0,0.03)' : 'inset 0 0 60px rgba(0,0,0,0.35)',
+            transform: `rotateY(${a}deg) translateZ(${-R}px)`,
+            backfaceVisibility: 'hidden',
+          }}
+        >
+          <WallTrim color={t.trim} isLight={isLight} />
+        </div>
+      ))}
+      {/* Sàn hành lang */}
+      <div
+        style={{
+          ...centeredBox(floorSize, floorSize),
+          ...floorBg,
+          transform: `translateY(${ROOM_HEIGHT / 2}px) rotateX(90deg)`,
+          maskImage: 'radial-gradient(circle, #000 45%, transparent 70%)',
+          WebkitMaskImage: 'radial-gradient(circle, #000 45%, transparent 70%)',
+        }}
+      />
+    </>
+  );
+};
 
 // ----------------------------------------------------
 // DỰ DỰNG NHẠC NỀN BẰNG WEB AUDIO API (KHÔNG TỐN BĂNG THÔNG)
@@ -139,11 +571,11 @@ class AmbientSynth {
 
 // ----------------------------------------------------
 // CANVAS HIỆU ỨNG HẠT LƠ LỬNG TRANG TRÍ THEO CHỦ ĐỀ
-// ----------------------------------------------------
-const ParticleCanvas = ({ theme }: { theme: 'technology' | 'galaxy' | 'ocean' }) => {
+const ParticleCanvas = ({ theme }: { theme: GalleryTheme }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    if (theme === 'museum') return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -1065,8 +1497,8 @@ const GalaxyLayout = ({ paintings, selectedPainting, onSelectPainting }: GalaxyL
 // ----------------------------------------------------
 export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
   const [paintings, setPaintings] = useState<PaintingData[]>([]);
-  const [activeLayout, setActiveLayout] = useState<'cylinder' | 'hallway' | 'cube' | 'galaxy'>('cylinder');
-  const [activeTheme, setActiveTheme] = useState<'technology' | 'galaxy' | 'ocean'>('technology');
+  const [activeLayout, setActiveLayout] = useState<'cylinder' | 'hallway' | 'cube' | 'galaxy'>('cube');
+  const [activeTheme, setActiveTheme] = useState<GalleryTheme>('museum');
   
   const [selectedPainting, setSelectedPainting] = useState<PaintingData | null>(null);
   const [editingPainting, setEditingPainting] = useState<PaintingData | null>(null);
@@ -1175,6 +1607,25 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
     }
   };
 
+  // Chuyển tranh bằng mũi tên điều hướng
+  const goToPaintingByIndex = (idx: number) => {
+    if (paintings.length === 0) return;
+    const targetIdx = ((idx % paintings.length) + paintings.length) % paintings.length;
+    const targetP = paintings[targetIdx];
+    const { focusAngle } = getCardPlacement(activeLayout, targetIdx, paintings.length);
+    handleCardClick(targetP, focusAngle);
+  };
+
+  const handlePrevPainting = () => {
+    const curIdx = paintings.findIndex(p => p.id === selectedPainting?.id);
+    goToPaintingByIndex(curIdx <= 0 ? paintings.length - 1 : curIdx - 1);
+  };
+
+  const handleNextPainting = () => {
+    const curIdx = paintings.findIndex(p => p.id === selectedPainting?.id);
+    goToPaintingByIndex(curIdx === -1 ? 0 : curIdx + 1);
+  };
+
   // Auto Tour lifecycle
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -1185,16 +1636,7 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
       interval = setInterval(() => {
         const nextIndex = (currentIndex + 1) % paintings.length;
         const nextPainting = paintings[nextIndex];
-        const count = paintings.length;
-        
-        let cardAngle = 0;
-        if (activeLayout === 'hallway') {
-          cardAngle = -45 + (nextIndex / (count - 1 || 1)) * 90;
-        } else if (activeLayout === 'cube') {
-          cardAngle = (nextIndex % 4) * 90;
-        } else {
-          cardAngle = (nextIndex / count) * 360;
-        }
+        const cardAngle = getCardPlacement(activeLayout, nextIndex, paintings.length).focusAngle;
 
         setSelectedPainting(nextPainting);
         
@@ -1223,6 +1665,15 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
     }
     return () => clearInterval(interval);
   }, [autoTour, paintings, selectedPainting, activeLayout]);
+
+  // Đổi bố cục phòng -> đưa góc nhìn về chính diện
+  useEffect(() => {
+    rotationY.current = 0;
+    targetRotation.current = 0;
+    if (ringRef.current) {
+      gsap.set(ringRef.current, { rotationY: 0 });
+    }
+  }, [activeLayout]);
 
   // Image Upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1328,6 +1779,19 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
         </div>
 
         <div className="flex items-center gap-2 font-sans z-50">
+          {/* Quick upload in header */}
+          <label className="p-2.5 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 px-3 cursor-pointer shadow-lg shadow-emerald-950/20 transition-all">
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">Tải ảnh lên</span>
+            <input 
+              type="file" 
+              multiple 
+              accept="image/*" 
+              className="hidden" 
+              onChange={handleImageUpload} 
+            />
+          </label>
+
           {/* Toggle View Mode */}
           <button
             onClick={() => setViewMode(prev => prev === 'gallery' ? 'manage' : 'gallery')}
@@ -1414,16 +1878,16 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
               <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-950/80 border border-slate-800 rounded-xl shadow-inner">
                 <button
                   onClick={() => {
-                    setActiveLayout('cylinder');
+                    setActiveLayout('cube');
                     setSelectedPainting(null);
                   }}
                   className={`py-2 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
-                    activeLayout === 'cylinder' 
+                    activeLayout === 'cube' 
                       ? 'bg-slate-800 text-white border border-slate-700/50 shadow-md' 
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  Vòng tròn
+                  Phòng vuông
                 </button>
                 <button
                   onClick={() => {
@@ -1440,16 +1904,16 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
                 </button>
                 <button
                   onClick={() => {
-                    setActiveLayout('cube');
+                    setActiveLayout('cylinder');
                     setSelectedPainting(null);
                   }}
                   className={`py-2 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
-                    activeLayout === 'cube' 
+                    activeLayout === 'cylinder' 
                       ? 'bg-slate-800 text-white border border-slate-700/50 shadow-md' 
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  Phòng vuông
+                  Vòng tròn
                 </button>
                 <button
                   onClick={() => {
@@ -1472,36 +1936,46 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                 <Palette className="w-3.5 h-3.5 text-cyan-400" /> Chủ đề không gian
               </label>
-              <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-950/80 border border-slate-800 rounded-xl shadow-inner">
+              <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-950/80 border border-slate-800 rounded-xl shadow-inner">
+                <button
+                  onClick={() => setActiveTheme('museum')}
+                  className={`py-2 px-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
+                    activeTheme === 'museum' 
+                      ? 'bg-linear-to-r from-amber-500/30 to-amber-600/30 text-amber-200 border border-amber-400/50 shadow-md' 
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  🏛️ Bảo tàng trắng
+                </button>
                 <button
                   onClick={() => setActiveTheme('technology')}
-                  className={`py-2 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
+                  className={`py-2 px-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
                     activeTheme === 'technology' 
                       ? 'bg-linear-to-r from-cyan-600/30 to-cyan-700/30 text-cyan-300 border border-cyan-500/40 shadow-md' 
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  Công nghệ
+                  ⚡ Công nghệ
                 </button>
                 <button
                   onClick={() => setActiveTheme('galaxy')}
-                  className={`py-2 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
+                  className={`py-2 px-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
                     activeTheme === 'galaxy' 
                       ? 'bg-linear-to-r from-indigo-600/30 to-indigo-700/30 text-indigo-300 border border-indigo-500/40 shadow-md' 
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  Vũ trụ
+                  ✨ Vũ trụ
                 </button>
                 <button
                   onClick={() => setActiveTheme('ocean')}
-                  className={`py-2 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
+                  className={`py-2 px-1 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
                     activeTheme === 'ocean' 
                       ? 'bg-linear-to-r from-blue-600/30 to-blue-700/30 text-blue-300 border border-blue-500/40 shadow-md' 
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  Đại dương
+                  🌊 Đại dương
                 </button>
               </div>
             </div>
@@ -1555,17 +2029,8 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
                         if (activeLayout === 'galaxy') {
                           setSelectedPainting(p);
                         } else {
-                          const count = paintings.length;
                           const idx = paintings.findIndex(x => x.id === p.id);
-                          let cardAngle = 0;
-                          if (activeLayout === 'hallway') {
-                            cardAngle = -45 + (idx / (count - 1 || 1)) * 90;
-                          } else if (activeLayout === 'cube') {
-                            cardAngle = (idx % 4) * 90;
-                          } else {
-                            cardAngle = (idx / count) * 360;
-                          }
-                          handleCardClick(p, cardAngle);
+                          handleCardClick(p, getCardPlacement(activeLayout, idx, paintings.length).focusAngle);
                         }
                       }}
                       className={`p-2 rounded-xl border flex items-center justify-between cursor-pointer group transition-all ${
@@ -1671,7 +2136,7 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
           <div className="absolute top-4 left-4 z-10 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800 text-left pointer-events-none shadow-lg">
             <span className="text-[9px] text-cyan-400 font-black uppercase tracking-wider block">Góc triển lãm</span>
             <span className="text-xs font-black text-white uppercase">
-              {activeLayout === 'cylinder' ? 'Phòng Tròn 3D' : activeLayout === 'hallway' ? 'Bức Tường Nghệ Thuật' : activeLayout === 'cube' ? 'Hộp Không Gian' : '✦ Thiên Hà Galaxy'}
+              {activeLayout === 'cylinder' ? 'Phòng Tròn 3D' : activeLayout === 'hallway' ? 'Bức Tường Nghệ Thuật' : activeLayout === 'cube' ? 'Phòng Triển Lãm' : '✦ Thiên Hà Galaxy'}
             </span>
           </div>
 
@@ -1693,22 +2158,31 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
             )}
           </button>
 
-          {/* Bottom HUD guidance */}
-          <div className="absolute bottom-4 left-4 right-4 md:right-auto z-10 px-3.5 py-2 rounded-full bg-slate-900/90 border border-slate-800 text-[10px] text-slate-300 flex items-center justify-center md:justify-start gap-1.5 pointer-events-none shadow-lg max-w-lg">
+          {/* Top HUD guidance */}
+          <div className="absolute top-16 left-4 z-10 px-3.5 py-2 rounded-full bg-slate-900/90 border border-slate-800 text-[10px] text-slate-300 flex items-center justify-center md:justify-start gap-1.5 pointer-events-none shadow-lg max-w-lg">
             <Compass className="w-4 h-4 text-cyan-400 animate-pulse" />
-            <span className="font-medium text-[9.5px]">Kéo/quẹt màn hình để xoay vòng tranh • Click chọn tranh để xem cận cảnh chi tiết</span>
+            <span className="font-medium text-[9.5px]">Kéo/quẹt màn hình để xoay phòng 360° • Click chọn tranh để xem cận cảnh chi tiết</span>
           </div>
 
           {/* 3D VIEWPORT CONTAINER (hidden when galaxy layout) */}
           {activeLayout !== 'galaxy' && (
           <div 
-            className="w-full h-full flex items-center justify-center overflow-hidden cursor-grab active:cursor-grabbing select-none"
-            style={{ perspective: '1600px', touchAction: 'none' }}
+            className="relative z-2 w-full h-full flex items-center justify-center overflow-hidden cursor-grab active:cursor-grabbing select-none"
+            style={{ perspective: isRoomLayout(activeLayout) ? `${ROOM_PERSPECTIVE}px` : '1600px', touchAction: 'none' }}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerLeave={handlePointerUp}
           >
+            {/* Camera rig: với chế độ phòng, đặt người xem đứng bên trong phòng */}
+            <div
+              style={{
+                transformStyle: 'preserve-3d',
+                transform: isRoomLayout(activeLayout)
+                  ? `translateZ(${ROOM_PERSPECTIVE - ROOM_CAMERA_BACK}px)`
+                  : 'none',
+              }}
+            >
             {/* The revolving 3D Ring */}
             <div
               ref={ringRef}
@@ -1717,48 +2191,27 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
                 width: '250px',
                 height: '350px',
                 transformStyle: 'preserve-3d',
-                transform: `rotateX(-3deg) rotateY(0deg)`,
+                transform: `rotateX(0deg) rotateY(0deg)`,
                 willChange: 'transform',
               }}
             >
+              {/* Tường, sàn, trần của phòng triển lãm */}
+              {isRoomLayout(activeLayout) && (
+                <RoomShell 
+                  layout={activeLayout} 
+                  theme={activeTheme} 
+                  count={paintings.length}
+                  paintings={paintings}
+                  onCardClick={handleCardClick}
+                />
+              )}
+
               {paintings.map((p, idx) => {
-                const count = paintings.length;
                 const isSelected = selectedPainting?.id === p.id;
-                
-                // Spacing angle & translations math
-                let angle = 0;
-                let cardRadius = Math.max(450, (count * 310) / (2 * Math.PI));
-                let rotateYValue = 0;
-                let translateZValue = cardRadius;
-                let translateXValue = 0;
-
-                if (activeLayout === 'hallway') {
-                  // Arc curve (wall look)
-                  const span = Math.min(100, (count - 1) * 22);
-                  angle = count > 1 
-                    ? -span / 2 + (idx / (count - 1)) * span 
-                    : 0;
-                  rotateYValue = angle;
-                  translateZValue = cardRadius - 60; // flatter look
-                } else if (activeLayout === 'cube') {
-                  // Box Room Layout
-                  const wall = idx % 4;
-                  const row = Math.floor(idx / 4);
-                  const wallAngle = wall * 90;
-                  const rowSpacing = 280;
-                  const rowCount = Math.ceil(count / 4);
-                  const rowOffset = (row - (rowCount - 1) / 2) * rowSpacing;
-
-                  angle = wallAngle;
-                  rotateYValue = wallAngle;
-                  translateZValue = 400;
-                  translateXValue = rowOffset;
-                } else {
-                  // Cylinder: full circular carousel
-                  angle = (idx / count) * 360;
-                  rotateYValue = angle;
-                  translateZValue = cardRadius;
-                }
+                const { focusAngle: angle, transform } = getCardPlacement(activeLayout, idx, paintings.length);
+                const inRoom = isRoomLayout(activeLayout);
+                const spot = ROOM_THEMES[activeTheme].spot;
+                const isMuseum = activeTheme === 'museum';
 
                 return (
                   <div
@@ -1766,59 +2219,104 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
                     className="absolute top-0 left-0 w-full h-full"
                     style={{
                       transformStyle: 'preserve-3d',
-                      transform: `rotateY(${rotateYValue}deg) translateZ(${translateZValue}px) translateX(${translateXValue}px)`,
-                      backfaceVisibility: activeLayout === 'cylinder' ? 'hidden' : 'visible',
+                      transform,
+                      backfaceVisibility: 'hidden',
                       willChange: 'transform',
                     }}
                   >
+                    {inRoom && (
+                      <>
+                        {/* Quầng sáng đèn rọi tranh hắt lên tường */}
+                        <div
+                          className="absolute pointer-events-none"
+                          style={{
+                            left: -110, right: -110, top: -100, bottom: -80,
+                            transform: 'translateZ(-4px)',
+                            background: isMuseum
+                              ? `radial-gradient(ellipse 65% 80% at 50% -10%, ${spot}, transparent 80%)`
+                              : `radial-gradient(ellipse 60% 75% at 50% 0%, ${spot}, transparent 75%)`,
+                          }}
+                        />
+                        {/* Đèn rọi tranh bảo tàng kim loại sang trọng */}
+                        <div
+                          className="absolute pointer-events-none rounded-md"
+                          style={{
+                            left: '50%', top: -38, width: 140, height: 12, marginLeft: -70,
+                            background: isMuseum 
+                              ? 'linear-gradient(180deg, #d4d4d8 0%, #71717a 100%)' 
+                              : 'linear-gradient(180deg, #64748b, #1e293b)',
+                            boxShadow: isMuseum 
+                              ? `0 10px 30px 8px ${spot}` 
+                              : `0 8px 26px 6px ${spot}`,
+                            transform: 'translateZ(18px)',
+                            border: isMuseum ? '1px solid #e4e4e7' : 'none',
+                          }}
+                        >
+                          {/* Chân gắn đèn rọi */}
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full w-2 h-3 bg-zinc-600" />
+                        </div>
+                      </>
+                    )}
                     {/* Inner 3D card slot to isolate hovers */}
                     <div
                       onClick={(e) => {
                         e.stopPropagation();
                         handleCardClick(p, angle);
                       }}
-                      className={`dropdown-item w-full h-full rounded-2xl border-3 flex flex-col justify-between overflow-hidden relative shadow-2xl select-none group/card ${
-                        isSelected 
-                          ? 'border-cyan-400 bg-slate-900 scale-102 ring-4 ring-cyan-500/20' 
-                          : 'border-slate-800 hover:border-cyan-400/50 hover:scale-105 bg-slate-950/90'
+                      className={`dropdown-item w-full h-full rounded-2xl flex flex-col justify-between overflow-hidden relative select-none group/card cursor-pointer transition-all duration-300 ${
+                        isMuseum
+                          ? isSelected
+                            ? 'border-4 border-amber-500 bg-white ring-4 ring-amber-400/40 shadow-[0_25px_60px_rgba(0,0,0,0.35)] scale-103'
+                            : 'border-8 border-[#18181b] bg-white hover:border-amber-700/80 hover:scale-104 shadow-[0_20px_45px_rgba(0,0,0,0.22)]'
+                          : isSelected 
+                            ? 'border-3 border-cyan-400 bg-slate-900 scale-102 ring-4 ring-cyan-500/20 shadow-2xl' 
+                            : 'border-3 border-slate-800 hover:border-cyan-400/50 hover:scale-105 bg-slate-950/90 shadow-2xl'
                       }`}
                       style={{
                         transformStyle: 'preserve-3d',
-                        transition: 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s, scale 0.3s',
                         willChange: 'transform',
                       }}
                     >
-                      {/* Image frame */}
-                      <div className="w-full flex-1 overflow-hidden relative bg-slate-900">
-                        <img
-                          src={p.url}
-                          alt={p.title}
-                          className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-500 group-hover/card:scale-106"
-                          onError={(e) => {
-                            // If Unsplash/external load fails, render fallback canvas graphic
-                            const imgNode = e.currentTarget;
-                            imgNode.style.display = 'none';
-                            const fallback = imgNode.nextElementSibling as HTMLDivElement;
-                            if (fallback) fallback.style.display = 'flex';
-                          }}
-                        />
-                        {/* Fallback frame UI (immunity to CORS errors) */}
-                        <div 
-                          className="absolute inset-0 hidden flex-col items-center justify-center p-4 bg-slate-900 text-center"
-                          style={{ display: 'none' }}
-                        >
-                          <ImageIcon className="w-8 h-8 text-slate-500 mb-2" />
-                          <span className="text-[10px] font-bold text-slate-400">{p.title}</span>
+                      {/* Image frame với viền bo lụa passe-partout kiểu bảo tàng */}
+                      <div className={`w-full flex-1 overflow-hidden relative ${isMuseum ? 'p-2 bg-[#ffffff]' : 'bg-slate-900'}`}>
+                        <div className="w-full h-full overflow-hidden relative rounded-xs">
+                          <img
+                            src={p.url}
+                            alt={p.title}
+                            className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-500 group-hover/card:scale-106"
+                            onError={(e) => {
+                              const imgNode = e.currentTarget;
+                              imgNode.style.display = 'none';
+                              const fallback = imgNode.nextElementSibling as HTMLDivElement;
+                              if (fallback) fallback.style.display = 'flex';
+                            }}
+                          />
+                          {/* Fallback frame UI */}
+                          <div 
+                            className="absolute inset-0 hidden flex-col items-center justify-center p-4 bg-slate-100 text-center"
+                            style={{ display: 'none' }}
+                          >
+                            <ImageIcon className="w-8 h-8 text-slate-400 mb-2" />
+                            <span className="text-[10px] font-bold text-slate-600">{p.title}</span>
+                          </div>
+                          
+                          {/* Subtle spotlight reflection overlay */}
+                          <div className="absolute inset-0 bg-linear-to-tr from-transparent via-white/8 to-transparent pointer-events-none" />
                         </div>
-                        
-                        {/* Subtle spotlight reflection overlay */}
-                        <div className="absolute inset-0 bg-linear-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
                       </div>
 
-                      {/* Header/Bottom info tab */}
-                      <div className="bg-slate-900 border-t border-slate-800 p-3 text-left">
-                        <h4 className="text-xs font-black text-white truncate">{p.title}</h4>
-                        <p className="text-[9px] text-cyan-400 font-bold uppercase tracking-wider mt-0.5 truncate flex items-center gap-1">
+                      {/* Header/Bottom info tab (Biển đồng kim loại bảo tàng) */}
+                      <div className={`p-2.5 text-center transition-colors ${
+                        isMuseum
+                          ? 'bg-linear-to-b from-[#27272a] to-[#18181b] border-t-2 border-amber-600/50'
+                          : 'bg-slate-900 border-t border-slate-800 text-left'
+                      }`}>
+                        <h4 className={`text-xs font-black truncate ${isMuseum ? 'text-amber-100 font-serif' : 'text-white'}`}>
+                          {p.title}
+                        </h4>
+                        <p className={`text-[9px] font-bold uppercase tracking-wider mt-0.5 truncate flex items-center justify-center gap-1 ${
+                          isMuseum ? 'text-amber-400/90' : 'text-cyan-400'
+                        }`}>
                           <User className="w-2.5 h-2.5" /> {p.author}
                         </p>
                       </div>
@@ -1826,6 +2324,66 @@ export default function PhongTranhPanorama({ onBack }: { onBack: () => void }) {
                   </div>
                 );
               })}
+            </div>
+            </div>
+
+            {/* Nút mũi tên lớn bên trái */}
+            <button
+              onClick={handlePrevPainting}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-slate-900/85 hover:bg-slate-800 border-2 border-slate-700/80 text-white hover:text-amber-400 flex items-center justify-center shadow-2xl backdrop-blur transition-all hover:scale-110 active:scale-95 cursor-pointer group"
+              title="Ngắm bức tranh / vách trước (←)"
+            >
+              <ChevronLeft className="w-7 h-7 transition-transform group-hover:-translate-x-0.5" />
+            </button>
+
+            {/* Nút mũi tên lớn bên phải */}
+            <button
+              onClick={handleNextPainting}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-slate-900/85 hover:bg-slate-800 border-2 border-slate-700/80 text-white hover:text-amber-400 flex items-center justify-center shadow-2xl backdrop-blur transition-all hover:scale-110 active:scale-95 cursor-pointer group"
+              title="Ngắm bức tranh / vách tiếp theo (→)"
+            >
+              <ChevronRight className="w-7 h-7 transition-transform group-hover:translate-x-0.5" />
+            </button>
+
+            {/* Thanh điều hướng tham quan khắp phòng ở đáy (Virtual Tour Navigation Bar) */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-4 py-2 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto custom-scrollbar">
+              <div className="flex items-center gap-1.5 pr-2 border-r border-slate-700 text-xs font-bold text-amber-400 shrink-0">
+                <Compass className="w-4 h-4 animate-spin" style={{ animationDuration: '8s' }} />
+                <span className="hidden sm:inline">Tham quan:</span>
+              </div>
+              
+              <div className="flex items-center gap-1">
+                {paintings.map((p, idx) => {
+                  const isCurrent = selectedPainting?.id === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => goToPaintingByIndex(idx)}
+                      className={`px-2.5 py-1 rounded-full text-[10px] font-black transition-all cursor-pointer shrink-0 ${
+                        isCurrent 
+                          ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30 scale-105' 
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                      }`}
+                      title={p.title}
+                    >
+                      Vách {idx + 1}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Quick Upload Button ngay trên thanh tham quan */}
+              <label className="ml-1 px-2.5 py-1 rounded-full bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-300 border border-cyan-500/40 text-[10px] font-bold flex items-center gap-1 cursor-pointer shrink-0 transition-all">
+                <Plus className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Gắn ảnh mới</span>
+                <input 
+                  type="file" 
+                  multiple 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={handleImageUpload} 
+                />
+              </label>
             </div>
           </div>
           )}

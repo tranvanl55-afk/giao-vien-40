@@ -220,7 +220,11 @@ export const LESSON_REGISTRY: Record<string, LessonRegistryEntry> = {
     backTarget: 'subcategory',
   },
 
-  // ── Giáo dục địa phương & Khác ────────────────────────────────
+  // ── Giáo dục địa phương, E-learning & Khác ───────────────────
+  'du-an-tinh-bot-cellulose': {
+    component: lazyNamed(() => import('../components/simulations/TinhBotCelluloseElearning'), 'TinhBotCelluloseElearning'),
+    backTarget: 'subcategory',
+  },
   'phong-tranh-panorama': {
     component: lazy(() => import('../components/simulations/PhongTranhPanorama')),
     backTarget: 'subcategory',

@@ -4,12 +4,12 @@ import { ChevronLeft, Play, Upload, CheckCircle, Zap, Target, Battery, Crown, Im
 import confetti from 'canvas-confetti';
 import { BlockMath, InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
-import { getGeminiClient, getGeminiApiKey } from '../../lib/gemini';
+import { getGeminiClient, ensureGeminiApiKey } from '../../lib/gemini';
 import { AIConnectionBadge } from '../AIConnectionBadge';
 
 // Initialize Gemini SDK conditionally inside the scan function, using getGeminiClient
-const getGeminiAPI = () => {
-  return getGeminiClient();
+const getGeminiAPI = (apiKey?: string) => {
+  return getGeminiClient(apiKey);
 };
 
 type LevelTheme = 'jungle' | 'desert' | 'mountain' | 'plains' | 'ocean';
@@ -312,13 +312,14 @@ export function KhamPhaTheGioiGame({ initialQuestions, onBack }: KhamPhaTheGioiP
     setIsScanning(true);
     try {
       const cleanBase64 = base64Str.split(',')[1];
-      const apiKey = getGeminiApiKey();
-      if (!apiKey) {
-        setErrorMsg('Tài khoản của bạn yêu cầu nhập Gemini API Key để sử dụng tính năng AI này. Vui lòng đăng nhập lại!');
+      let apiKey = '';
+      try {
+        apiKey = await ensureGeminiApiKey();
+      } catch {
         setIsScanning(false);
         return;
       }
-      const ai = getGeminiAPI();
+      const ai = getGeminiAPI(apiKey);
       
       const themeCount = selectedThemes.length;
       const totalRequired = themeCount * 3;

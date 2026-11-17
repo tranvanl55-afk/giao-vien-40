@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Upload, Image as ImageIcon, Settings, Plus, Minus, History, Rocket, GraduationCap, CheckCircle2, ChevronLeft, FileText, Download, RefreshCw } from 'lucide-react';
 import { Type } from "@google/genai";
-import { getGeminiClient, getGeminiApiKey } from '../../lib/gemini';
+import { getGeminiClient, ensureGeminiApiKey, isPrivilegedUser } from '../../lib/gemini';
 
 
 interface TaoDeKiemTraAppProps {
@@ -65,8 +65,9 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
       const mimeType = match[1];
       const base64Data = match[2];
 
-      const currentKey = getGeminiApiKey();
+      const currentKey = await ensureGeminiApiKey();
       const systemKey = (import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY || '').trim();
+      const isPrivileged = isPrivilegedUser();
 
       const callGenAI = async (key: string) => {
         if (!key) throw new Error("Chưa cấu hình API Key. Vui lòng kiểm tra lại!");
@@ -92,8 +93,8 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
         if (isKeyInvalid && typeof window !== 'undefined' && localStorage.getItem('user_gemini_api_key')) {
           localStorage.removeItem('user_gemini_api_key');
         }
-        if (systemKey && currentKey !== systemKey) {
-          console.warn("User key failed in OCR, falling back to system key...", err);
+        if (isPrivileged && systemKey && currentKey !== systemKey) {
+          console.warn("Privileged user key failed in OCR, falling back to system key...", err);
           response = await callGenAI(systemKey);
         } else {
           if (isKeyInvalid) {
@@ -120,8 +121,9 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
     }
     setIsGenerating(true);
     try {
-      const currentKey = getGeminiApiKey();
+      const currentKey = await ensureGeminiApiKey();
       const systemKey = (import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY || '').trim();
+      const isPrivileged = isPrivilegedUser();
 
       const callGenerateTest = async (key: string) => {
         if (!key) throw new Error("Chưa cấu hình API Key. Vui lòng kiểm tra lại!");
@@ -195,8 +197,8 @@ export function TaoDeKiemTraApp({ onBack }: TaoDeKiemTraAppProps) {
         if (isKeyInvalid && typeof window !== 'undefined' && localStorage.getItem('user_gemini_api_key')) {
           localStorage.removeItem('user_gemini_api_key');
         }
-        if (systemKey && currentKey !== systemKey) {
-          console.warn("User key failed in test generation, falling back to system key...", err);
+        if (isPrivileged && systemKey && currentKey !== systemKey) {
+          console.warn("Privileged user key failed in test generation, falling back to system key...", err);
           response = await callGenerateTest(systemKey);
         } else {
           if (isKeyInvalid) {

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, X, Send, Sparkles, Loader2, Maximize2, Minimize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getGeminiClient, askGemini } from '../lib/gemini';
+import { getGeminiClient, askGemini, ensureGeminiApiKey } from '../lib/gemini';
 import ReactMarkdown from 'react-markdown';
 import { AIConnectionBadge } from './AIConnectionBadge';
 
@@ -39,41 +39,13 @@ export function AIAssistant({ contextTitle = 'Khoa học tự nhiên', contextDe
     }
   }, [isOpen, contextTitle]);
 
-  const initChat = async () => {
-    try {
-      const client = getGeminiClient();
-      
-      const systemInstruction = `Bạn là một trợ giảng AI thân thiện, chuyên môn cao về Khoa học tự nhiên (Vật lý, Hóa học, Sinh học).
-Người dùng hiện đang học/chơi phần: "${contextTitle}".
-Mô tả nội dung phần học: "${contextDescription}".
-Hãy trả lời ngắn gọn, súc tích, dễ hiểu đối với học sinh cấp 2. Nếu người dùng hỏi ngoài lề, hãy khéo léo dẫn dắt họ quay lại bài học. Trình bày bằng tiếng Việt.`;
-
-      // For @google/genai, we use client.chats.create
-      const chat = client.chats.create({
-        model: 'gemini-2.5-flash',
-        config: {
-          systemInstruction: systemInstruction,
-          temperature: 0.7,
-        }
-      });
-      
-      chatSessionRef.current = chat;
-
-      // Add initial greeting
+  const initChat = () => {
+    if (messages.length === 0) {
       setMessages([
         {
           id: '1',
           role: 'model',
           content: `Chào bạn! 👋 Mình là Trợ giảng AI. Bạn đang xem bài **${contextTitle}**. Bạn có câu hỏi nào về phần này không?`
-        }
-      ]);
-    } catch (error) {
-      console.error('Lỗi khởi tạo AI:', error);
-      setMessages([
-        {
-          id: '1',
-          role: 'model',
-          content: 'Xin lỗi, hệ thống AI đang gặp sự cố kết nối. Vui lòng thử lại sau.'
         }
       ]);
     }
@@ -91,7 +63,19 @@ Hãy trả lời ngắn gọn, súc tích, dễ hiểu đối với học sinh c
 
     try {
       if (!chatSessionRef.current) {
-        await initChat();
+        const apiKey = await ensureGeminiApiKey();
+        const client = getGeminiClient(apiKey);
+        const systemInstruction = `Bạn là một trợ giảng AI thân thiện, chuyên môn cao về Khoa học tự nhiên (Vật lý, Hóa học, Sinh học).
+Người dùng hiện đang học/chơi phần: "${contextTitle}".
+Mô tả nội dung phần học: "${contextDescription}".
+Hãy trả lời ngắn gọn, súc tích, dễ hiểu đối với học sinh cấp 2. Nếu người dùng hỏi ngoài lề, hãy khéo léo dẫn dắt họ quay lại bài học. Trình bày bằng tiếng Việt.`;
+        chatSessionRef.current = client.chats.create({
+          model: 'gemini-2.5-flash',
+          config: {
+            systemInstruction,
+            temperature: 0.7,
+          }
+        });
       }
 
       let replyText = '';

@@ -47,6 +47,7 @@ export const LessonRenderer: React.FC<LessonRendererProps> = ({
     return (
       <Suspense fallback={<CatLoader />}>
         <GameConfigScreen
+          gameId={activeSimulationId}
           gameTitle={gameConfig.title}
           gameDescription={gameConfig.description}
           gameRules={gameConfig.rules}

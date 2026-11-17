@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, CheckCircle2, XCircle, Settings, Image as ImageIcon, RefreshCw, Upload } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, XCircle, Settings, Image as ImageIcon, RefreshCw, Upload, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { exportOfflineGameHtml } from '../../utils/exportOfflineGameHtml';
 
 export interface Question {
   text: string;
@@ -131,6 +132,21 @@ export const GiaiMaBucTranhGame: React.FC<GiaiMaBucTranhGameProps> = ({ question
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            onClick={() =>
+              exportOfflineGameHtml({
+                gameId: 'game-giai-ma-buc-tranh',
+                gameTitle: 'Giải Mã Bức Tranh',
+                questions: questions.map((q, idx) => ({ id: String(idx), text: q.text, options: q.options, answer: q.answer })),
+                customImageUrl: imageUrl,
+                gridSize,
+              })
+            }
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors font-medium text-sm cursor-pointer"
+          >
+            <Download className="w-4 h-4" />
+            Xuất HTML Offline
+          </button>
           <button
             onClick={() => setShowSettings(!showSettings)}
             className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors font-medium text-sm"

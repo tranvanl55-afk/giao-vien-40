@@ -1,6 +1,6 @@
 // src/context/MultiplayerContext.tsx
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { doc, setDoc, getDoc, updateDoc, collection, addDoc, onSnapshot, query, where, serverTimestamp } from 'firebase/firestore';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { doc, setDoc, getDoc, updateDoc, collection, addDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -104,12 +104,7 @@ export const MultiplayerProvider = ({ children }: { children: ReactNode }) => {
     if (!player) throw new Error('User not authenticated');
     const roomDoc = await getDoc(doc(db, `rooms/${rid}`));
     if (!roomDoc.exists()) throw new Error('Room not found');
-    // Determine team based on current players count
-    const playersSnap = await getDoc(doc(db, `rooms/${rid}/players/${player.uid}`));
-    const roomPlayersCol = collection(db, `rooms/${rid}/players`);
-    const allPlayersSnap = await getDoc(doc(db, `rooms/${rid}`)); // just to ensure room exists
-    // Assign team: red if less than 2 players, else blue (simple demo)
-    const assignedTeam = 'blue';
+    const assignedTeam: 'red' | 'blue' = 'blue';
     await setDoc(doc(db, `rooms/${rid}/players/${player.uid}`), {
       uid: player.uid,
       displayName: player.displayName,
@@ -117,7 +112,7 @@ export const MultiplayerProvider = ({ children }: { children: ReactNode }) => {
     });
     setRoomId(rid);
     setIsHost(false);
-    setPlayer(prev => prev ? { ...prev, team: assignedTeam as any } : null);
+    setPlayer(prev => prev ? { ...prev, team: assignedTeam } : null);
   };
 
   const startGame = async () => {

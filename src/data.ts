@@ -476,6 +476,23 @@ export const categories: Category[] = [
     logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2FElearning-removebg-preview.png?alt=media&token=f0117924-7d35-4238-834f-1f912f40d756",
     colorClass: "from-violet-400 via-purple-500 to-fuchsia-600",
     subCategories: [
+      {
+        id: "bai-hoc-elearning",
+        title: "Bài học E-learning",
+        description: "Các bài học E-learning tương tác và dự án học tập theo chủ đề Khoa học tự nhiên",
+        colorClass: "hover:bg-emerald-500/20 hover:border-emerald-500/50",
+        logoUrl: "https://img.icons8.com/fluency/96/e-learning.png",
+        lessons: [
+          {
+            id: "du-an-tinh-bot-cellulose",
+            title: 'Dự án "Bắt đầu từ sự kết thúc" - Bài "Tinh bột - Cellulose"',
+            description: "Khám phá cấu trúc, tính chất hóa học (phản ứng màu với iodine, thủy phân) và xưởng dự án STEM tái sinh phụ phẩm Tinh bột - Cellulose thành màng nhựa sinh học & giấy hạt giống.",
+            icon: Leaf,
+            logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F1(1).png?alt=media&token=36e8fb36-b5c6-4c47-879f-84020196df9a",
+            theme: "green"
+          }
+        ]
+      },
       { id: "bg-khtn", title: "Bài giảng KHTN", description: "Kho tàng bài giảng điện tử sinh động", colorClass: "hover:bg-violet-500/20 hover:border-violet-500/50", logoUrl: "https://img.icons8.com/fluency/96/presentation.png" },
       { id: "docs-sgk", title: "Tài liệu bồi dưỡng", description: "Kho tài liệu đọc mở rộng và nâng cao", colorClass: "hover:bg-purple-500/20 hover:border-purple-500/50", logoUrl: "https://img.icons8.com/fluency/96/books.png" },
     ]

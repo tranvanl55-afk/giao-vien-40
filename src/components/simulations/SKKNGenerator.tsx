@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { generateSKKNDocument, SKKNData, Author, Supporter, Solution } from '../../utils/docxExport';
 import { FileDown, Plus, Trash2, ArrowRight, ArrowLeft, Sparkles, Loader2, FileUp } from 'lucide-react';
-import { getGeminiClient } from '../../lib/gemini';
+import { getGeminiClient, ensureGeminiApiKey } from '../../lib/gemini';
 
 import { AIConnectionBadge } from '../AIConnectionBadge';
 
@@ -79,7 +79,8 @@ export default function SKKNGenerator() {
   const generateAIText = async (fieldId: string, promptInfo: string, currentText: string, extraContext: string = '') => {
     setLoadingAI(fieldId);
     try {
-      const client = getGeminiClient();
+      const apiKey = await ensureGeminiApiKey();
+      const client = getGeminiClient(apiKey);
       
       let baseContext = `Bạn là một chuyên gia giáo dục, chuyên tư vấn và viết Sáng kiến kinh nghiệm (SKKN) cho giáo viên Việt Nam.
 Thông tin cơ bản về đề tài:

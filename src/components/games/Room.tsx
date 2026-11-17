@@ -1,5 +1,5 @@
 // src/components/games/Room.tsx
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMultiplayer } from '../../context/MultiplayerContext';
 import { motion } from 'motion/react';
@@ -8,7 +8,7 @@ import { Star } from 'lucide-react';
 export const Room = () => {
   const { roomId: paramRoomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
-  const { joinRoom, roomId, isHost, gameState, startGame, player } = useMultiplayer();
+  const { joinRoom, roomId, isHost, gameState, startGame } = useMultiplayer();
   const [loading, setLoading] = useState(true);
 
   // Join the room on mount
@@ -60,6 +60,7 @@ export const Room = () => {
         <p className="mb-4 text-slate-300">Bạn đã vào phòng. Chờ người khác tham gia...</p>
         {isHost && (
           <button
+            type="button"
             onClick={handleStart}
             disabled={!canStart}
             className="px-6 py-3 bg-linear-to-r from-green-600 to-emerald-500 rounded-xl font-bold hover:from-green-500 hover:to-emerald-400 transition-colors disabled:opacity-50"
@@ -68,6 +69,7 @@ export const Room = () => {
           </button>
         )}
         <button
+          type="button"
           onClick={() => navigate('/')}
           className="mt-4 text-sm underline"
         >
