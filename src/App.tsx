@@ -100,7 +100,10 @@ export default function App() {
   const isFullscreenPage = location.pathname.startsWith('/lesson') || location.pathname.startsWith('/subcategory');
 
   if (!currentUser) {
-    if (location.pathname === '/lesson/du-an-tinh-bot-cellulose') {
+    const isPublicTinhBotUnlocked =
+      typeof window !== 'undefined' && sessionStorage.getItem('public_tinhbot_unlocked') === 'true';
+
+    if (location.pathname === '/lesson/du-an-tinh-bot-cellulose' && isPublicTinhBotUnlocked) {
       return (
         <ErrorBoundary onBack={() => navigate('/')}>
           <Suspense fallback={<CatLoader />}>

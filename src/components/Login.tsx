@@ -113,6 +113,9 @@ export function Login() {
   const [rememberMe, setRememberMe] = useState(true);
   const [googleNeedsKey, setGoogleNeedsKey] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [showElearningPassModal, setShowElearningPassModal] = useState(false);
+  const [elearningPassInput, setElearningPassInput] = useState('');
+  const [elearningPassError, setElearningPassError] = useState('');
 
   const [lang, setLangState] = useState<'vi' | 'en'>(() => {
     return document.cookie.includes('googtrans=/vi/en') ? 'en' : 'vi';
@@ -755,7 +758,15 @@ export function Login() {
         <div className="w-full max-w-md md:max-w-200 lg:w-80 shrink-0 flex">
           <button
             type="button"
-            onClick={() => navigate('/lesson/du-an-tinh-bot-cellulose')}
+            onClick={() => {
+              if (sessionStorage.getItem('public_tinhbot_unlocked') === 'true') {
+                navigate('/lesson/du-an-tinh-bot-cellulose');
+                return;
+              }
+              setElearningPassInput('');
+              setElearningPassError('');
+              setShowElearningPassModal(true);
+            }}
             className="w-full group flex flex-col justify-between gap-5 p-6 rounded-3xl bg-linear-to-br from-emerald-600/95 via-teal-700/95 to-cyan-800/95 hover:from-emerald-500 hover:via-teal-600 hover:to-cyan-700 text-white border-2 border-emerald-300/40 shadow-[0_20px_60px_rgba(16,185,129,0.4)] backdrop-blur-md cursor-pointer transition-all duration-300 hover:-translate-y-1 text-left"
           >
             <div className="space-y-4">
@@ -794,6 +805,85 @@ export function Login() {
           </button>
         </div>
       </div>
+
+      {/* Modal nhập mật khẩu vào E-learning nguồn mở */}
+      {showElearningPassModal && (
+        <div
+          onClick={() => setShowElearningPassModal(false)}
+          className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl border border-emerald-100 text-slate-800"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                <Lock className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="font-black text-base text-slate-900">
+                  {lang === 'vi' ? 'Nhập mật khẩu truy cập' : 'Enter Access Password'}
+                </h4>
+                <p className="text-xs text-slate-500">
+                  {lang === 'vi'
+                    ? 'Elearning dự án "bắt đầu từ sự kết thúc"'
+                    : 'E-learning Project: "Begin with the End"'}
+                </p>
+              </div>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (elearningPassInput.trim() === '01011993') {
+                  sessionStorage.setItem('public_tinhbot_unlocked', 'true');
+                  setShowElearningPassModal(false);
+                  navigate('/lesson/du-an-tinh-bot-cellulose');
+                } else {
+                  setElearningPassError(
+                    lang === 'vi'
+                      ? 'Mật khẩu chưa đúng, vui lòng thử lại!'
+                      : 'Incorrect password, please try again!'
+                  );
+                }
+              }}
+              className="space-y-3 mt-4"
+            >
+              <input
+                type="password"
+                autoFocus
+                value={elearningPassInput}
+                onChange={(e) => {
+                  setElearningPassInput(e.target.value);
+                  if (elearningPassError) setElearningPassError('');
+                }}
+                placeholder={lang === 'vi' ? 'Nhập mật khẩu...' : 'Enter password...'}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500"
+              />
+
+              {elearningPassError && (
+                <p className="text-xs font-bold text-rose-600">{elearningPassError}</p>
+              )}
+
+              <div className="flex items-center justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowElearningPassModal(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-colors"
+                >
+                  {lang === 'vi' ? 'Hủy' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs shadow-md cursor-pointer transition-all"
+                >
+                  {lang === 'vi' ? 'Mở bài học' : 'Unlock'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
