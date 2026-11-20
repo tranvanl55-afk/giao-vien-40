@@ -3308,7 +3308,7 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
                             </div>
                             <div>
                               <h4 className="text-sm font-black text-emerald-950">
-                                KẾT QUẢ BÀI KIỂM TRA: {testScore} / 12 ĐIỂM ({Math.round((testScore / 12) * 100)}%)
+                                KẾT QUẢ BÀI KIỂM TRA: {testScore} / 10 ĐIỂM ({Math.round((testScore / 10) * 100)}%)
                               </h4>
                               <p className="text-xs text-emerald-800 font-medium">
                                 Học sinh: <strong>{testStudentName}</strong> • Lớp: <strong>{testStudentClass || 'KHTN 9'}</strong>
@@ -3318,7 +3318,7 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
 
                           <div className="flex items-center gap-2">
                             <a
-                              href={`mailto:${TEACHER_EMAIL}?subject=[KHTN 9] Điểm kiểm tra Chặng 2: ${testStudentName} - Lớp ${testStudentClass}&body=Họ tên: ${testStudentName}%0D%0ALớp: ${testStudentClass}%0D%0AĐiểm số: ${testScore}/12 điểm`}
+                              href={`mailto:${TEACHER_EMAIL}?subject=[KHTN 9] Điểm kiểm tra Chặng 2: ${testStudentName} - Lớp ${testStudentClass}&body=Họ tên: ${testStudentName}%0D%0ALớp: ${testStudentClass}%0D%0AĐiểm số: ${testScore}/10 điểm`}
                               className="px-3.5 py-1.5 rounded-full bg-white border border-indigo-200 text-indigo-900 font-bold text-xs flex items-center gap-1.5 hover:bg-indigo-50 cursor-pointer"
                             >
                               <Mail className="w-3.5 h-3.5 text-indigo-600" />

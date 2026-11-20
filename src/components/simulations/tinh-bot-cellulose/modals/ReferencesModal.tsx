@@ -43,6 +43,140 @@ export function ReferencesModal({ isOpen, onClose }: ReferencesModalProps) {
         </div>
 
         <div className="p-5 md:p-6 overflow-y-auto space-y-4 text-xs md:text-sm text-indigo-950 leading-relaxed">
+          {/* Nhóm dành cho Học sinh */}
+          <div className="bg-sky-50/70 border border-sky-200 rounded-2xl p-4 space-y-3">
+            <h4 className="font-black text-sky-900 uppercase text-xs flex items-center gap-1.5">
+              <span>🎓 Tài liệu tham khảo dành cho Học sinh (Học liệu số &amp; Thực tiễn)</span>
+            </h4>
+
+            <div className="space-y-2.5 text-xs text-slate-700 font-medium">
+              <div>
+                <p className="font-bold text-sky-950 mb-1">
+                  • Bài giảng tham khảo về Tinh bột và Cellulose trên kho học liệu số dùng chung của TP. HCM:
+                </p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>
+                    <a
+                      href="https://lms360.vn/play?p=af237c74-d3cf-4f11-a2f7-514bf7bdac74&c=67586da8c25553b7b2e8bff8&cs=b9a6e106-34c8-4806-9a77-e49ea65a58ca&m=0&pa=1&sch=0"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sky-700 hover:text-sky-900 hover:underline font-bold"
+                    >
+                      <span>Bài giảng tham khảo 1 (LMS360 TP. HCM)</span>
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://lms360.vn/play?p=31842e07-068f-4e64-b8e9-0d40a1e1a392&c=67bee013eacd9d802a07862d&cs=f9e1171a-8889-42d0-9984-66146822d3d0&m=0&pa=1&sch=0"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sky-700 hover:text-sky-900 hover:underline font-bold"
+                    >
+                      <span>Bài giảng tham khảo 2 (LMS360 TP. HCM)</span>
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://lms360.vn/play?p=d50be0e1-ff69-4e71-b81f-9222654beaef&c=67c95a87e9dcedc3c704366c&cs=836f0758-ea1c-4b58-8afb-743cfbe090ef&m=0&pa=3&sch=0"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sky-700 hover:text-sky-900 hover:underline font-bold"
+                    >
+                      <span>Bài giảng tham khảo 3 (LMS360 TP. HCM)</span>
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <p className="font-bold text-sky-950 mb-1">
+                  • Các thông tin về từ khóa &ldquo;Green newspaper&rdquo;:
+                </p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>
+                    Tiếng Việt:{' '}
+                    <a
+                      href="https://moit.gov.vn/bao-ve-moi-truong/cay-xanh-moc-len-tu-giay-bao-tai-nhat-ban2.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sky-700 hover:text-sky-900 hover:underline font-bold"
+                    >
+                      <span>Cây xanh mọc lên từ giấy báo tại Nhật Bản (Bộ Công Thương)</span>
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                    </a>
+                  </li>
+                  <li>
+                    Tiếng Anh:{' '}
+                    <a
+                      href="https://www.editiontime.com/paper-to-read-and-plant/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sky-700 hover:text-sky-900 hover:underline font-bold"
+                    >
+                      <span>Paper to read and plant (EditionTime)</span>
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <p className="font-bold text-sky-950 mb-1">
+                  • Các video &amp; tài liệu về nghề làm giấy, tái chế phế phẩm:
+                </p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>
+                    <a
+                      href="https://scp.gov.vn/Video?VideoId=13088"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sky-700 hover:text-sky-900 hover:underline font-bold"
+                    >
+                      <span>Sản xuất giấy và tác động đến môi trường (Video)</span>
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://vienktxh.hanoi.gov.vn/nghien-cuu-trao-doi/giay-chong-tham-tu-ba-mia-67308.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sky-700 hover:text-sky-900 hover:underline font-bold"
+                    >
+                      <span>Giấy chống thấm từ bã mía</span>
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://elib.vnuf.edu.vn/bitstream/123456789/8830/1/LV7340.pdf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sky-700 hover:text-sky-900 hover:underline font-bold"
+                    >
+                      <span>Nghiên cứu nấu bột giấy từ nguyên liệu rơm rạ (PDF)</span>
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://nhandan.vn/11-du-an-sang-tao-duoc-lua-chon-tham-gia-chuong-trinh-thuc-day-tai-chinh-khi-hau-viet-nam-post793215.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sky-700 hover:text-sky-900 hover:underline font-bold"
+                    >
+                      <span>11 dự án sáng tạo được lựa chọn tham gia Chương trình thúc đẩy tài chính khí hậu Việt Nam (Báo Nhân Dân)</span>
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           {/* Nhóm 1 */}
           <div className="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4 space-y-2">
             <h4 className="font-black text-indigo-900 uppercase text-xs flex items-center gap-1.5">

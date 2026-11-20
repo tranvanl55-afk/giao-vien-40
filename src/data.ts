@@ -544,6 +544,7 @@ export const categories: Category[] = [
       { id: "game-ai-la-trieu-phu", title: "Ai Là Triệu Phú", description: "Vượt qua 15 câu hỏi trắc nghiệm hóc búa với sự trợ giúp của khán giả, người thân để giành giải thưởng 150 triệu! 💰", colorClass: "hover:bg-amber-500/20 hover:border-amber-500/50", logoUrl: "https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fai_l%C3%A0_tri%E1%BB%87u_ph%C3%BA-removebg-preview.png?alt=media&token=9fa001c0-9d5d-4b96-a721-0799ed5c96a8" },
       { id: "game-ban-trung-hoa-hoc", title: "Bắn Trứng Hóa Học", description: "Bắn các ion để tạo thành hợp chất hóa học có tổng điện tích bằng 0! 🧪", colorClass: "hover:bg-indigo-500/20 hover:border-indigo-500/50", logoUrl: "https://img.icons8.com/fluency/96/test-tube.png" },
       { id: "game-angry-khtn", title: "Bắn Chim KHTN", description: "Trả lời câu hỏi trắc nghiệm đúng để nhận chim xịn, sai nhận chim cùi bắp, sau đó dùng súng cao su phá hủy bầy heo! 🐦💣", colorClass: "hover:bg-sky-500/20 hover:border-sky-500/50", logoUrl: "https://img.icons8.com/fluency/96/angry-birds.png" },
+      { id: "game-duong-dua-mam-xanh", title: "Đường Đua Mầm Xanh – Trạm Năng Lượng", description: "Trò chơi khởi động Tiết 1 Dự án STEAM Bài 30 (KHTN 9): Đường đua 8 nhóm & 6 mini-game tương tác Tinh bột – Cellulose! 🌱", colorClass: "hover:bg-emerald-500/20 hover:border-emerald-500/50", logoUrl: "https://img.icons8.com/fluency/96/sprout.png" },
     ]
   },
   {

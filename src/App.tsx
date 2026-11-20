@@ -34,6 +34,12 @@ const PublicTinhBotElearning = lazy(() =>
   }))
 );
 
+const PublicDuongDuaMamXanhGame = lazy(() =>
+  import('./components/games/DuongDuaMamXanhGame').then((m) => ({
+    default: m.DuongDuaMamXanhGame,
+  }))
+);
+
 function LessonWrapper() {
   const { simId } = useParams<{ simId: string }>();
   const navigate = useNavigate();
@@ -100,6 +106,18 @@ export default function App() {
   const isFullscreenPage = location.pathname.startsWith('/lesson') || location.pathname.startsWith('/subcategory');
 
   if (!currentUser) {
+    if (location.pathname === '/lesson/game-duong-dua-mam-xanh') {
+      return (
+        <ErrorBoundary onBack={() => navigate('/')}>
+          <Suspense fallback={<CatLoader />}>
+            <div className="h-screen w-full overflow-y-auto relative z-10 bg-emerald-50">
+              <PublicDuongDuaMamXanhGame onBack={() => navigate('/')} />
+            </div>
+          </Suspense>
+        </ErrorBoundary>
+      );
+    }
+
     const isPublicTinhBotUnlocked =
       typeof window !== 'undefined' && sessionStorage.getItem('public_tinhbot_unlocked') === 'true';
 

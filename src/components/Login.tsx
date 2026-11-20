@@ -755,7 +755,28 @@ export function Login() {
         </div>
 
         {/* Lối tắt bên phải: Nguồn mở - Không cần đăng nhập */}
-        <div className="w-full max-w-md md:max-w-200 lg:w-80 shrink-0 flex">
+        <div className="w-full max-w-md md:max-w-200 lg:w-80 shrink-0 flex flex-col gap-3">
+          <button
+            type="button"
+            onClick={() => navigate('/lesson/game-duong-dua-mam-xanh')}
+            className="w-full group flex items-center justify-between gap-3 p-4 rounded-3xl bg-linear-to-r from-lime-500/95 via-emerald-600/95 to-teal-600/95 hover:from-lime-400 hover:via-emerald-500 hover:to-teal-500 text-white border-2 border-lime-200/50 shadow-[0_14px_40px_rgba(16,185,129,0.35)] backdrop-blur-md cursor-pointer transition-all duration-300 hover:-translate-y-0.5 text-left"
+          >
+            <div className="min-w-0">
+              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-300 text-amber-950 font-black text-[10px] uppercase tracking-wider mb-1">
+                <span>🌱 Trò chơi mở • Không cần đăng nhập</span>
+              </div>
+              <div className="text-sm font-black leading-snug text-white">
+                Đường Đua Mầm Xanh – Trạm Năng Lượng
+              </div>
+              <div className="text-[11px] text-emerald-50/90 font-medium mt-0.5">
+                Khởi động Bài 30: Tinh bột &amp; Cellulose (8 nhóm)
+              </div>
+            </div>
+            <div className="w-9 h-9 rounded-2xl bg-white text-emerald-700 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          </button>
+
           <button
             type="button"
             onClick={() => {

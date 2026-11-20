@@ -14,6 +14,7 @@ import {
 } from '../rubricData';
 
 export interface RubricInteractivePanelProps {
+  mode?: 'rubric' | 'checklist';
   stageShortLabel: string;
   stageFullTitle: string;
   rubricSubtitle: string;
@@ -27,8 +28,9 @@ export interface RubricInteractivePanelProps {
   teacherEmail: string;
 }
 
-/** Bảng Analytical Rubric 5 mức tương tác dùng chung cho Chặng 3 và Chặng 5. */
+/** Bảng Analytical Rubric 5 mức hoặc Bảng kiểm 5 mức độ dùng chung cho Chặng 3 và Chặng 5. */
 export function RubricInteractivePanel({
+  mode = 'rubric',
   stageShortLabel,
   stageFullTitle,
   rubricSubtitle,
@@ -41,6 +43,7 @@ export function RubricInteractivePanel({
   onSubmit,
   teacherEmail,
 }: RubricInteractivePanelProps) {
+  const isChecklistMode = mode === 'checklist';
   const { answeredCount, isComplete, totalPoints, rank } = getRubricSummary(criteria, state);
 
   const handleSelectLevel = (criterion: Stage3RubricCriterion, lv: RubricLevelOption) => {
@@ -83,7 +86,9 @@ export function RubricInteractivePanel({
         <div className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full bg-amber-400 text-indigo-950 font-black text-[11px] uppercase">
-              📐 ANALYTICAL RUBRIC 5 MỨC • THANG 10 ĐIỂM (100%)
+              {isChecklistMode
+                ? '✅ BẢNG KIỂM 5 MỨC ĐỘ • THANG 10 ĐIỂM (100%)'
+                : '📐 ANALYTICAL RUBRIC 5 MỨC • THANG 10 ĐIỂM (100%)'}
             </span>
             <span className="text-xs text-indigo-200 font-bold">
               Mức 1 (Cần cố gắng) → Mức 5 (Xuất sắc)
@@ -208,12 +213,87 @@ export function RubricInteractivePanel({
               className="px-3.5 py-1.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 text-xs font-black flex items-center gap-1.5 cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>In phiếu Rubric</span>
+              <span>{isChecklistMode ? 'In bảng kiểm' : 'In phiếu Rubric'}</span>
             </button>
           </div>
         </div>
       </div>
 
+      {isChecklistMode ? (
+        <div className="rounded-2xl border-2 border-indigo-200 bg-white shadow-sm overflow-hidden">
+          <div className="bg-indigo-950 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs font-black">
+            <span>✅ BẢNG KIỂM 5 MỨC ĐỘ — CHỌN NHANH THEO TỪNG TIÊU CHÍ</span>
+            <span className="text-amber-300 font-bold text-[11px]">
+              1: Cần cố gắng • 2: Đạt • 3: Khá • 4: Tốt • 5: Xuất sắc
+            </span>
+          </div>
+          <div className="divide-y divide-indigo-100">
+            {criteria.map((criterion, cIdx) => {
+              const selectedLevel = state.selections[criterion.id];
+              return (
+                <div key={criterion.id} className="p-3.5 sm:p-4 flex flex-col gap-2.5 hover:bg-indigo-50/20 transition-colors">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex-1 min-w-56">
+                      <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-black ${RUBRIC_CATEGORY_BADGE_CLASSES[criterion.category]}`}
+                        >
+                          {criterion.category}
+                        </span>
+                      </div>
+                      <div className="text-xs sm:text-sm font-black text-indigo-950">
+                        {cIdx + 1}. {criterion.title}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-5 gap-2">
+                    {criterion.levels.map((lv) => {
+                      const isPicked = selectedLevel === lv.level;
+                      const lvStyle = RUBRIC_LEVEL_STYLE_CLASSES[lv.level];
+                      return (
+                        <button
+                          key={lv.level}
+                          type="button"
+                          onClick={() => handleSelectLevel(criterion, lv)}
+                          className={`px-2 py-2.5 rounded-xl border-2 text-center flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all ${
+                            isPicked
+                              ? `${lvStyle.picked} shadow-xs scale-[1.01]`
+                              : 'bg-slate-50/70 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 text-slate-700'
+                          }`}
+                        >
+                          <span className="text-sm font-black">{lv.level}</span>
+                          <span className="text-[10px] font-bold opacity-85 hidden sm:inline">{lv.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="bg-indigo-950 text-white px-4 py-3 flex flex-wrap items-center justify-between gap-3 border-t-2 border-indigo-800">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs md:text-sm font-black uppercase tracking-wide text-amber-300">
+                TỔNG ĐIỂM BẢNG KIỂM ({stageShortLabel} • 100%):
+              </span>
+              {isComplete ? (
+                <span className={`px-3 py-0.5 rounded-full text-xs font-black ${rank.colorClass}`}>
+                  Xếp loại: {rank.label}
+                </span>
+              ) : (
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/15 text-indigo-200">
+                  Đã chọn {answeredCount}/{criteria.length} tiêu chí
+                </span>
+              )}
+            </div>
+            <div className="px-4 py-1.5 rounded-xl bg-orange-600 text-center">
+              <span className="text-lg font-black text-white">{totalPoints}</span>
+              <span className="text-[11px] font-bold text-amber-100 ml-1">/ 10.0 điểm</span>
+            </div>
+          </div>
+        </div>
+      ) : (
       <div className="overflow-x-auto rounded-2xl border-2 border-indigo-200 bg-white shadow-sm">
         <table className="w-full min-w-280 border-collapse text-left">
           <thead>
@@ -361,6 +441,7 @@ export function RubricInteractivePanel({
           </tfoot>
         </table>
       </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
         <div className="lg:col-span-6 bg-indigo-50/60 border border-indigo-200 rounded-2xl p-4 flex flex-col gap-2">

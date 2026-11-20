@@ -542,120 +542,88 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                         </div>
                       </div>
 
-                      {/* BẢNG RUBRIC 4 TIÊU CHÍ */}
-                      <div className="overflow-x-auto rounded-2xl border border-indigo-200 bg-white shadow-sm">
-                        <table className="w-full min-w-225 text-left border-collapse text-xs">
-                          <thead>
-                            <tr className="bg-linear-to-r from-emerald-900 to-teal-900 text-white font-black text-[11px]">
-                              <th className="p-3 w-45 border-r border-emerald-700/60 uppercase">
-                                Tiêu chí tự đánh giá<br />
-                                <span className="text-[10px] font-normal text-emerald-200">(Trọng số • Điểm tối đa)</span>
-                              </th>
-                              <th className="p-3 w-37 border-r border-emerald-700/60 text-center bg-rose-900/60">
-                                MỨC 1 (20%)<br />
-                                <span className="text-[10px] font-bold text-rose-200">CẦN CỐ GẮNG</span>
-                              </th>
-                              <th className="p-3 w-37 border-r border-emerald-700/60 text-center bg-amber-900/60">
-                                MỨC 2 (40%)<br />
-                                <span className="text-[10px] font-bold text-amber-200">ĐẠT</span>
-                              </th>
-                              <th className="p-3 w-37 border-r border-emerald-700/60 text-center bg-sky-900/60">
-                                MỨC 3 (60%)<br />
-                                <span className="text-[10px] font-bold text-sky-200">KHÁ</span>
-                              </th>
-                              <th className="p-3 w-37 border-r border-emerald-700/60 text-center bg-indigo-900/60">
-                                MỨC 4 (80%)<br />
-                                <span className="text-[10px] font-bold text-indigo-200">TỐT</span>
-                              </th>
-                              <th className="p-3 w-37 border-r border-emerald-700/60 text-center bg-emerald-800/80">
-                                MỨC 5 (100%)<br />
-                                <span className="text-[10px] font-bold text-emerald-200">XUẤT SẮC</span>
-                              </th>
-                              <th className="p-3 w-22 text-center bg-orange-600 text-white uppercase">
-                                Tự chấm
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-indigo-100">
-                            {STAGE6_SELF_RUBRIC_CRITERIA.map((criterion, idx) => {
-                              const curScore = stage6SelfScores[criterion.id];
-                              return (
-                                <tr key={criterion.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
-                                  <td className="p-3 border-r border-indigo-100 align-top">
-                                    <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 mb-1">
-                                      {criterion.badge}
-                                    </span>
-                                    <div className="font-extrabold text-indigo-950 text-xs leading-tight mb-1">
+                      {/* BẢNG KIỂM 5 MỨC ĐỘ — TỰ ĐÁNH GIÁ */}
+                      <div className="rounded-2xl border-2 border-emerald-200 bg-white shadow-sm overflow-hidden">
+                        <div className="bg-linear-to-r from-emerald-900 to-teal-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs font-black">
+                          <span>✅ BẢNG KIỂM 5 MỨC ĐỘ — TỰ ĐÁNH GIÁ CÁ NHÂN</span>
+                          <span className="text-emerald-200 font-bold text-[11px]">
+                            1: Cần cố gắng • 2: Đạt • 3: Khá • 4: Tốt • 5: Xuất sắc
+                          </span>
+                        </div>
+                        <div className="divide-y divide-emerald-100">
+                          {STAGE6_SELF_RUBRIC_CRITERIA.map((criterion, idx) => {
+                            const curScore = stage6SelfScores[criterion.id];
+                            const levelNames = ['Cần cố gắng', 'Đạt', 'Khá', 'Tốt', 'Xuất sắc'];
+                            return (
+                              <div
+                                key={criterion.id}
+                                className={`p-3.5 sm:p-4 flex flex-col gap-2.5 ${idx % 2 === 0 ? 'bg-white' : 'bg-emerald-50/20'}`}
+                              >
+                                <div className="flex flex-wrap items-start justify-between gap-2">
+                                  <div className="flex-1 min-w-56">
+                                    <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                                      <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
+                                        {criterion.badge}
+                                      </span>
+                                    </div>
+                                    <div className="font-extrabold text-indigo-950 text-xs sm:text-sm leading-snug">
                                       {criterion.code}. {criterion.title}
                                     </div>
-                                    <div className="text-[11px] font-bold text-emerald-700">
-                                      {criterion.weightText}
-                                    </div>
-                                  </td>
+                                  </div>
+                                  <div className="px-3 py-1 rounded-xl bg-emerald-50 border border-emerald-200 text-center shrink-0">
+                                    <span className="text-xs font-black text-emerald-700">
+                                      {curScore !== undefined
+                                        ? `Mức ${criterion.levels.find((l) => l.points === curScore)?.level ?? '-'}`
+                                        : 'Chưa chọn'}
+                                    </span>
+                                  </div>
+                                </div>
 
-                                  {criterion.levels.map((lv) => {
+                                <div className="grid grid-cols-5 gap-2">
+                                  {criterion.levels.map((lv, lvIdx) => {
                                     const isSelected = curScore === lv.points;
                                     return (
-                                      <td
+                                      <button
                                         key={lv.level}
+                                        type="button"
                                         onClick={() =>
                                           setStage6SelfScores((prev) => ({
                                             ...prev,
                                             [criterion.id]: lv.points,
                                           }))
                                         }
-                                        className={`p-2.5 border-r border-indigo-100 align-top cursor-pointer transition-all text-[11px] leading-relaxed relative ${
+                                        className={`px-2 py-2.5 rounded-xl border-2 text-center flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all ${
                                           isSelected
-                                            ? 'bg-emerald-100/90 font-bold text-emerald-950 ring-2 ring-emerald-500 ring-inset shadow-xs'
-                                            : 'hover:bg-indigo-50/60 text-slate-700'
+                                            ? 'bg-emerald-100 border-emerald-500 text-emerald-950 shadow-xs scale-[1.01]'
+                                            : 'bg-slate-50/80 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40 text-slate-700'
                                         }`}
                                       >
-                                        <div className="flex items-center justify-between mb-1">
-                                          <span className={`px-1.5 py-0.2 rounded font-black text-[10px] ${
-                                            isSelected ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'
-                                          }`}>
-                                            {lv.points} điểm
-                                          </span>
-                                          {isSelected && (
-                                            <span className="text-[10px] font-black text-emerald-700">✓ Chọn</span>
-                                          )}
-                                        </div>
-                                        <div>{lv.text}</div>
-                                      </td>
+                                        <span className="text-sm font-black">{lv.level}</span>
+                                        <span className="text-[10px] font-bold opacity-85 hidden sm:inline">
+                                          {levelNames[lvIdx] ?? ''}
+                                        </span>
+                                      </button>
                                     );
                                   })}
-
-                                  <td className="p-3 text-center align-middle bg-indigo-50/40">
-                                    <div className="text-base font-black text-emerald-700">
-                                      {curScore !== undefined ? curScore : '...'}
-                                    </div>
-                                    <div className="text-[10px] font-bold text-slate-500">
-                                      / {criterion.maxPoints}đ
-                                    </div>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                          <tfoot>
-                            <tr className="bg-emerald-950 text-white border-t-2 border-emerald-800">
-                              <td colSpan={6} className="p-3 text-right">
-                                <div className="flex items-center justify-end gap-2">
-                                  <span className="text-xs md:text-sm font-black uppercase text-amber-300">
-                                    TỔNG ĐIỂM TỰ ĐÁNH GIÁ CỦA CÁ NHÂN (100%):
-                                  </span>
-                                  <span className={`px-3 py-0.5 rounded-full text-xs font-black ${rankInfo.colorClass}`}>
-                                    {rankInfo.badge}
-                                  </span>
                                 </div>
-                              </td>
-                              <td className="p-3 bg-orange-600 text-center">
-                                <div className="text-lg md:text-xl font-black text-white">{totalSelfScore}</div>
-                                <div className="text-[10px] font-bold text-amber-100">/ 10.0 điểm</div>
-                              </td>
-                            </tr>
-                          </tfoot>
-                        </table>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="bg-emerald-950 text-white px-4 py-3 flex flex-wrap items-center justify-between gap-3 border-t-2 border-emerald-800">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-xs md:text-sm font-black uppercase text-amber-300">
+                              TỔNG ĐIỂM TỰ ĐÁNH GIÁ CỦA CÁ NHÂN (100%):
+                            </span>
+                            <span className={`px-3 py-0.5 rounded-full text-xs font-black ${rankInfo.colorClass}`}>
+                              {rankInfo.badge}
+                            </span>
+                          </div>
+                          <div className="px-4 py-1.5 rounded-xl bg-orange-600 text-center">
+                            <span className="text-lg md:text-xl font-black text-white">{totalSelfScore}</span>
+                            <span className="text-[10px] font-bold text-amber-100 ml-1">/ 10.0 điểm</span>
+                          </div>
+                        </div>
                       </div>
 
                       {/* PHẦN II: GÓC TỰ PHẢN CHIẾU CỦA EM SAU DỰ ÁN (REFLECTION) */}
@@ -898,59 +866,45 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                           </div>
                         </div>
 
-                        {/* BẢNG 4 TIÊU CHÍ ĐÁNH GIÁ ĐÓNG GÓP CÁ NHÂN */}
-                        <div className="overflow-x-auto rounded-2xl border border-indigo-200 bg-white shadow-2xs">
-                          <table className="w-full min-w-225 text-left border-collapse text-xs">
-                            <thead>
-                              <tr className="bg-linear-to-r from-amber-900 to-orange-900 text-white font-black text-[11px]">
-                                <th className="p-3 w-45 border-r border-amber-700/60 uppercase">
-                                  Tiêu chí đánh giá<br />
-                                  <span className="text-[10px] font-normal text-amber-200">(Trọng số • Điểm tối đa)</span>
-                                </th>
-                                <th className="p-3 w-37 border-r border-amber-700/60 text-center bg-rose-900/60">
-                                  MỨC 1 (20%)<br />
-                                  <span className="text-[10px] font-bold text-rose-200">CẦN CỐ GẮNG</span>
-                                </th>
-                                <th className="p-3 w-37 border-r border-amber-700/60 text-center bg-amber-900/60">
-                                  MỨC 2 (40%)<br />
-                                  <span className="text-[10px] font-bold text-amber-200">ĐẠT</span>
-                                </th>
-                                <th className="p-3 w-37 border-r border-amber-700/60 text-center bg-sky-900/60">
-                                  MỨC 3 (60%)<br />
-                                  <span className="text-[10px] font-bold text-sky-200">KHÁ</span>
-                                </th>
-                                <th className="p-3 w-37 border-r border-amber-700/60 text-center bg-indigo-900/60">
-                                  MỨC 4 (80%)<br />
-                                  <span className="text-[10px] font-bold text-indigo-200">TỐT</span>
-                                </th>
-                                <th className="p-3 w-37 border-r border-amber-700/60 text-center bg-emerald-800/80">
-                                  MỨC 5 (100%)<br />
-                                  <span className="text-[10px] font-bold text-emerald-200">XUẤT SẮC</span>
-                                </th>
-                                <th className="p-3 w-22 text-center bg-orange-600 text-white uppercase">
-                                  Điểm
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-indigo-100">
-                              {STAGE6_LEADER_RUBRIC_CRITERIA.map((criterion, idx) => {
-                                const curScore = currentMember.scores[criterion.id];
-                                return (
-                                  <tr key={criterion.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
-                                    <td className="p-3 border-r border-indigo-100 align-top">
-                                      <div className="font-extrabold text-indigo-950 text-xs leading-tight mb-1">
+                        {/* BẢNG KIỂM 5 MỨC ĐỘ — NHÓM TRƯỞNG ĐÁNH GIÁ THÀNH VIÊN */}
+                        <div className="rounded-2xl border-2 border-amber-200 bg-white shadow-2xs overflow-hidden">
+                          <div className="bg-linear-to-r from-amber-900 to-orange-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs font-black">
+                            <span>✅ BẢNG KIỂM 5 MỨC ĐỘ — ĐÁNH GIÁ ĐÓNG GÓP THÀNH VIÊN</span>
+                            <span className="text-amber-200 font-bold text-[11px]">
+                              1: Cần cố gắng • 2: Đạt • 3: Khá • 4: Tốt • 5: Xuất sắc
+                            </span>
+                          </div>
+                          <div className="divide-y divide-amber-100">
+                            {STAGE6_LEADER_RUBRIC_CRITERIA.map((criterion, idx) => {
+                              const curScore = currentMember.scores[criterion.id];
+                              const levelNames = ['Cần cố gắng', 'Đạt', 'Khá', 'Tốt', 'Xuất sắc'];
+                              return (
+                                <div
+                                  key={criterion.id}
+                                  className={`p-3.5 sm:p-4 flex flex-col gap-2.5 ${idx % 2 === 0 ? 'bg-white' : 'bg-amber-50/20'}`}
+                                >
+                                  <div className="flex flex-wrap items-start justify-between gap-2">
+                                    <div className="flex-1 min-w-56">
+                                      <div className="font-extrabold text-indigo-950 text-xs sm:text-sm leading-snug">
                                         {criterion.code}. {criterion.title}
                                       </div>
-                                      <div className="text-[11px] font-bold text-amber-700">
-                                        {criterion.weightText}
-                                      </div>
-                                    </td>
+                                    </div>
+                                    <div className="px-3 py-1 rounded-xl bg-amber-50 border border-amber-200 text-center shrink-0">
+                                      <span className="text-xs font-black text-amber-700">
+                                        {curScore !== undefined
+                                          ? `Mức ${criterion.levels.find((l) => l.points === curScore)?.level ?? '-'}`
+                                          : 'Chưa chọn'}
+                                      </span>
+                                    </div>
+                                  </div>
 
-                                    {criterion.levels.map((lv) => {
+                                  <div className="grid grid-cols-5 gap-2">
+                                    {criterion.levels.map((lv, lvIdx) => {
                                       const isSelected = curScore === lv.points;
                                       return (
-                                        <td
+                                        <button
                                           key={lv.level}
+                                          type="button"
                                           onClick={() => {
                                             setStage6Members((prev) =>
                                               prev.map((m) =>
@@ -960,40 +914,24 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                                               )
                                             );
                                           }}
-                                          className={`p-2.5 border-r border-indigo-100 align-top cursor-pointer transition-all text-[11px] leading-relaxed relative ${
+                                          className={`px-2 py-2.5 rounded-xl border-2 text-center flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all ${
                                             isSelected
-                                              ? 'bg-amber-100/90 font-bold text-amber-950 ring-2 ring-amber-500 ring-inset shadow-xs'
-                                              : 'hover:bg-amber-50/50 text-slate-700'
+                                              ? 'bg-amber-100 border-amber-500 text-amber-950 shadow-xs scale-[1.01]'
+                                              : 'bg-slate-50/80 border-slate-200 hover:border-amber-300 hover:bg-amber-50/40 text-slate-700'
                                           }`}
                                         >
-                                          <div className="flex items-center justify-between mb-1">
-                                            <span className={`px-1.5 py-0.2 rounded font-black text-[10px] ${
-                                              isSelected ? 'bg-amber-600 text-white' : 'bg-slate-200 text-slate-700'
-                                            }`}>
-                                              {lv.points} điểm
-                                            </span>
-                                            {isSelected && (
-                                              <span className="text-[10px] font-black text-amber-700">✓ Chọn</span>
-                                            )}
-                                          </div>
-                                          <div>{lv.text}</div>
-                                        </td>
+                                          <span className="text-sm font-black">{lv.level}</span>
+                                          <span className="text-[10px] font-bold opacity-85 hidden sm:inline">
+                                            {levelNames[lvIdx] ?? ''}
+                                          </span>
+                                        </button>
                                       );
                                     })}
-
-                                    <td className="p-3 text-center align-middle bg-amber-50/30">
-                                      <div className="text-base font-black text-amber-700">
-                                        {curScore !== undefined ? curScore : '...'}
-                                      </div>
-                                      <div className="text-[10px] font-bold text-slate-500">
-                                        / {criterion.maxPoints}đ
-                                      </div>
-                                    </td>
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
 
                         {/* NHẬN XÉT CỦA NHÓM TRƯỞNG CHO THÀNH VIÊN NÀY */}

@@ -166,6 +166,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const [showNewWordsModal, setShowNewWordsModal] = useState<boolean>(false);
   // Chế độ Học sinh (khóa theo chặng) vs Chế độ Giáo viên (xem tất cả các chặng, pass: 01011993)
   const [isTeacherMode, setIsTeacherMode] = useState<boolean>(false);
+  const [isJudgeMode, setIsJudgeMode] = useState<boolean>(false);
   const [showTeacherModal, setShowTeacherModal] = useState<boolean>(false);
   const [teacherPassInput, setTeacherPassInput] = useState<string>('');
   const [teacherPassError, setTeacherPassError] = useState<string | null>(null);
@@ -521,7 +522,10 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const [isTestSubmitted, setIsTestSubmitted] = useState<boolean>(() => Boolean(savedProgress.isTestSubmitted));
   const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
   const [emailSendStatus, setEmailSendStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [testScore, setTestScore] = useState<number>(() => savedProgress.testScore ?? 0);
+  const [testScore, setTestScore] = useState<number>(() => {
+    const saved = savedProgress.testScore ?? 0;
+    return saved > 10 ? Math.round((saved / 12) * 10 * 10) / 10 : saved;
+  });
   const [testFeedbackMessage, setTestFeedbackMessage] = useState<string | null>(null);
 
   // Hàm tính điểm bài kiểm tra 12 câu quy về thang điểm 10
@@ -1503,7 +1507,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const unlockTask = (id: string) => {
     setUnlockedTaskIds((prev) => {
       const next = new Set(prev);
-      if (!isTeacherMode) {
+      if (!isTeacherMode && !isJudgeMode) {
         const siblingTasks = Object.values(STAGE_TASK_MAP).find((arr) => arr.includes(id)) || [];
         siblingTasks.forEach((sibId) => {
           if (sibId !== id && isTaskIdCompleted(sibId)) {
@@ -1966,7 +1970,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     (quizSubmitted || stage6SelfSubmitted || stage6LeaderSubmitted || stage6TeacherSubmitted || everUnlockedTaskIds.has('task-s6-assessment'));
 
   const isStageUnlocked = (stage: StageId): boolean => {
-    if (isTeacherMode) return true;
+    if (isTeacherMode || isJudgeMode) return true;
     switch (stage) {
       case 'stage-1':
         return true;
@@ -1986,6 +1990,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const handleTeacherLogin = () => {
     if (teacherPassInput.trim() === TEACHER_PASSWORD) {
       setIsTeacherMode(true);
+      setIsJudgeMode(false);
       setShowTeacherModal(false);
       setTeacherPassInput('');
       setTeacherPassError(null);
@@ -2628,6 +2633,18 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
           <button
             type="button"
             onClick={() => {
+              import('./tinh-bot-cellulose/exportProjectDocx').then((m) => m.exportAllStagesToWord());
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 font-extrabold text-xs cursor-pointer transition-colors"
+            title="Xuất toàn bộ nội dung 6 chặng của dự án ra file Word (.docx)"
+          >
+            <Download className="w-3.5 h-3.5 text-sky-700" />
+            <span>Xuất Word 6 chặng</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
               if (!window.confirm('Thầy/Em có chắc chắn muốn đặt lại toàn bộ tiến trình học tập từ Chặng 1 trên máy này không?')) {
                 return;
               }
@@ -2657,15 +2674,33 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
               type="button"
               onClick={() => {
                 setIsTeacherMode(false);
+                setIsJudgeMode(false);
                 setStageLockMessage(null);
               }}
-              className={`px-3 py-1 rounded-full text-xs font-black flex items-center gap-1 transition-all cursor-pointer ${!isTeacherMode
+              className={`px-3 py-1 rounded-full text-xs font-black flex items-center gap-1 transition-all cursor-pointer ${!isTeacherMode && !isJudgeMode
                 ? 'bg-indigo-600 text-white shadow-xs'
                 : 'text-indigo-900/70 hover:text-indigo-950'
                 }`}
             >
               <Lock className="w-3 h-3" />
               <span>Chế độ HS</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsJudgeMode(true);
+                setIsTeacherMode(false);
+                setStageLockMessage(null);
+                unlockAllTasksForTeacher();
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-black flex items-center gap-1 transition-all cursor-pointer ${isJudgeMode
+                ? 'bg-linear-to-r from-amber-500 to-orange-500 text-white shadow-xs'
+                : 'text-indigo-900/70 hover:text-amber-600'
+                }`}
+              title="Chế độ dành cho Giám khảo: Không cần mật khẩu, mở tất cả chặng & xem tất cả kết quả"
+            >
+              <Award className="w-3 h-3" />
+              <span>{isJudgeMode ? 'Giám khảo (Mở tất cả)' : 'Giám khảo'}</span>
             </button>
             <button
               type="button"
@@ -2686,7 +2721,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             </button>
           </div>
 
-          {isTeacherMode && (
+          {(isTeacherMode || isJudgeMode) && (
             <>
               <button
                 type="button"
@@ -2695,10 +2730,10 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                   fetchTeacherDashboardData();
                 }}
                 className="px-3.5 py-1.5 rounded-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black text-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
-                title="Xem bảng tổng hợp điểm của cả lớp & Xuất Excel (không cần đọc từng email)"
+                title="Xem toàn bộ kết quả kiểm tra, Rubric & Bảng kiểm của các nhóm"
               >
                 <BarChart3 className="w-3.5 h-3.5" />
-                <span>Bảng Tổng hợp Lớp</span>
+                <span>{isJudgeMode ? 'Xem tất cả kết quả' : 'Bảng Tổng hợp Lớp'}</span>
               </button>
               <button
                 type="button"
@@ -3518,7 +3553,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         {activeStage === 'stage-2' && (
           <Stage2View
             guideBanner={renderStageGuideBanner('stage-2')}
-            isTeacherMode={isTeacherMode}
+            isTeacherMode={isTeacherMode || isJudgeMode}
             unlockedTaskIds={unlockedTaskIds}
             unlockTask={unlockTask}
             lockTask={lockTask}
@@ -3667,7 +3702,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         {activeStage === 'stage-3' && (
           <Stage3View
             guideBanner={renderStageGuideBanner('stage-3')}
-            isTeacherMode={isTeacherMode}
+            isTeacherMode={isTeacherMode || isJudgeMode}
             unlockedTaskIds={unlockedTaskIds}
             unlockTask={unlockTask}
             lockTask={lockTask}
@@ -3711,7 +3746,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         {activeStage === 'stage-5' && (
           <Stage5View
             guideBanner={renderStageGuideBanner('stage-5')}
-            isTeacherMode={isTeacherMode}
+            isTeacherMode={isTeacherMode || isJudgeMode}
             unlockedTaskIds={unlockedTaskIds}
             unlockTask={unlockTask}
             lockTask={lockTask}
@@ -3852,7 +3887,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         onSelectGuideStage={setSelectedGuideStage}
         selectedGuideStage={selectedGuideStage}
         isStageUnlocked={isStageUnlocked}
-        isTeacherMode={isTeacherMode}
+        isTeacherMode={isTeacherMode || isJudgeMode}
         onClose={() => setShowStageGuideModal(false)}
         onStartStage={(stage) => {
           setActiveStage(stage);
