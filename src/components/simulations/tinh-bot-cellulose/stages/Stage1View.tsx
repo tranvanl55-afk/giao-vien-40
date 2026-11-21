@@ -428,15 +428,7 @@ export function Stage1View({
               </div>
             </LockedTaskBox>
 
-            <div className="bg-white/90 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
-              <div className="flex gap-4 text-xs font-bold">
-                <span className={padletConfirmed ? 'text-emerald-700' : 'text-indigo-900/60'}>
-                  {padletConfirmed ? '✅' : '⏳'} 1. Lập nhóm Padlet
-                </span>
-                <span className={isKeywordComplete ? 'text-emerald-700' : 'text-indigo-900/60'}>
-                  {isKeywordComplete ? '✅' : '⏳'} 2. Ô chữ (22/22)
-                </span>
-              </div>
+            <div className="flex justify-end">
               <button
                 type="button"
                 onClick={() => onNextStage()}
@@ -446,7 +438,7 @@ export function Stage1View({
                   }`}
               >
                 {isNextStageUnlocked ? <Unlock className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
-                <span>Sang Chặng 2: Kiến thức nền (Tự học tại nhà)</span>
+                <span>Sang Chặng 2: Kiến thức nền</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>

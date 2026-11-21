@@ -73,8 +73,6 @@ import {
   STAGE5_POSTER_DRIVE_URL,
   STAGE5_PRESENTATION_DRIVE_URL,
   STAGE6_SUMMARY_VIDEO_DRIVE_URL,
-  PEER_ASSESSMENT_IDEA_FORM_URL,
-  PEER_ASSESSMENT_BOOTH_FORM_URL,
   PROJECT_COVER_IMAGE_URL,
   WORKSHEET_PDF_URL,
   WORKSHEET_DOCX_URL,
@@ -88,6 +86,9 @@ import {
   STAGE2_PART2_HYDROLYSIS_VIDEO_URL,
   STAGE2_PART3_VIDEO_URL,
   NARRATOR_VIDEO_URL,
+  COVER_AUDIO_URL,
+  VIDEO1_AUDIO_URL,
+  VIDEO2_AUDIO_URL,
   TEACHER_PASSWORD,
   TEACHER_EMAIL,
   FIRESTORE_STAGE2_TESTS_COLLECTION,
@@ -149,6 +150,9 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const [savedProgress] = useState<SavedLearningProgress>(() => loadSavedLearningProgress());
   const [showCover, setShowCover] = useState<boolean>(true);
   const [coverBgRevealed, setCoverBgRevealed] = useState<boolean>(false);
+  const coverAudioRef = useRef<HTMLAudioElement | null>(null);
+  const coverVideoRef = useRef<HTMLVideoElement | null>(null);
+  const [coverAudioBlocked, setCoverAudioBlocked] = useState<boolean>(false);
   // Trình phát video điện ảnh xuyên suốt & Chuyển cảnh mượt mà (Unified Video Player)
   const [introVideoStep, setIntroVideoStep] = useState<'video1' | 'video2' | null>(null);
   const [isVideoFading, setIsVideoFading] = useState<boolean>(false);
@@ -892,14 +896,12 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const [checkedSteps, setCheckedSteps] = useState<Set<number>>(
     () => new Set(savedProgress.checkedSteps || [])
   );
-  const [peerIdeaFormUrl, setPeerIdeaFormUrl] = useState<string>(PEER_ASSESSMENT_IDEA_FORM_URL);
   const [peerIdeaConfirmed, setPeerIdeaConfirmed] = useState<boolean>(
     () => Boolean(savedProgress.peerIdeaConfirmed)
   );
   const [stage3RubricState, setStage3RubricState] = useState<RubricFormState>(() =>
     createInitialRubricFormState()
   );
-  const [stage3AssessTab, setStage3AssessTab] = useState<'rubric' | 'form'>('rubric');
   const [stage6SummaryVideoConfirmed, setStage6SummaryVideoConfirmed] = useState<boolean>(false);
 
   useEffect(() => {
@@ -916,17 +918,15 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const [homeChecks, setHomeChecks] = useState<Set<string>>(() => new Set(savedProgress.homeChecks || []));
   const [productSubmitted, setProductSubmitted] = useState(() => Boolean(savedProgress.productSubmitted));
 
-  // Chặng 5: Ngày hội xanh & Đánh giá Rubric (3 Tiêu chí × 5 Mức) + Form Đồng đẳng (Báo cáo tại lớp)
+  // Chặng 5: Ngày hội xanh & Đánh giá Rubric (3 Tiêu chí × 5 Mức) (Báo cáo tại lớp)
   const [boothChecks, setBoothChecks] = useState<Set<string>>(() => new Set(savedProgress.boothChecks || []));
   const [stage5PresentationSubmitted, setStage5PresentationSubmitted] = useState<boolean>(
     () => Boolean(savedProgress.voteConfirmed)
   );
-  const [peerBoothFormUrl, setPeerBoothFormUrl] = useState<string>(PEER_ASSESSMENT_BOOTH_FORM_URL);
   const [voteConfirmed, setVoteConfirmed] = useState(() => Boolean(savedProgress.voteConfirmed));
   const [stage5RubricState, setStage5RubricState] = useState<RubricFormState>(() =>
     createInitialRubricFormState()
   );
-  const [stage5AssessTab, setStage5AssessTab] = useState<'rubric' | 'form'>('rubric');
 
   // Chặng 6: Tổng kết dự án
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>(
@@ -1440,7 +1440,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const isQ1Done = ansQ1.trim().length > 0 || showSampleQ1;
   const isQ2Done = ansQ2.trim().length > 0 || showSampleQ2;
   const isPart5Done =
-    stage2SteamSubmitted || (isQ1Done && isQ2Done && checkedHomeItems.size >= 1);
+    stage2SteamSubmitted || (isQ1Done && isQ2Done);
 
   const isStage2Done = isPart1Done && isPart2Done && isPart3Done && isPart4Done && isPart5Done;
 
@@ -2247,17 +2247,51 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     };
   }, [introVideoStep, toggleIntroFullscreen, handleTransitionToVideo2, handleTransitionToStage1]);
 
-  // Hiệu ứng điện ảnh Trang Bìa: Con icon hiện ra trước trên nền khung đen (1.4s đầu hoàn toàn đen) -> Ảnh bìa dự án từ từ hiện ra toàn màn hình bên dưới icon (trong 2.2s)
+  // Hiệu ứng điện ảnh Trang Bìa: Con icon hiện ra ở giữa trên nền đen (3s đầu hoàn toàn tối) -> Ảnh bìa từ từ sáng rõ + icon bay về góc dưới phải
   useEffect(() => {
     if (!showCover || introVideoStep !== null) {
       setCoverBgRevealed(false);
+      if (coverAudioRef.current) {
+        coverAudioRef.current.pause();
+        coverAudioRef.current.currentTime = 0;
+      }
       return;
     }
     setCoverBgRevealed(false);
-    const timer = window.setTimeout(() => {
-      setCoverBgRevealed(true);
-    }, 1400);
-    return () => window.clearTimeout(timer);
+    setCoverAudioBlocked(false);
+
+    const audio = coverAudioRef.current;
+    let fallbackTimer: number | null = null;
+    if (audio) {
+      audio.currentTime = 0;
+      audio
+        .play()
+        .then(() => {
+          setCoverAudioBlocked(false);
+          // Bảo hiểm tối đa 6s nếu file mp3 dài hoặc mạng lag
+          fallbackTimer = window.setTimeout(() => {
+            setCoverBgRevealed(true);
+          }, 6000);
+        })
+        .catch(() => {
+          setCoverAudioBlocked(true);
+          fallbackTimer = window.setTimeout(() => {
+            setCoverBgRevealed(true);
+          }, 3000);
+        });
+    } else {
+      fallbackTimer = window.setTimeout(() => {
+        setCoverBgRevealed(true);
+      }, 3000);
+    }
+
+    return () => {
+      if (fallbackTimer) window.clearTimeout(fallbackTimer);
+      if (coverAudioRef.current) {
+        coverAudioRef.current.pause();
+        coverAudioRef.current.currentTime = 0;
+      }
+    };
   }, [showCover, introVideoStep]);
 
   if (showCover) {
@@ -2272,13 +2306,36 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     };
 
     return (
-      <div className="min-h-screen w-full h-screen bg-black text-white flex flex-col font-sans relative overflow-hidden select-none">
-        {/* LỚP 1 (z-10 - NẰM DƯỚI ICON): LÚC ĐẦU ẨN HOÀN TOÀN TRÊN KHUNG ĐEN -> SAU 1.4S TỪ TỪ HIỆN RA TOÀN MÀN HÌNH */}
+      <div
+        onClick={() => {
+          if (coverAudioBlocked && coverAudioRef.current) {
+            coverAudioRef.current.play().then(() => setCoverAudioBlocked(false)).catch(() => {});
+          }
+          if (!coverBgRevealed) setCoverBgRevealed(true);
+        }}
+        className="min-h-screen w-full h-screen bg-black text-white flex flex-col font-sans relative overflow-hidden select-none"
+      >
+        <audio
+          ref={coverAudioRef}
+          src={COVER_AUDIO_URL}
+          preload="auto"
+          onPlaying={() => {
+            if (coverVideoRef.current) {
+              coverVideoRef.current.currentTime = 0;
+              coverVideoRef.current.play().catch(() => {});
+            }
+          }}
+          onEnded={() => {
+            setCoverBgRevealed(true);
+          }}
+        />
+        {/* LỚP 1 (z-10 - NẰM DƯỚI ICON): 3s đầu tối hoàn toàn -> từ từ hiện ra mờ đến sáng rõ */}
         <div
           style={{
             opacity: coverBgRevealed ? 1 : 0,
+            filter: coverBgRevealed ? 'blur(0px)' : 'blur(14px)',
             transform: coverBgRevealed ? 'scale(1)' : 'scale(1.06)',
-            transition: 'opacity 2200ms ease-out, transform 2200ms ease-out',
+            transition: 'opacity 2000ms ease-out, filter 2000ms ease-out, transform 2000ms ease-out',
           }}
           className="absolute inset-0 z-10 w-full h-full pointer-events-none flex items-center justify-center"
         >
@@ -2297,31 +2354,80 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
           />
         </div>
 
-        {/* LỚP 2 (z-20 - NẰM TRÊN ẢNH BÌA): CON ICON (NHÂN VẬT MC AI) HIỆN RA TRƯỚC TRÊN KHUNG ĐEN */}
+        {/* LỚP 2 (z-30): CON ICON (NHÂN VẬT MC AI) Ở GIỮA -> BAY VỀ GÓC DƯỚI PHẢI + NÚT BẮT ĐẦU DỰ ÁN NẰM DƯỚI ICON */}
         <div
-          onClick={() => openIntroVideo('video1', true)}
-          className="absolute bottom-6 right-4 sm:right-8 md:bottom-8 md:right-12 w-44 sm:w-56 md:w-72 lg:w-84 z-20 cursor-pointer group animate-in zoom-in-75 fade-in duration-500"
-          title="Bấm vào nhân vật để xem video mở đầu toàn màn hình"
+          style={{
+            left: coverBgRevealed ? 'calc(100% - 24px)' : '50%',
+            top: coverBgRevealed ? 'calc(100% - 20px)' : '50%',
+            transform: coverBgRevealed ? 'translate(-100%, -100%) scale(1)' : 'translate(-50%, -50%) scale(1.2)',
+            transition:
+              'left 1400ms cubic-bezier(0.22, 1, 0.36, 1), top 1400ms cubic-bezier(0.22, 1, 0.36, 1), transform 1400ms cubic-bezier(0.22, 1, 0.36, 1)',
+          }}
+          className="fixed z-30 flex flex-col items-center gap-2.5 w-44 sm:w-56 md:w-64"
         >
-          <div className="absolute inset-0 rounded-full bg-emerald-400/20 blur-2xl scale-90 group-hover:bg-amber-400/30 transition-all pointer-events-none" />
-          <video
-            src={INTRO_VIDEO_URL}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="relative z-10 w-full h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.85)] group-hover:scale-105 transition-transform duration-300"
-          />
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              openIntroVideo('video1', true);
+            }}
+            className="relative w-full cursor-pointer group animate-in zoom-in-75 fade-in duration-500"
+            title="Bấm vào nhân vật để xem video mở đầu toàn màn hình"
+          >
+            <div className="absolute inset-0 rounded-full bg-emerald-400/25 blur-2xl scale-90 group-hover:bg-amber-400/35 transition-all pointer-events-none" />
+            <video
+              ref={coverVideoRef}
+              src={INTRO_VIDEO_URL}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="relative z-10 w-full h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.85)] group-hover:scale-105 transition-transform duration-300"
+            />
+            {coverAudioBlocked && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (coverAudioRef.current) {
+                    coverAudioRef.current.play().then(() => setCoverAudioBlocked(false)).catch(() => {});
+                  }
+                }}
+                className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 px-3 py-1 rounded-full bg-amber-400 text-indigo-950 font-black text-[11px] shadow-md whitespace-nowrap animate-bounce cursor-pointer"
+              >
+                🔊 Bấm nghe lời chào
+              </button>
+            )}
+          </div>
+
+          {/* Nút BẮT ĐẦU TỪ ĐẦU nằm ngay phía dưới con icon (không che chữ DỰ ÁN) */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              openIntroVideo('video1', true);
+            }}
+            className={`group px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-linear-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:via-amber-600 hover:to-orange-700 text-white font-black text-xs sm:text-sm tracking-wide shadow-[0_10px_28px_rgba(249,115,22,0.55)] hover:scale-105 active:scale-95 transition-all duration-700 flex items-center justify-center gap-1.5 cursor-pointer ring-2 ring-white/85 whitespace-nowrap ${
+              coverBgRevealed ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+            }`}
+            title="Phát video mở đầu và bắt đầu dự án"
+          >
+            <Sparkles className="w-4 h-4 text-white group-hover:rotate-12 transition-transform shrink-0" />
+            <span>BẮT ĐẦU DỰ ÁN</span>
+            <ChevronRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform shrink-0" />
+          </button>
         </div>
 
-        {/* LỚP 3 (z-30): HEADER & NÚT BẮT ĐẦU HÀNH TRÌNH NỔI TRÊN CÙNG */}
+        {/* LỚP 3 (z-30): HEADER (QUAY LẠI + ĐẾN CHẶNG HIỆN TẠI Ở GÓC TRÊN PHẢI) */}
         <header
-          className={`relative z-30 px-4 md:px-8 py-4 flex items-center justify-between gap-3 transition-all duration-1000 ${coverBgRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3'
+          className={`relative z-30 px-4 md:px-8 py-4 flex items-center justify-between gap-3 transition-all duration-1000 ${coverBgRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3 pointer-events-none'
             }`}
         >
           <button
             type="button"
-            onClick={onBack}
+            onClick={(e) => {
+              e.stopPropagation();
+              onBack();
+            }}
             className="flex items-center gap-2 text-indigo-950 hover:text-orange-600 px-5 py-2.5 bg-white/85 hover:bg-white backdrop-blur-md rounded-full border border-white shadow-lg font-bold text-sm cursor-pointer group transition-all"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -2331,7 +2437,10 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
           {/* Nút góc trên dẫn nhanh đến chặng hiện tại */}
           <button
             type="button"
-            onClick={handleGoToCurrentStage}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleGoToCurrentStage();
+            }}
             className="flex items-center gap-2 text-emerald-950 hover:text-emerald-800 px-4 sm:px-5 py-2.5 bg-white/90 hover:bg-white backdrop-blur-md rounded-full border border-emerald-300/80 shadow-lg font-extrabold text-xs sm:text-sm cursor-pointer group transition-all hover:scale-105 active:scale-95"
             title={`Vào thẳng ${currentStageGuide.step}: ${currentStageGuide.label}`}
           >
@@ -2341,37 +2450,6 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             <ChevronRight className="w-4 h-4 text-emerald-600 group-hover:translate-x-1 transition-transform" />
           </button>
         </header>
-
-        <main className="relative z-30 flex-1 flex flex-col items-center justify-end px-4 md:px-8 pb-7 md:pb-10 max-w-6xl mx-auto w-full pointer-events-none">
-          <div
-            className={`flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pointer-events-auto transition-all duration-1000 ${coverBgRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-              }`}
-          >
-            {/* NÚT 1: BẮT ĐẦU TỪ ĐẦU (XEM VIDEO) */}
-            <button
-              type="button"
-              onClick={() => openIntroVideo('video1', true)}
-              className="group relative w-full sm:w-auto px-7 md:px-10 py-3.5 md:py-4 rounded-full bg-linear-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:via-amber-600 hover:to-orange-700 text-white font-black text-sm md:text-lg tracking-wide shadow-[0_12px_35px_rgba(249,115,22,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer ring-4 ring-white/80"
-              title="Phát video mở đầu và giới thiệu dự án từ đầu"
-            >
-              <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white group-hover:rotate-12 transition-transform" />
-              <span>BẮT ĐẦU TỪ ĐẦU (XEM VIDEO)</span>
-              <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-white group-hover:translate-x-1.5 transition-transform" />
-            </button>
-
-            {/* NÚT 2: ĐẾN CHẶNG HIỆN TẠI (VÀO THẲNG BÀI HỌC) */}
-            <button
-              type="button"
-              onClick={handleGoToCurrentStage}
-              className="group relative w-full sm:w-auto px-7 md:px-10 py-3.5 md:py-4 rounded-full bg-linear-to-r from-emerald-500 via-teal-500 to-cyan-600 hover:from-emerald-600 hover:via-teal-600 hover:to-cyan-700 text-white font-black text-sm md:text-lg tracking-wide shadow-[0_12px_35px_rgba(16,185,129,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer ring-4 ring-white/80"
-              title={`Bỏ qua video, vào thẳng ${currentStageGuide.step}: ${currentStageGuide.label}`}
-            >
-              <span className="text-lg md:text-xl">{currentStageGuide.emoji}</span>
-              <span>ĐẾN {currentStageGuide.step.toUpperCase()}: {currentStageGuide.label.toUpperCase()}</span>
-              <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-white group-hover:translate-x-1.5 transition-transform" />
-            </button>
-          </div>
-        </main>
 
         {/* Preload ngầm Video 2 để khi chuyển từ Video 1 sang Video 2 là phát tức thì, 0s giật mạng */}
         <video
@@ -2403,39 +2481,57 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             {/* VIDEO PHÁT TOÀN MÀN HÌNH (TRUE FULLSCREEN DISPLAY) */}
             <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-black">
               {introVideoStep === 'video1' ? (
-                <video
-                  key="intro-video-1"
-                  src={INTRO_VIDEO_URL}
-                  autoPlay
-                  controls
-                  playsInline
-                  onEnded={handleTransitionToVideo2}
-                  onTimeUpdate={(e) => {
-                    const v = e.currentTarget;
-                    if (v.duration > 0 && v.currentTime >= v.duration - 0.28) {
-                      handleTransitionToVideo2();
-                    }
-                  }}
-                  className={`w-full h-full transition-all duration-300 ${isVideoCoverFit ? 'object-cover' : 'object-contain'
-                    } ${isVideoFading ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}
-                />
+                <>
+                  <audio
+                    key="intro-video-1-audio"
+                    src={VIDEO1_AUDIO_URL}
+                    autoPlay
+                    preload="auto"
+                    onEnded={handleTransitionToVideo2}
+                    onTimeUpdate={(e) => {
+                      const a = e.currentTarget;
+                      if (a.duration > 0 && a.currentTime >= a.duration - 0.28) {
+                        handleTransitionToVideo2();
+                      }
+                    }}
+                  />
+                  <video
+                    key="intro-video-1"
+                    src={INTRO_VIDEO_URL}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className={`w-full h-full transition-all duration-300 ${isVideoCoverFit ? 'object-cover' : 'object-contain'
+                      } ${isVideoFading ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}
+                  />
+                </>
               ) : (
-                <video
-                  key="intro-video-2"
-                  src={PROJECT_INTRO_VIDEO_URL}
-                  autoPlay
-                  controls
-                  playsInline
-                  onEnded={handleTransitionToStage1}
-                  onTimeUpdate={(e) => {
-                    const v = e.currentTarget;
-                    if (v.duration > 0 && v.currentTime >= v.duration - 0.28) {
-                      handleTransitionToStage1();
-                    }
-                  }}
-                  className={`w-full h-full transition-all duration-300 ${isVideoCoverFit ? 'object-cover' : 'object-contain'
-                    } ${isVideoFading ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}
-                />
+                <>
+                  <audio
+                    key="intro-video-2-audio"
+                    src={VIDEO2_AUDIO_URL}
+                    autoPlay
+                    preload="auto"
+                    onEnded={handleTransitionToStage1}
+                    onTimeUpdate={(e) => {
+                      const a = e.currentTarget;
+                      if (a.duration > 0 && a.currentTime >= a.duration - 0.28) {
+                        handleTransitionToStage1();
+                      }
+                    }}
+                  />
+                  <video
+                    key="intro-video-2"
+                    src={PROJECT_INTRO_VIDEO_URL}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className={`w-full h-full transition-all duration-300 ${isVideoCoverFit ? 'object-cover' : 'object-contain'
+                      } ${isVideoFading ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}
+                  />
+                </>
               )}
             </div>
 
@@ -2540,37 +2636,13 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const renderStageGuideBanner = (stageId: StageId) => {
     const g = STAGE_DETAILED_GUIDES[stageId];
     return (
-      <div className="bg-linear-to-r from-amber-50/95 via-orange-50/90 to-indigo-50/90 border-2 border-amber-300/80 rounded-3xl p-4 md:p-5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
-        <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-linear-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center font-black text-xl shadow-md shadow-orange-500/20 shrink-0">
-            {g.emoji}
-          </div>
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] font-black uppercase tracking-wider text-orange-800 bg-orange-100/90 px-2.5 py-0.5 rounded-full border border-orange-200">
-                {g.step} • {g.place}
-              </span>
-              <span className="text-[11px] font-bold text-slate-500">
-                ⏱️ Ước tính: {g.estimatedTime}
-              </span>
-            </div>
-            <h3 className="text-sm md:text-base font-black text-indigo-950 mt-1">
-              {g.title}
-            </h3>
-          </div>
+      <div className="bg-linear-to-r from-amber-50/95 via-orange-50/90 to-indigo-50/90 border-2 border-amber-300/80 rounded-3xl px-4 py-3 flex items-center gap-3 shadow-xs">
+        <div className="w-10 h-10 rounded-2xl bg-linear-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center font-black text-lg shadow-md shadow-orange-500/20 shrink-0">
+          {g.emoji}
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            setSelectedGuideStage(stageId);
-            setShowStageGuideModal(true);
-          }}
-          className="px-4 py-2 rounded-2xl bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-sm hover:scale-[1.02] active:scale-95 transition-all cursor-pointer shrink-0"
-        >
-          <BookOpen className="w-3.5 h-3.5" />
-          <span>📖 Hướng dẫn {g.step}</span>
-          <ChevronRight className="w-3.5 h-3.5" />
-        </button>
+        <h3 className="text-sm md:text-base font-black text-indigo-950">
+          {g.step}: {g.title}
+        </h3>
       </div>
     );
   };
@@ -2598,7 +2670,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-indigo-50 hover:bg-orange-50 text-indigo-900 hover:text-orange-600 font-bold text-xs border border-indigo-200/80 cursor-pointer"
           >
             <BookOpen className="w-3.5 h-3.5 text-orange-500" />
-            <span>Bìa dự án</span>
+            <span>Bìa</span>
           </button>
 
           <button
@@ -2606,30 +2678,30 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             onClick={() => {
               openIntroVideo('video2', true);
             }}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-indigo-50 hover:bg-orange-50 text-indigo-900 hover:text-orange-600 font-bold text-xs border border-indigo-200/80 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 hover:bg-orange-50 text-indigo-900 hover:text-orange-600 font-bold text-xs border border-indigo-200/80 cursor-pointer"
           >
             <Play className="w-3.5 h-3.5 text-orange-500 fill-orange-500" />
-            <span>Giới thiệu dự án</span>
+            <span>Video</span>
           </button>
 
           <button
             type="button"
             onClick={() => setShowNewWordsModal(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-extrabold text-xs border border-emerald-200 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-extrabold text-xs border border-emerald-200 cursor-pointer"
             title="Từ vựng Tiếng Anh Khoa học tự nhiên (New Words) kèm phát âm chuẩn"
           >
             <Volume2 className="w-3.5 h-3.5 text-emerald-600" />
-            <span>🇬🇧 New Words</span>
+            <span>New Words</span>
           </button>
 
           <button
             type="button"
             onClick={() => setShowReferencesModal(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-indigo-50 hover:bg-orange-50 text-indigo-900 hover:text-orange-600 font-bold text-xs border border-indigo-200/80 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 hover:bg-orange-50 text-indigo-900 hover:text-orange-600 font-bold text-xs border border-indigo-200/80 cursor-pointer"
             title="Xem danh mục Tài liệu tham khảo & Nguồn học liệu của dự án"
           >
             <FileText className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Tài liệu tham khảo</span>
+            <span>Tài liệu</span>
           </button>
 
           <button
@@ -2641,7 +2713,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             title="Xuất toàn bộ nội dung 6 chặng của dự án ra file Word (.docx)"
           >
             <Download className="w-3.5 h-3.5 text-sky-700" />
-            <span>Xuất Word 6 chặng</span>
+            <span>Xuất Word</span>
           </button>
 
           <button
@@ -2661,11 +2733,11 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             title="Xóa tiến trình lưu tạm trên máy này để học lại từ đầu"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Làm lại từ đầu</span>
+            <span className="hidden sm:inline">Làm lại</span>
           </button>
 
           <h1 className="text-sm md:text-base font-black text-indigo-950 ml-1">
-            🌱 Dự án &ldquo;Bắt đầu từ sự kết thúc&rdquo; — Tinh bột &amp; Cellulose
+            🌱 Tinh bột &amp; Cellulose
           </h1>
         </div>
 
@@ -2685,7 +2757,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                 }`}
             >
               <Lock className="w-3 h-3" />
-              <span>Chế độ HS</span>
+              <span>HS</span>
             </button>
             <button
               type="button"
@@ -2702,7 +2774,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
               title="Chế độ dành cho Giám khảo: Không cần mật khẩu, mở tất cả chặng & xem tất cả kết quả"
             >
               <Award className="w-3 h-3" />
-              <span>{isJudgeMode ? 'Giám khảo (Mở tất cả)' : 'Giám khảo'}</span>
+              <span>Giám khảo</span>
             </button>
             <button
               type="button"
@@ -2719,7 +2791,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                 }`}
             >
               <Unlock className="w-3 h-3" />
-              <span>{isTeacherMode ? 'Chế độ GV (Mở hết chặng)' : 'Chế độ GV'}</span>
+              <span>GV</span>
             </button>
           </div>
 
@@ -2735,7 +2807,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                 title="Xem toàn bộ kết quả kiểm tra, Rubric & Bảng kiểm của các nhóm"
               >
                 <BarChart3 className="w-3.5 h-3.5" />
-                <span>{isJudgeMode ? 'Xem tất cả kết quả' : 'Bảng Tổng hợp Lớp'}</span>
+                <span>Kết quả</span>
               </button>
               <button
                 type="button"
@@ -2743,7 +2815,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                 className="px-3 py-1.5 rounded-full bg-amber-100 hover:bg-amber-200 text-orange-900 border border-amber-300 font-black text-xs flex items-center gap-1 cursor-pointer"
               >
                 <Eye className="w-3.5 h-3.5 text-orange-600" />
-                <span>Mở tất cả ô</span>
+                <span>Mở hết</span>
               </button>
             </>
           )}
@@ -2960,45 +3032,30 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                   </div>
                 )}
 
-                {/* Thanh cấu hình kênh thu nhận báo cáo (Chống tràn 50 email + Google Sheets Webhook) */}
-                <div className="bg-white border border-indigo-100 rounded-2xl p-3.5 shadow-2xs flex flex-col gap-2.5">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <label className="flex items-center gap-2 text-xs font-bold text-indigo-950 cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={sendIndividualEmails}
-                        onChange={(e) => {
-                          const checked = e.target.checked;
-                          setSendIndividualEmails(checked);
-                          try {
-                            window.localStorage.setItem(LOCAL_SEND_INDIVIDUAL_EMAIL_KEY, String(checked));
-                          } catch {
-                            // ignore
-                          }
-                        }}
-                        className="w-4 h-4 accent-indigo-600 rounded-sm cursor-pointer"
-                      />
-                      <Mail className="w-3.5 h-3.5 text-indigo-600" />
-                      <span>
-                        Gửi kèm Email lẻ từng bài về <code>{TEACHER_EMAIL}</code>
-                      </span>
-                      <span className="text-[11px] font-medium text-slate-500">
-                        (Nên TẮT khi cho 50 HS làm cùng lúc để tránh tràn hộp thư Gmail — dữ liệu vẫn tự lưu vào Bảng này)
-                      </span>
-                    </label>
+                {/* Thanh cấu hình kênh thu nhận báo cáo gọn nhẹ */}
+                <div className="bg-white border border-indigo-100 rounded-2xl p-3 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+                  <label className="flex items-center gap-2 text-xs font-bold text-indigo-950 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={sendIndividualEmails}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setSendIndividualEmails(checked);
+                        try {
+                          window.localStorage.setItem(LOCAL_SEND_INDIVIDUAL_EMAIL_KEY, String(checked));
+                        } catch {
+                          // ignore
+                        }
+                      }}
+                      className="w-4 h-4 accent-indigo-600 rounded-sm cursor-pointer"
+                    />
+                    <Mail className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>
+                      Gửi kèm Email lẻ từng bài về <code>{TEACHER_EMAIL}</code>
+                    </span>
+                  </label>
 
-                    <button
-                      type="button"
-                      onClick={() => setShowSheetHelp((v) => !v)}
-                      className="text-xs font-black text-emerald-700 hover:text-emerald-900 underline cursor-pointer shrink-0"
-                    >
-                      {showSheetHelp ? 'Ẩn hướng dẫn & Mã Apps Script' : '📗 Lấy mã Apps Script kết nối 3 Google Sheets'}
-                    </button>
-                  </div>
-
-                  {/* 3 NÚT MỞ NHANH 3 FILE GOOGLE SHEETS CỦA THẦY TRẦN VĂN LĨNH */}
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    <span className="text-[11px] font-black text-slate-600">📊 Mở nhanh Google Sheets của Thầy:</span>
+                  <div className="flex flex-wrap items-center gap-2">
                     <a
                       href={TEACHER_SCORE_SHEET_URL}
                       target="_blank"
@@ -3006,7 +3063,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                       className="px-3 py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-[11px] font-black flex items-center gap-1"
                     >
                       <ExternalLink className="w-3 h-3" />
-                      <span>1. Điểm Kiểm tra Chặng 2</span>
+                      <span>1. Điểm Chặng 2</span>
                     </a>
                     <a
                       href={TEACHER_PEER_RUBRIC_SHEET_URL}
@@ -3027,95 +3084,6 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                       <span>3. Tự đánh giá</span>
                     </a>
                   </div>
-
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                    <span className="text-[11px] font-black text-slate-600 shrink-0">
-                      🔗 Link Web App Apps Script:
-                    </span>
-                    <input
-                      type="url"
-                      value={googleSheetWebhookUrl}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setGoogleSheetWebhookUrl(val);
-                        setSheetTestFeedback(null);
-                        try {
-                          window.localStorage.setItem(LOCAL_SHEET_WEBHOOK_KEY, val.trim());
-                        } catch {
-                          // ignore
-                        }
-                      }}
-                      placeholder="Dán link https://script.google.com/macros/s/.../exec sau khi Deploy để tự ghi vào cả 3 Sheets..."
-                      className="flex-1 rounded-xl bg-slate-50 border border-slate-200 px-3 py-1.5 text-xs font-medium text-indigo-950 outline-none focus:border-emerald-500"
-                    />
-                    <button
-                      type="button"
-                      disabled={!googleSheetWebhookUrl.trim()}
-                      onClick={async () => {
-                        setSheetTestFeedback('⏳ Đang gửi dòng kiểm tra...');
-                        try {
-                          await fetch(googleSheetWebhookUrl.trim(), {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                            body: JSON.stringify({
-                              sheetType: 'stage2_test',
-                              submittedAt: new Date().toLocaleString('vi-VN'),
-                              studentName: 'Học sinh Test Kết nối',
-                              studentClass: '9A1',
-                              studentSchool: 'THCS',
-                              score: 10,
-                              maxScore: 10,
-                              percent: '100%',
-                              rank: 'Xuất sắc (Test)',
-                            }),
-                          });
-                          setSheetTestFeedback('✅ Đã gửi thử 1 dòng! Thầy mở Sheet "Điểm kiểm tra kiến thức nền" kiểm tra xem đã nhảy dòng chưa nhé!');
-                        } catch {
-                          setSheetTestFeedback('❌ Không gửi được tới link này. Thầy kiểm tra lại link Web App và quyền "Anyone" nhé!');
-                        }
-                      }}
-                      className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-black text-xs cursor-pointer shrink-0"
-                    >
-                      🧪 Gửi thử 1 dòng
-                    </button>
-                  </div>
-
-                  {sheetTestFeedback && (
-                    <div className="text-[11px] font-bold text-emerald-900 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
-                      {sheetTestFeedback}
-                    </div>
-                  )}
-
-                  {showSheetHelp && (
-                    <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3 text-[11px] text-emerald-950 space-y-2">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className="font-black">
-                          📌 Chỉ cần Deploy 1 Apps Script duy nhất là tự ghi vào đúng cả 3 file Google Sheets của Thầy!
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            navigator.clipboard?.writeText(GOOGLE_APPS_SCRIPT_TEMPLATE);
-                            setScriptCopied(true);
-                            setTimeout(() => setScriptCopied(false), 3000);
-                          }}
-                          className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] cursor-pointer"
-                        >
-                          {scriptCopied ? '✅ Đã copy mã Apps Script!' : '📋 Copy nhanh mã Apps Script'}
-                        </button>
-                      </div>
-                      <p className="leading-relaxed">
-                        1. Mở link <strong>Điểm kiểm tra kiến thức nền</strong> ở trên → chọn <strong>Tiện ích mở rộng → Apps Script</strong>.<br />
-                        2. Xóa code cũ và dán đoạn mã vừa copy (đã gắn sẵn ID của cả 3 file Google Sheets của thầy) → Lưu lại.<br />
-                        3. Bấm <strong>Triển khai (Deploy) → Tùy chọn triển khai mới → Loại: Ứng dụng web (Web app) → Người có quyền truy cập: Bất kỳ ai (Anyone)</strong> → Bấm Triển khai &amp; Cấp quyền.<br />
-                        4. Copy URL Web App (<code>https://script.google.com/macros/s/.../exec</code>) dán vào ô bên trên (hoặc gửi cho trợ lý gắn cứng vào code để cả 50 máy HS tự gửi!).
-                      </p>
-                      <pre className="bg-slate-900 text-emerald-300 p-2.5 rounded-xl text-[10px] overflow-x-auto max-h-40 font-mono">
-                        {GOOGLE_APPS_SCRIPT_TEMPLATE}
-                      </pre>
-                    </div>
-                  )}
                 </div>
 
                 {/* Thanh chuyển Tab + Tìm kiếm & Lọc lớp */}
@@ -3704,7 +3672,6 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         {activeStage === 'stage-3' && (
           <Stage3View
             guideBanner={renderStageGuideBanner('stage-3')}
-            isTeacherMode={isTeacherMode || isJudgeMode}
             unlockedTaskIds={unlockedTaskIds}
             unlockTask={unlockTask}
             lockTask={lockTask}
@@ -3714,12 +3681,8 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             presenterName={presenterName}
             setPresenterName={setPresenterName}
             isStage32Done={isStage32Done}
-            peerIdeaFormUrl={peerIdeaFormUrl}
-            setPeerIdeaFormUrl={setPeerIdeaFormUrl}
             peerIdeaConfirmed={peerIdeaConfirmed}
             setPeerIdeaConfirmed={setPeerIdeaConfirmed}
-            stage3AssessTab={stage3AssessTab}
-            setStage3AssessTab={setStage3AssessTab}
             stage3RubricState={stage3RubricState}
             setStage3RubricState={setStage3RubricState}
             stage3RubricSummary={stage3RubricSummary}
@@ -3748,7 +3711,6 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         {activeStage === 'stage-5' && (
           <Stage5View
             guideBanner={renderStageGuideBanner('stage-5')}
-            isTeacherMode={isTeacherMode || isJudgeMode}
             unlockedTaskIds={unlockedTaskIds}
             unlockTask={unlockTask}
             lockTask={lockTask}
@@ -3757,12 +3719,8 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             toggleSetItem={toggleSetItem}
             stage5PresentationSubmitted={stage5PresentationSubmitted}
             setStage5PresentationSubmitted={setStage5PresentationSubmitted}
-            peerBoothFormUrl={peerBoothFormUrl}
-            setPeerBoothFormUrl={setPeerBoothFormUrl}
             voteConfirmed={voteConfirmed}
             setVoteConfirmed={setVoteConfirmed}
-            stage5AssessTab={stage5AssessTab}
-            setStage5AssessTab={setStage5AssessTab}
             stage5RubricState={stage5RubricState}
             setStage5RubricState={setStage5RubricState}
             stage5RubricSummary={stage5RubricSummary}
@@ -3796,6 +3754,12 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             setStage6GameMode={setStage6GameMode}
             poseGameKey={poseGameKey}
             setPoseGameKey={setPoseGameKey}
+            isPoseGameUnlocked={isPoseGameUnlocked || isTeacherMode}
+            poseGamePassInput={poseGamePassInput}
+            setPoseGamePassInput={setPoseGamePassInput}
+            poseGamePassError={poseGamePassError}
+            setPoseGamePassError={setPoseGamePassError}
+            handleUnlockPoseGame={handleUnlockPoseGame}
             stage6AssessTab={stage6AssessTab}
             setStage6AssessTab={setStage6AssessTab}
             stage6SelfStudentName={stage6SelfStudentName}

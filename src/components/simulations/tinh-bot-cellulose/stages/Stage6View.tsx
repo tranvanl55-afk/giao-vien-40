@@ -12,6 +12,7 @@ import {
   Users,
   Crown,
   User,
+  Lock,
 } from 'lucide-react';
 import {
   STAGE6_SUMMARY_VIDEO_DRIVE_URL,
@@ -54,6 +55,12 @@ interface Stage6ViewProps {
   setStage6GameMode: React.Dispatch<React.SetStateAction<'pose_game' | 'quiz'>>;
   poseGameKey: number;
   setPoseGameKey: React.Dispatch<React.SetStateAction<number>>;
+  isPoseGameUnlocked: boolean;
+  poseGamePassInput: string;
+  setPoseGamePassInput: React.Dispatch<React.SetStateAction<string>>;
+  poseGamePassError: string | null;
+  setPoseGamePassError: React.Dispatch<React.SetStateAction<string | null>>;
+  handleUnlockPoseGame: () => void;
   stage6AssessTab: 'self' | 'leader' | 'teacher';
   setStage6AssessTab: React.Dispatch<React.SetStateAction<'self' | 'leader' | 'teacher'>>;
   stage6SelfStudentName: string;
@@ -119,6 +126,12 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
   setStage6GameMode,
   poseGameKey,
   setPoseGameKey,
+  isPoseGameUnlocked,
+  poseGamePassInput,
+  setPoseGamePassInput,
+  poseGamePassError,
+  setPoseGamePassError,
+  handleUnlockPoseGame,
   stage6AssessTab,
   setStage6AssessTab,
   stage6SelfStudentName,
@@ -241,21 +254,61 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>{quizSubmitted ? '✓ Đã hoàn thành Chặng 6' : 'Xác nhận hoàn thành Trò chơi'}</span>
                   </button>
-                  <a
-                    href="/trac-nghiem-tao-dang.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black flex items-center gap-1.5 shadow-xs cursor-pointer"
-                    title="Mở trò chơi toàn màn hình trên Smart TV / Máy chiếu lớp học"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>Chiếu Smart TV</span>
-                  </a>
+                  {isPoseGameUnlocked && (
+                    <a
+                      href="/trac-nghiem-tao-dang.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black flex items-center gap-1.5 shadow-xs cursor-pointer"
+                      title="Mở trò chơi toàn màn hình trên Smart TV / Máy chiếu lớp học"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Chiếu Smart TV</span>
+                    </a>
+                  )}
                 </div>
               </div>
 
               {/* NỘI DUNG 1: TRÒ CHƠI VẬN ĐỘNG BODY POSE QUIZ TRÊN SMART TV */}
               {stage6GameMode === 'pose_game' ? (
+                !isPoseGameUnlocked ? (
+                  <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-6 flex flex-col items-center text-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shadow-xs">
+                      <Lock className="w-6 h-6" />
+                    </div>
+                    <h4 className="text-sm font-black text-indigo-950">
+                      Game Vận động Smart TV cần mật khẩu Giáo viên
+                    </h4>
+                    <p className="text-xs text-indigo-900/75 max-w-md font-medium">
+                      Giáo viên nhập mật khẩu để mở trò chơi vận động cho cả lớp trên Smart TV. Học sinh có thể làm bài ở tab <strong>Làm bài Trắc nghiệm cá nhân</strong> bên trên.
+                    </p>
+                    <div className="flex flex-wrap items-center justify-center gap-2 w-full max-w-sm mt-1">
+                      <input
+                        type="password"
+                        value={poseGamePassInput}
+                        onChange={(e) => {
+                          setPoseGamePassInput(e.target.value);
+                          setPoseGamePassError(null);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleUnlockPoseGame();
+                        }}
+                        placeholder="Nhập mật khẩu Giáo viên..."
+                        className="flex-1 min-w-44 px-3.5 py-2 rounded-xl border border-amber-300 bg-white text-xs font-bold text-indigo-950 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleUnlockPoseGame}
+                        className="px-4 py-2 rounded-xl bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-black shadow-xs cursor-pointer"
+                      >
+                        Mở khóa Game
+                      </button>
+                    </div>
+                    {poseGamePassError && (
+                      <p className="text-xs font-bold text-rose-600">{poseGamePassError}</p>
+                    )}
+                  </div>
+                ) : (
                 <div className="flex flex-col gap-3">
                   <div className="rounded-2xl overflow-hidden border border-indigo-200 shadow-sm relative bg-black aspect-video sm:aspect-16/10">
                     <iframe
@@ -284,6 +337,7 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                     </button>
                   </div>
                 </div>
+                )
               ) : (
                 /* NỘI DUNG 2: BÀI TRẮC NGHIỆM TRUYỀN THỐNG CÁ NHÂN */
                 <div className="flex flex-col gap-3">

@@ -175,6 +175,7 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
   });
   const [roomCodeInput, setRoomCodeInput] = useState<string>(roomCode);
   const [syncStatus, setSyncStatus] = useState<'connecting' | 'live' | 'offline'>('connecting');
+  const [syncError, setSyncError] = useState<string | null>(null);
   const prevRemoteStartedRef = useRef<boolean>(false);
 
   // Active mini-game state
@@ -241,6 +242,7 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
       q,
       (snap) => {
         setSyncStatus('live');
+        setSyncError(null);
         const events = snap.docs
           .map((d) => d.data() as { targetGroup?: string; totalPoints?: number; createdAtMs?: number })
           .sort((a, b) => Number(a.createdAtMs || 0) - Number(b.createdAtMs || 0));
@@ -272,7 +274,9 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
         }
         prevRemoteStartedRef.current = remoteStarted;
       },
-      () => {
+      (err: unknown) => {
+        const msg = (err as { code?: string; message?: string })?.code || (err as { message?: string })?.message || 'read-error';
+        setSyncError(msg);
         setSyncStatus('offline');
       }
     );
@@ -378,7 +382,9 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
         targetGroup,
         totalPoints,
         createdAtMs: Date.now(),
-      }).catch(() => {
+      }).catch((err: unknown) => {
+        const msg = (err as { code?: string; message?: string })?.code || (err as { message?: string })?.message || 'write-error';
+        setSyncError(msg);
         setSyncStatus('offline');
       });
     },
@@ -1038,8 +1044,12 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
                     : 'bg-rose-400'
                 }`}
               />
-              <span className="text-slate-700">
-                {syncStatus === 'live' ? 'Đồng bộ Live:' : syncStatus === 'connecting' ? 'Đang kết nối...' : 'Offline:'}
+              <span className="text-slate-700" title={syncError || undefined}>
+                {syncStatus === 'live'
+                  ? 'Đồng bộ Live:'
+                  : syncStatus === 'connecting'
+                  ? 'Đang kết nối...'
+                  : `Offline${syncError ? ` (${syncError})` : ''}:`}
               </span>
               <input
                 type="text"

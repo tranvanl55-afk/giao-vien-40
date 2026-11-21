@@ -114,15 +114,7 @@ export function Stage4View({
               </div>
             </LockedTaskBox>
 
-            <div className="bg-white/90 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
-              <div className="flex flex-wrap gap-3 text-xs font-bold">
-                <span className={homeChecks.size === 3 ? 'text-emerald-700' : 'text-indigo-900/60'}>
-                  {homeChecks.size === 3 ? '✅' : '⏳'} Ô 4.1: Hoàn thành {homeChecks.size}/3 bước tại nhà
-                </span>
-                <span className={productSubmitted ? 'text-emerald-700' : 'text-indigo-900/60'}>
-                  {productSubmitted ? '✅' : '⏳'} Ô 4.2: Nộp minh chứng Padlet
-                </span>
-              </div>
+            <div className="flex justify-end">
               <button
                 type="button"
                 onClick={() => onNextStage()}
@@ -132,7 +124,7 @@ export function Stage4View({
                   }`}
               >
                 {isNextStageUnlocked ? <Unlock className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
-                <span>Sang Chặng 5: Ngày hội xanh (Báo cáo tại lớp)</span>
+                <span>Sang Chặng 5: Ngày hội xanh</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>

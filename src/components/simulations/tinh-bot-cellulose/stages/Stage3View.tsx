@@ -20,7 +20,6 @@ import { RubricInteractivePanel } from '../components/RubricInteractivePanel';
 
 interface Stage3ViewProps {
   guideBanner: React.ReactNode;
-  isTeacherMode: boolean;
   unlockedTaskIds: Set<string>;
   unlockTask: (id: string) => void;
   lockTask: (id: string) => void;
@@ -30,12 +29,8 @@ interface Stage3ViewProps {
   presenterName: string;
   setPresenterName: React.Dispatch<React.SetStateAction<string>>;
   isStage32Done: boolean;
-  peerIdeaFormUrl: string;
-  setPeerIdeaFormUrl: React.Dispatch<React.SetStateAction<string>>;
   peerIdeaConfirmed: boolean;
   setPeerIdeaConfirmed: React.Dispatch<React.SetStateAction<boolean>>;
-  stage3AssessTab: 'rubric' | 'form';
-  setStage3AssessTab: React.Dispatch<React.SetStateAction<'rubric' | 'form'>>;
   stage3RubricState: RubricFormState;
   setStage3RubricState: React.Dispatch<React.SetStateAction<RubricFormState>>;
   stage3RubricSummary: { answeredCount: number; isComplete: boolean; totalPoints: number };
@@ -53,7 +48,6 @@ interface Stage3ViewProps {
 
 export function Stage3View({
   guideBanner,
-  isTeacherMode,
   unlockedTaskIds,
   unlockTask,
   lockTask,
@@ -63,12 +57,8 @@ export function Stage3View({
   presenterName,
   setPresenterName,
   isStage32Done,
-  peerIdeaFormUrl,
-  setPeerIdeaFormUrl,
   peerIdeaConfirmed,
   setPeerIdeaConfirmed,
-  stage3AssessTab,
-  setStage3AssessTab,
   stage3RubricState,
   setStage3RubricState,
   stage3RubricSummary,
@@ -202,7 +192,7 @@ export function Stage3View({
       <LockedTaskBox
         taskId="task-s3-peer"
         badgeText="Chặng 3 • 3.3"
-        title="3.3. Đánh giá Ý tưởng & Quy trình theo Rubric (5 Tiêu chí × 5 Mức độ) & Form đồng đẳng"
+        title="3.3. Đánh giá Ý tưởng & Quy trình theo Rubric (5 Tiêu chí × 5 Mức độ)"
         emoji="📊"
         isUnlocked={unlockedTaskIds.has('task-s3-peer')}
         isCompleted={peerIdeaConfirmed}
@@ -210,168 +200,41 @@ export function Stage3View({
         onLock={lockTask}
       >
         <div className="flex flex-col gap-4">
-          {/* THANH CHUYỂN CHẾ ĐỘ: BẢNG RUBRIC TƯƠNG TÁC vs BIỂU MẪU GOOGLE FORM */}
-          <div className="flex flex-wrap items-center justify-between gap-2 bg-indigo-50/80 p-2 rounded-2xl border border-indigo-200">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setStage3AssessTab('rubric')}
-                className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${stage3AssessTab === 'rubric'
-                  ? 'bg-linear-to-r from-indigo-600 to-purple-600 text-white shadow-xs'
-                  : 'bg-white text-indigo-900 hover:bg-indigo-100'
-                  }`}
-              >
-                <span>✅</span>
-                <span>Bảng kiểm 5 mức độ trực tiếp (5 tiêu chí)</span>
-              </button>
-              {(peerIdeaFormUrl || isTeacherMode) && (
-                <button
-                  type="button"
-                  onClick={() => setStage3AssessTab('form')}
-                  className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${stage3AssessTab === 'form'
-                    ? 'bg-linear-to-r from-orange-500 to-amber-500 text-white shadow-xs'
-                    : 'bg-white text-indigo-900 hover:bg-indigo-100'
-                    }`}
-                >
-                  <span>📋</span>
-                  <span>Biểu mẫu Google Form đồng đẳng</span>
-                </button>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black px-3 py-1.5 rounded-full bg-white border border-indigo-200 text-indigo-950">
-                Điểm Bảng kiểm:{' '}
-                <strong className="text-orange-600">{stage3RubricSummary.totalPoints}/10</strong> (
-                {stage3RubricSummary.answeredCount}/{STAGE3_RUBRIC_CRITERIA.length} tiêu chí)
-              </span>
-            </div>
+          <div className="flex items-center justify-end">
+            <span className="text-xs font-black px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-950">
+              Điểm Bảng kiểm:{' '}
+              <strong className="text-orange-600">{stage3RubricSummary.totalPoints}/10</strong> (
+              {stage3RubricSummary.answeredCount}/{STAGE3_RUBRIC_CRITERIA.length} tiêu chí)
+            </span>
           </div>
 
-          {stage3AssessTab === 'rubric' ? (
-            <RubricInteractivePanel
-              mode="checklist"
-              stageShortLabel="Chặng 3"
-              stageFullTitle="Chặng 3: Ý tưởng (3.1) & Quy trình (3.2)"
-              rubricSubtitle="5 tiêu chí (25% – 20% – 25% – 15% – 15%) đánh giá bản thiết kế ý tưởng và quy trình kỹ thuật."
-              feedbackLabel="💬 Nhận xét phản hồi (Ưu điểm & Góp ý để nhóm hoàn thiện bản thiết kế trước khi làm sản phẩm ở Chặng 4):"
-              feedbackPlaceholder="Ví dụ: Cơ sở khoa học Bài 30 rõ, quy trình định lượng đủ gam/ml. Nhóm nên bổ sung bước lọc bã thừa để tránh tắc bồn rửa..."
-              criteria={STAGE3_RUBRIC_CRITERIA}
-              state={stage3RubricState}
-              onChangeState={setStage3RubricState}
-              onResetConfirm={() => setPeerIdeaConfirmed(false)}
-              onSubmit={() =>
-                submitRubricEvaluation({
-                  stage: 'stage-3',
-                  stageLabel: 'Chặng 3',
-                  criteria: STAGE3_RUBRIC_CRITERIA,
-                  state: stage3RubricState,
-                  setState: setStage3RubricState,
-                  onConfirmed: () => setPeerIdeaConfirmed(true),
-                })
-              }
-              teacherEmail={TEACHER_EMAIL}
-            />
-          ) : (
-            <div className="flex flex-col gap-3">
-              {/* Header thanh điều hướng Form */}
-              <div className="bg-indigo-50/70 border border-indigo-200 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-orange-500 text-white flex items-center justify-center text-lg shrink-0 shadow-xs">
-                    📋
-                  </div>
-                  <div>
-                    <div className="text-xs sm:text-sm font-black text-indigo-950">
-                      Phiếu đánh giá đồng đẳng Ý tưởng dự án (Biểu mẫu Google Form)
-                    </div>
-                    <p className="text-[11px] text-indigo-900/70 font-medium">
-                      Học sinh lắng nghe nhóm bạn báo cáo ý tưởng và điền phiếu đánh giá đồng đẳng qua Form bên dưới.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  {peerIdeaFormUrl && (
-                    <a
-                      href={peerIdeaFormUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-full bg-linear-to-r from-orange-500 to-amber-500 text-white font-black text-xs flex items-center gap-1.5 shadow-xs"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>Mở Form tab mới</span>
-                    </a>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPeerIdeaConfirmed(true);
-                      confetti({ particleCount: 60, spread: 55, origin: { y: 0.65 } });
-                    }}
-                    className={`px-4 py-2 rounded-full text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all ${peerIdeaConfirmed ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                      }`}
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>{peerIdeaConfirmed ? '✓ Đã hoàn thành đánh giá' : 'Xác nhận đã gửi phiếu Form'}</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Khung nhúng Form (Iframe) */}
-              {peerIdeaFormUrl ? (
-                <div className="w-full rounded-2xl overflow-hidden border-2 border-indigo-200 shadow-md bg-white">
-                  <iframe
-                    src={peerIdeaFormUrl}
-                    title="Biểu mẫu Đánh giá đồng đẳng Ý tưởng"
-                    className="w-full h-155 border-0 block"
-                    loading="lazy"
-                  />
-                </div>
-              ) : (
-                <div className="rounded-2xl border-2 border-dashed border-indigo-200 bg-indigo-50/40 p-6 sm:p-8 flex flex-col items-center justify-center text-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-3xl shadow-inner">
-                    📋
-                  </div>
-                  <div className="max-w-md">
-                    <h4 className="font-black text-indigo-950 text-sm md:text-base">
-                      Khung biểu mẫu đánh giá đồng đẳng Ý tưởng đã sẵn sàng!
-                    </h4>
-                    <p className="text-xs text-indigo-900/70 font-medium mt-1">
-                      Khi thầy/cô gửi link Form, biểu mẫu sẽ được nhúng hiển thị trực tiếp tại khung này để học sinh điền đánh giá.
-                    </p>
-                  </div>
-
-                  {/* Ô dán link nhanh cho giáo viên */}
-                  <div className="w-full max-w-lg mt-1 flex items-center gap-2 bg-white p-1.5 rounded-xl border border-indigo-200 shadow-2xs">
-                    <span className="text-xs font-bold text-slate-500 pl-2 shrink-0">🔗 Link Form:</span>
-                    <input
-                      type="url"
-                      placeholder="Dán link Google Form đánh giá ý tưởng vào đây..."
-                      value={peerIdeaFormUrl}
-                      onChange={(e) => setPeerIdeaFormUrl(e.target.value.trim())}
-                      className="flex-1 text-xs text-indigo-950 outline-none font-medium px-2 py-1"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          <RubricInteractivePanel
+            mode="checklist"
+            stageShortLabel="Chặng 3"
+            stageFullTitle="Chặng 3: Ý tưởng (3.1) & Quy trình (3.2)"
+            rubricSubtitle="5 tiêu chí (25% – 20% – 25% – 15% – 15%) đánh giá bản thiết kế ý tưởng và quy trình kỹ thuật."
+            feedbackLabel="💬 Nhận xét phản hồi (Ưu điểm & Góp ý để nhóm hoàn thiện bản thiết kế trước khi làm sản phẩm ở Chặng 4):"
+            feedbackPlaceholder="Ví dụ: Cơ sở khoa học Bài 30 rõ, quy trình định lượng đủ gam/ml. Nhóm nên bổ sung bước lọc bã thừa để tránh tắc bồn rửa..."
+            criteria={STAGE3_RUBRIC_CRITERIA}
+            state={stage3RubricState}
+            onChangeState={setStage3RubricState}
+            onResetConfirm={() => setPeerIdeaConfirmed(false)}
+            onSubmit={() =>
+              submitRubricEvaluation({
+                stage: 'stage-3',
+                stageLabel: 'Chặng 3',
+                criteria: STAGE3_RUBRIC_CRITERIA,
+                state: stage3RubricState,
+                setState: setStage3RubricState,
+                onConfirmed: () => setPeerIdeaConfirmed(true),
+              })
+            }
+            teacherEmail={TEACHER_EMAIL}
+          />
         </div>
       </LockedTaskBox>
 
-      <div className="bg-white/90 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-3 text-xs font-bold">
-          <span className={isStage31Done ? 'text-emerald-700' : 'text-indigo-900/60'}>
-            {isStage31Done ? '✅' : '⏳'} 3.1: Nộp ý tưởng (Drive)
-          </span>
-          <span className={isStage32Done ? "text-emerald-700" : "text-indigo-900/60"}>
-            {isStage32Done ? '✅' : '⏳'} 3.2: Báo cáo tại lớp {presenterName.trim() ? `(${presenterName.trim()})` : ''}
-          </span>
-          <span className={peerIdeaConfirmed ? 'text-emerald-700' : 'text-indigo-900/60'}>
-            {peerIdeaConfirmed ? '✅' : '⏳'} 3.3: Bảng kiểm 5 mức &amp; Đồng đẳng{' '}
-            {stage3RubricSummary.isComplete ? `(${stage3RubricSummary.totalPoints}/10đ)` : ''}
-          </span>
-        </div>
+      <div className="flex justify-end">
         <button
           type="button"
           onClick={() => onNextStage()}
@@ -381,7 +244,7 @@ export function Stage3View({
             }`}
         >
           {isNextStageUnlocked ? <Unlock className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
-          <span>Sang Chặng 4: Hoàn thiện sản phẩm (Tại nhà)</span>
+          <span>Sang Chặng 4: Hoàn thiện sản phẩm</span>
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>

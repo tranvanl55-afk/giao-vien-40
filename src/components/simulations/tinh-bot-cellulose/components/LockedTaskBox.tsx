@@ -92,7 +92,7 @@ export function LockedTaskBox({
               title="Bấm để xem hướng dẫn chi tiết cách làm nhiệm vụ này"
             >
               <Lightbulb className="w-3.5 h-3.5" />
-              <span>{showTaskGuide ? 'Ẩn hướng dẫn' : '💡 Hướng dẫn nhiệm vụ'}</span>
+              <span>{showTaskGuide ? 'Ẩn' : 'Hướng dẫn'}</span>
             </button>
           )}
 

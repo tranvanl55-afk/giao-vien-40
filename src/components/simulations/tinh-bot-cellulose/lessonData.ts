@@ -8,8 +8,6 @@ export const IDEA_DRIVE_URL = 'https://drive.google.com/drive/u/0/folders/1zxkC-
 export const STAGE5_POSTER_DRIVE_URL = 'https://drive.google.com/drive/folders/1B6YI-b5MInsnQqFjgVuA91Ow5o0nmM5o?usp=sharing';
 export const STAGE5_PRESENTATION_DRIVE_URL = 'https://drive.google.com/drive/u/0/folders/1zxkC-W-mKio7gQ_qoW57xWSMO5Ng6I2C';
 export const STAGE6_SUMMARY_VIDEO_DRIVE_URL = 'https://drive.google.com/drive/folders/1il0bD0vZEj0D1WWe7ha6A74XSaXVD7y8';
-export const PEER_ASSESSMENT_IDEA_FORM_URL = '';
-export const PEER_ASSESSMENT_BOOTH_FORM_URL = '';
 export const PROJECT_COVER_IMAGE_URL =
   'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F1(1).png?alt=media&token=36e8fb36-b5c6-4c47-879f-84020196df9a';
 export const WORKSHEET_PDF_URL =
@@ -34,6 +32,12 @@ export const STAGE2_PART3_VIDEO_URL =
   'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F1111.mp4?alt=media&token=6c59a5f8-b49b-4849-a03e-4732c01657c7';
 export const NARRATOR_VIDEO_URL =
   'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fd%E1%BA%ABn%20chuy%E1%BB%87n-nobg.webm?alt=media&token=a85c54d6-5cb0-48e2-8517-42e65de724f3';
+export const COVER_AUDIO_URL =
+  'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Ftrang%20b%C3%ACa.mp3?alt=media&token=009f74f0-de88-4ebd-8c4d-4cd24943b591';
+export const VIDEO1_AUDIO_URL =
+  'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Ftrong_du_an_nay_cac_em_se_trai_qua_6_chang_thu_1127b5ff-117e-43ad-ba9c-f51e7a554197.mp3?alt=media&token=337490c4-f663-4e35-b511-dbdc57ef16dd';
+export const VIDEO2_AUDIO_URL =
+  'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fva_day_la_lo_trinh_6_chang_cua_chung_ta_chang_1_158fd507-b31d-4aa5-9398-72672b8d7ce6.mp3?alt=media&token=3f969103-58ab-44b8-a29d-a00879ae222f';
 export const TEACHER_PASSWORD = '01011993';
 export const TEACHER_EMAIL = 'tranvanl55@gmail.com';
 export const FIRESTORE_STAGE2_TESTS_COLLECTION = 'khtn9_bai30_stage2_tests';
@@ -224,37 +228,43 @@ export const STAGE_GUIDE_INFO: Record<StageId, { title: string; guideText: strin
     title: 'Hướng dẫn Chặng 1: Khởi động',
     guideText:
       'Chào mừng các em đến với Chặng 1! Hãy mở Nhiệm vụ 1 để tạo nhóm trên Padlet, sau đó vượt qua 6 thử thách ở Nhiệm vụ 2 và kéo thả các chữ cái vào ô trống để tìm ra Từ khóa Bí ẩn của dự án nhé!',
-    audioUrl: '',
+    audioUrl:
+      'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fchao_mung_cac_em_den_voi_chang_1_khoi_dong_o_630b1a89-114a-4bcf-a4a1-a6f8c318663b.mp3?alt=media&token=18d9c814-f521-4098-a06e-cc19278c5bf4',
   },
   'stage-2': {
     title: 'Hướng dẫn Chặng 2: Kiến thức nền (Tự học tại nhà)',
     guideText:
       'Chúc mừng các em đã sang Chặng 2! Các em hãy học theo thứ tự bài học: Phần I xem video và kéo thả tính chất vật lí; Phần II xem video thí nghiệm và làm trắc nghiệm hóa học; Phần III xem video và chọn 5 điểm nóng ứng dụng trên Hình 30.2; Phần IV hoàn thành bài kiểm tra 12 câu và Phần V vận dụng kiến thức vào thực tiễn đời sống nhé!',
-    audioUrl: '',
+    audioUrl:
+      'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fchao_mung_cac_ban_da_buoc_vao_chang_2_kien_thuc_0bf7b520-b01e-497f-8267-fdae68d221c2.mp3?alt=media&token=3a96c3f8-38c7-4d70-a1cd-b70380660154',
   },
   'stage-3': {
     title: 'Hướng dẫn Chặng 3: Ý tưởng & Quy trình (Tại lớp)',
     guideText:
       'Ở Chặng 3 tại lớp, các nhóm hãy chuẩn bị bản ý tưởng sản phẩm tái sinh và nộp vào thư mục Google Drive ở mục 3.1, chốt đủ 4 bước quy trình ở mục 3.2 và tự đánh giá / đánh giá đồng đẳng theo thang đo Rubric ở mục 3.3 nhé!',
-    audioUrl: '',
+    audioUrl:
+      'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fchao_mung_cac_ban_den_voi_chang_3_xay_dung_ban_y_5a7c2116-793e-498b-abe0-38fd2126104b.mp3?alt=media&token=2c625a3f-73a6-4902-98ed-aaa1dc3b34ee',
   },
   'stage-4': {
     title: 'Hướng dẫn Chặng 4: Hoàn thiện sản phẩm (Tại nhà)',
     guideText:
       'Chào mừng đến với Chặng 4! Tại nhà, nhóm hãy chế tạo mẫu sản phẩm, thử nghiệm thực tế, ghi hình minh chứng và đăng tải sản phẩm hoàn thiện lên Padlet dự án nhé!',
-    audioUrl: '',
+    audioUrl:
+      'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fchao_mung_cac_ban_den_voi_chang_4_che_tao_mau_c83d7d73-abe4-4e86-9877-a87fe567a191.mp3?alt=media&token=55e3e824-6266-48df-a85d-2d0a2dc1f4a0',
   },
   'stage-5': {
     title: 'Hướng dẫn Chặng 5: Ngày hội xanh (Báo cáo tại lớp)',
     guideText:
       'Đã đến Ngày hội xanh ở Chặng 5! Các nhóm hãy trưng bày gian hàng, thuyết trình cơ sở khoa học của sản phẩm và tham gia chấm điểm bình chọn cho các gian hàng nhé!',
-    audioUrl: '',
+    audioUrl:
+      'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fchao_mung_cac_ban_den_voi_chang_5_trung_bay_gian_cd1cb500-a1e9-4e2f-85ff-492229673e99.mp3?alt=media&token=090525b2-1430-4af2-9d64-679a2384fc67',
   },
   'stage-6': {
     title: 'Hướng dẫn Chặng 6: Tổng kết dự án',
     guideText:
       'Chặng cuối cùng — Chặng 6! Các em hãy ôn lại phần Em đã học, tham gia trò chơi vận động trên Smart TV và hoàn thành đánh giá dự án 360 độ để về đích xuất sắc nhé!',
-    audioUrl: '',
+    audioUrl:
+      'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2Fchuc_mung_cac_ban_da_can_dich_chang_6_tong_ket_c00b7675-51f9-4f53-8264-776e1e8c373f.mp3?alt=media&token=055ee50e-d029-4842-8ffd-1e094ee8f02f',
   },
 };
 
@@ -1157,7 +1167,7 @@ export const TASK_SPECIFIC_GUIDES: Record<string, TaskGuideInfo> = {
   'task-s5-vote': {
     goal: 'Tham quan và chấm điểm các gian hàng theo Bảng Rubric Ngày hội Xanh (3 Tiêu chí × 5 Mức độ).',
     steps: [
-      'Chọn tab "Thang đo Rubric Ngày hội xanh" (hoặc Google Form nếu giáo viên yêu cầu).',
+      'Mở "Thang đo Rubric Ngày hội xanh".',
       'Điền thông tin người chấm và chọn nhóm được chấm điểm.',
       'Đánh giá 3 tiêu chí: Tính thẩm mỹ gian hàng/poster; Thông điệp môi trường; Kỹ năng thuyết minh và phản biện.',
       'Ghi nhận xét khen ngợi và bấm "Nộp kết quả đánh giá Gian hàng".'

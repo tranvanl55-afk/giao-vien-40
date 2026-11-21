@@ -26,6 +26,7 @@ export function NarratorOverlay({
             key={`narrator-full-${activeStage}`}
             src={NARRATOR_VIDEO_URL}
             autoPlay
+            loop={Boolean(STAGE_GUIDE_INFO[activeStage].audioUrl)}
             muted
             playsInline
             disablePictureInPicture
@@ -62,6 +63,12 @@ export function NarratorOverlay({
               src={STAGE_GUIDE_INFO[activeStage].audioUrl}
               autoPlay
               controls
+              onTimeUpdate={(e) => {
+                const a = e.currentTarget;
+                if (a.duration > 0 && a.currentTime >= a.duration - 0.25) {
+                  onClose();
+                }
+              }}
               onEnded={onClose}
               className="w-full h-10 mt-1"
             />
@@ -77,7 +84,7 @@ export function NarratorOverlay({
               className="px-4 py-2 rounded-full bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs md:text-sm flex items-center gap-1.5 shadow-sm cursor-pointer transition-colors"
             >
               <BookOpen className="w-4 h-4" />
-              <span>📖 Xem Hướng Dẫn Chi Tiết Từng Bước</span>
+              <span>Xem chi tiết</span>
             </button>
 
             <button
@@ -85,7 +92,7 @@ export function NarratorOverlay({
               onClick={onClose}
               className="px-5 py-2 rounded-full bg-indigo-600 hover:bg-orange-500 text-white font-black text-xs md:text-sm flex items-center gap-1.5 shadow-sm cursor-pointer transition-colors"
             >
-              <span>Đã hiểu • Bắt đầu làm bài</span>
+              <span>Bắt đầu</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

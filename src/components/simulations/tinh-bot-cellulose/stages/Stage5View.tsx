@@ -23,7 +23,6 @@ import { RubricInteractivePanel } from '../components/RubricInteractivePanel';
 
 interface Stage5ViewProps {
   guideBanner: React.ReactNode;
-  isTeacherMode: boolean;
   unlockedTaskIds: Set<string>;
   unlockTask: (id: string) => void;
   lockTask: (id: string) => void;
@@ -32,12 +31,8 @@ interface Stage5ViewProps {
   toggleSetItem: (setter: React.Dispatch<React.SetStateAction<Set<string>>>, val: string) => void;
   stage5PresentationSubmitted: boolean;
   setStage5PresentationSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
-  peerBoothFormUrl: string;
-  setPeerBoothFormUrl: React.Dispatch<React.SetStateAction<string>>;
   voteConfirmed: boolean;
   setVoteConfirmed: React.Dispatch<React.SetStateAction<boolean>>;
-  stage5AssessTab: 'rubric' | 'form';
-  setStage5AssessTab: React.Dispatch<React.SetStateAction<'rubric' | 'form'>>;
   stage5RubricState: RubricFormState;
   setStage5RubricState: React.Dispatch<React.SetStateAction<RubricFormState>>;
   stage5RubricSummary: { answeredCount: number; isComplete: boolean; totalPoints: number };
@@ -55,7 +50,6 @@ interface Stage5ViewProps {
 
 export function Stage5View({
   guideBanner,
-  isTeacherMode,
   unlockedTaskIds,
   unlockTask,
   lockTask,
@@ -64,12 +58,8 @@ export function Stage5View({
   toggleSetItem,
   stage5PresentationSubmitted,
   setStage5PresentationSubmitted,
-  peerBoothFormUrl,
-  setPeerBoothFormUrl,
   voteConfirmed,
   setVoteConfirmed,
-  stage5AssessTab,
-  setStage5AssessTab,
   stage5RubricState,
   setStage5RubricState,
   stage5RubricSummary,
@@ -244,167 +234,40 @@ export function Stage5View({
               onLock={lockTask}
             >
               <div className="flex flex-col gap-4">
-                {/* THANH CHUYỂN CHẾ ĐỘ: BẢNG RUBRIC TƯƠNG TÁC vs BIỂU MẪU GOOGLE FORM */}
-                <div className="flex flex-wrap items-center justify-between gap-2 bg-indigo-50/80 p-2 rounded-2xl border border-indigo-200">
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setStage5AssessTab('rubric')}
-                      className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
-                        stage5AssessTab === 'rubric'
-                          ? 'bg-linear-to-r from-indigo-600 to-purple-600 text-white shadow-xs'
-                          : 'bg-white text-indigo-900 hover:bg-indigo-100'
-                      }`}
-                    >
-                      <span>📊</span>
-                      <span>Thang đo Rubric Ngày hội xanh (3 tiêu chí • 5 mức)</span>
-                    </button>
-                    {(peerBoothFormUrl || isTeacherMode) && (
-                      <button
-                        type="button"
-                        onClick={() => setStage5AssessTab('form')}
-                        className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
-                          stage5AssessTab === 'form'
-                            ? 'bg-linear-to-r from-orange-500 to-amber-500 text-white shadow-xs'
-                            : 'bg-white text-indigo-900 hover:bg-indigo-100'
-                        }`}
-                      >
-                        <span>📋</span>
-                        <span>Biểu mẫu Google Form đồng đẳng</span>
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-black px-3 py-1.5 rounded-full bg-white border border-indigo-200 text-indigo-950">
-                      Điểm Rubric:{' '}
-                      <strong className="text-orange-600">{stage5RubricSummary.totalPoints}/10</strong> (
-                      {stage5RubricSummary.answeredCount}/{STAGE5_RUBRIC_CRITERIA.length} tiêu chí)
-                    </span>
-                  </div>
+                <div className="flex items-center justify-end">
+                  <span className="text-xs font-black px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-950">
+                    Điểm Rubric:{' '}
+                    <strong className="text-orange-600">{stage5RubricSummary.totalPoints}/10</strong> (
+                    {stage5RubricSummary.answeredCount}/{STAGE5_RUBRIC_CRITERIA.length} tiêu chí)
+                  </span>
                 </div>
 
-                {stage5AssessTab === 'rubric' ? (
-                  <RubricInteractivePanel
-                    stageShortLabel="Chặng 5"
-                    stageFullTitle="Chặng 5: Ngày hội xanh — Báo cáo sản phẩm tại lớp"
-                    rubricSubtitle="3 tiêu chí (40% Sản phẩm tái sinh – 30% Poster khoa học Bài 30 – 30% Thuyết trình & Phản biện)."
-                    feedbackLabel="💬 Nhận xét phản hồi Gian hàng & Báo cáo (Ưu điểm sản phẩm, Poster, phong thái thuyết trình & Góp ý):"
-                    feedbackPlaceholder="Ví dụ: Sản phẩm tái sinh độ dai tốt, hạt mầm bố trí đều. Poster trình bày rõ quy trình Bài 30 và nhóm thuyết trình tự tin, phản biện thuyết phục..."
-                    criteria={STAGE5_RUBRIC_CRITERIA}
-                    state={stage5RubricState}
-                    onChangeState={setStage5RubricState}
-                    onResetConfirm={() => setVoteConfirmed(false)}
-                    onSubmit={() =>
-                      submitRubricEvaluation({
-                        stage: 'stage-5',
-                        stageLabel: 'Chặng 5',
-                        criteria: STAGE5_RUBRIC_CRITERIA,
-                        state: stage5RubricState,
-                        setState: setStage5RubricState,
-                        onConfirmed: () => setVoteConfirmed(true),
-                      })
-                    }
-                    teacherEmail={TEACHER_EMAIL}
-                  />
-                ) : (
-                  <div className="flex flex-col gap-3">
-                    {/* Header thanh điều hướng Form */}
-                    <div className="bg-indigo-50/70 border border-indigo-200 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg shrink-0 shadow-xs">
-                          ⭐
-                        </div>
-                        <div>
-                          <div className="text-xs sm:text-sm font-black text-indigo-950">
-                            Phiếu đánh giá đồng đẳng Gian hàng &amp; Báo cáo sản phẩm (Biểu mẫu Form)
-                          </div>
-                          <p className="text-[11px] text-indigo-900/70 font-medium">
-                            Học sinh tham quan gian hàng các nhóm và điền phiếu bình chọn, đánh giá đồng đẳng qua Form bên dưới.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-2">
-                        {peerBoothFormUrl && (
-                          <a
-                            href={peerBoothFormUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-4 py-2 rounded-full bg-linear-to-r from-orange-500 to-amber-500 text-white font-black text-xs flex items-center gap-1.5 shadow-xs"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                            <span>Mở Form tab mới</span>
-                          </a>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setVoteConfirmed(true);
-                            confetti({ particleCount: 70, spread: 60, origin: { y: 0.65 } });
-                          }}
-                          className={`px-4 py-2 rounded-full text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all ${
-                            voteConfirmed ? 'bg-emerald-500 text-white' : 'bg-orange-500 hover:bg-orange-600 text-white'
-                          }`}
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>{voteConfirmed ? '✓ Đã hoàn thành đánh giá gian hàng' : 'Xác nhận đã gửi phiếu Form'}</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Khung nhúng Form (Iframe) */}
-                    {peerBoothFormUrl ? (
-                      <div className="w-full rounded-2xl overflow-hidden border-2 border-indigo-200 shadow-md bg-white">
-                        <iframe
-                          src={peerBoothFormUrl}
-                          title="Biểu mẫu Đánh giá đồng đẳng Gian hàng"
-                          className="w-full h-155 border-0 block"
-                          loading="lazy"
-                        />
-                      </div>
-                    ) : (
-                      <div className="rounded-2xl border-2 border-dashed border-indigo-200 bg-indigo-50/40 p-6 sm:p-8 flex flex-col items-center justify-center text-center gap-3">
-                        <div className="w-14 h-14 rounded-2xl bg-indigo-100 text-amber-500 flex items-center justify-center text-3xl shadow-inner">
-                          ⭐
-                        </div>
-                        <div className="max-w-md">
-                          <h4 className="font-black text-indigo-950 text-sm md:text-base">
-                            Khung biểu mẫu đánh giá đồng đẳng Gian hàng Ngày hội xanh đã sẵn sàng!
-                          </h4>
-                          <p className="text-xs text-indigo-900/70 font-medium mt-1">
-                            Khi thầy/cô gửi link Form, biểu mẫu sẽ được nhúng hiển thị trực tiếp tại khung này (hoặc học sinh chấm ngay ở tab Thang đo Rubric bên cạnh).
-                          </p>
-                        </div>
-
-                        {/* Ô dán link nhanh cho giáo viên */}
-                        <div className="w-full max-w-lg mt-1 flex items-center gap-2 bg-white p-1.5 rounded-xl border border-indigo-200 shadow-2xs">
-                          <span className="text-xs font-bold text-slate-500 pl-2 shrink-0">🔗 Link Form:</span>
-                          <input
-                            type="url"
-                            placeholder="Dán link Google Form đánh giá gian hàng vào đây..."
-                            value={peerBoothFormUrl}
-                            onChange={(e) => setPeerBoothFormUrl(e.target.value.trim())}
-                            className="flex-1 text-xs text-indigo-950 outline-none font-medium px-2 py-1"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <RubricInteractivePanel
+                  stageShortLabel="Chặng 5"
+                  stageFullTitle="Chặng 5: Ngày hội xanh — Báo cáo sản phẩm tại lớp"
+                  rubricSubtitle="3 tiêu chí (40% Sản phẩm tái sinh – 30% Poster khoa học Bài 30 – 30% Thuyết trình & Phản biện)."
+                  feedbackLabel="💬 Nhận xét phản hồi Gian hàng & Báo cáo (Ưu điểm sản phẩm, Poster, phong thái thuyết trình & Góp ý):"
+                  feedbackPlaceholder="Ví dụ: Sản phẩm tái sinh độ dai tốt, hạt mầm bố trí đều. Poster trình bày rõ quy trình Bài 30 và nhóm thuyết trình tự tin, phản biện thuyết phục..."
+                  criteria={STAGE5_RUBRIC_CRITERIA}
+                  state={stage5RubricState}
+                  onChangeState={setStage5RubricState}
+                  onResetConfirm={() => setVoteConfirmed(false)}
+                  onSubmit={() =>
+                    submitRubricEvaluation({
+                      stage: 'stage-5',
+                      stageLabel: 'Chặng 5',
+                      criteria: STAGE5_RUBRIC_CRITERIA,
+                      state: stage5RubricState,
+                      setState: setStage5RubricState,
+                      onConfirmed: () => setVoteConfirmed(true),
+                    })
+                  }
+                  teacherEmail={TEACHER_EMAIL}
+                />
               </div>
             </LockedTaskBox>
 
-            <div className="bg-white/90 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
-              <div className="flex flex-wrap gap-3 text-xs font-bold">
-                <span className={boothChecks.size === 3 ? 'text-emerald-700' : 'text-indigo-900/60'}>
-                  {boothChecks.size === 3 ? '✅' : '⏳'} Ô 5.1: Báo cáo ({boothChecks.size}/3)
-                </span>
-                <span className={voteConfirmed ? 'text-emerald-700' : 'text-indigo-900/60'}>
-                  {voteConfirmed ? '✅' : '⏳'} Ô 5.2: Rubric &amp; Đồng đẳng{' '}
-                  {stage5RubricSummary.isComplete ? `(${stage5RubricSummary.totalPoints}/10đ)` : ''}
-                </span>
-              </div>
+            <div className="flex justify-end">
               <button
                 type="button"
                 onClick={() => onNextStage()}
