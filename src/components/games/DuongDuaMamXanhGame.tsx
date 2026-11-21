@@ -19,7 +19,7 @@ import {
   Award,
   Lock,
 } from 'lucide-react';
-import { doc, onSnapshot, runTransaction, serverTimestamp, setDoc } from 'firebase/firestore';
+import { addDoc, collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { TEACHER_PASSWORD } from '../simulations/tinh-bot-cellulose/lessonData';
 
@@ -223,7 +223,7 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
     }
   }, [teams]);
 
-  // Real-time multi-device sync via Firebase Firestore
+  // Real-time multi-device sync via Firebase Firestore (using open collection khtn9_bai30_stage3_rubrics)
   useEffect(() => {
     setSyncStatus('connecting');
     const cleanRoom = roomCode.trim().toUpperCase() || 'KHTN9-BAI30';
@@ -232,34 +232,38 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
     } catch {
       // ignore
     }
-    const roomRef = doc(db, 'duong_dua_mam_xanh_rooms', cleanRoom);
+    const q = query(
+      collection(db, 'khtn9_bai30_stage3_rubrics'),
+      where('evaluatorGroup', '==', `MAM_XANH_${cleanRoom}`)
+    );
 
     const unsub = onSnapshot(
-      roomRef,
+      q,
       (snap) => {
         setSyncStatus('live');
-        if (!snap.exists()) {
-          const initScores: Record<string, number> = {};
-          INITIAL_TEAMS.forEach((t) => {
-            initScores[String(t.id)] = 0;
-          });
-          setDoc(
-            roomRef,
-            { scores: initScores, isTeacherStarted: false, updatedAt: serverTimestamp() },
-            { merge: true }
-          ).catch(() => {});
-          return;
+        const events = snap.docs
+          .map((d) => d.data() as { targetGroup?: string; totalPoints?: number; createdAtMs?: number })
+          .sort((a, b) => Number(a.createdAtMs || 0) - Number(b.createdAtMs || 0));
+
+        const nextScores: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
+        let remoteStarted = false;
+
+        for (const ev of events) {
+          if (ev.targetGroup === 'CMD_RESET') {
+            for (let i = 1; i <= 8; i++) nextScores[i] = 0;
+            remoteStarted = false;
+          } else if (ev.targetGroup === 'CMD_START') {
+            remoteStarted = true;
+          } else if (ev.targetGroup && ev.targetGroup.startsWith('TEAM_')) {
+            const tid = Number(ev.targetGroup.replace('TEAM_', ''));
+            if (tid >= 1 && tid <= 8) {
+              nextScores[tid] = Math.max(0, Math.min(MAX_SCORE, (nextScores[tid] || 0) + Number(ev.totalPoints || 0)));
+            }
+          }
         }
-        const data = snap.data();
-        if (data?.scores && typeof data.scores === 'object') {
-          setTeams((prev) =>
-            prev.map((t) => ({
-              ...t,
-              score: Math.max(0, Math.min(MAX_SCORE, Number(data.scores[String(t.id)] ?? 0))),
-            }))
-          );
-        }
-        const remoteStarted = Boolean(data?.isTeacherStarted);
+
+        setTeams((prev) => prev.map((t) => ({ ...t, score: nextScores[t.id] ?? 0 })));
+
         if (remoteStarted && !prevRemoteStartedRef.current) {
           setIsTeacherStarted(true);
           setGameStatus((curr) => (curr === 'ready' ? 'playing' : curr));
@@ -366,6 +370,21 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
     };
   }, []);
 
+  const emitRoomEvent = useCallback(
+    (targetGroup: string, totalPoints: number) => {
+      const cleanRoom = roomCode.trim().toUpperCase() || 'KHTN9-BAI30';
+      addDoc(collection(db, 'khtn9_bai30_stage3_rubrics'), {
+        evaluatorGroup: `MAM_XANH_${cleanRoom}`,
+        targetGroup,
+        totalPoints,
+        createdAtMs: Date.now(),
+      }).catch(() => {
+        setSyncStatus('offline');
+      });
+    },
+    [roomCode]
+  );
+
   const addScoreToTeam = useCallback(
     (teamId: number, delta: number) => {
       setTeams((prev) =>
@@ -375,31 +394,9 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
       );
       if (delta > 0) playSound('correct');
       else if (delta < 0) playSound('wrong');
-
-      const roomRef = doc(db, 'duong_dua_mam_xanh_rooms', roomCode);
-      runTransaction(db, async (tx) => {
-        const snap = await tx.get(roomRef);
-        const existingScores: Record<string, number> = snap.exists() ? snap.data()?.scores || {} : {};
-        const cur = Number(existingScores[String(teamId)] ?? 0);
-        const nextVal = Math.max(0, Math.min(MAX_SCORE, cur + delta));
-        const nextScores = { ...existingScores, [String(teamId)]: nextVal };
-        if (!snap.exists()) {
-          tx.set(roomRef, {
-            scores: nextScores,
-            isTeacherStarted: true,
-            updatedAt: serverTimestamp(),
-          });
-        } else {
-          tx.update(roomRef, {
-            scores: nextScores,
-            updatedAt: serverTimestamp(),
-          });
-        }
-      }).catch(() => {
-        setSyncStatus('offline');
-      });
+      emitRoomEvent(`TEAM_${teamId}`, delta);
     },
-    [playSound, roomCode]
+    [playSound, emitRoomEvent]
   );
 
   const resetMiniGameState = useCallback((gameId: MiniGameId) => {
@@ -982,15 +979,7 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
     setActiveTeamId(1);
     setIsTeacherStarted(false);
     resetMiniGameState(1);
-    const resetScores: Record<string, number> = {};
-    INITIAL_TEAMS.forEach((t) => {
-      resetScores[String(t.id)] = 0;
-    });
-    setDoc(
-      doc(db, 'duong_dua_mam_xanh_rooms', roomCode),
-      { scores: resetScores, isTeacherStarted: false, updatedAt: serverTimestamp() },
-      { merge: true }
-    ).catch(() => {});
+    emitRoomEvent('CMD_RESET', 0);
   };
 
   const handleTeacherStartConfirm = () => {
@@ -1002,11 +991,7 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
       resetMiniGameState(1);
       setGameStatus('playing');
       playSound('win');
-      setDoc(
-        doc(db, 'duong_dua_mam_xanh_rooms', roomCode),
-        { isTeacherStarted: true, updatedAt: serverTimestamp() },
-        { merge: true }
-      ).catch(() => {});
+      emitRoomEvent('CMD_START', 0);
     } else {
       playSound('wrong');
       setStartPassError('Mật khẩu giáo viên chưa chính xác!');

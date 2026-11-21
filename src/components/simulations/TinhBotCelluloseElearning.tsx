@@ -711,10 +711,12 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         id: d.id,
         ...(d.data() as Omit<Stage2TestSubmissionRecord, 'id'>),
       }));
-      const cloudRubrics: Stage3RubricSubmissionRecord[] = rubricsSnap.docs.map((d) => ({
-        id: d.id,
-        ...(d.data() as Omit<Stage3RubricSubmissionRecord, 'id'>),
-      }));
+      const cloudRubrics: Stage3RubricSubmissionRecord[] = rubricsSnap.docs
+        .map((d) => ({
+          id: d.id,
+          ...(d.data() as Omit<Stage3RubricSubmissionRecord, 'id'>),
+        }))
+        .filter((r) => !String(r.evaluatorGroup || '').startsWith('MAM_XANH_'));
 
       setDashboardTestRecords(mergeWithLocal(cloudTests, localTests));
       setDashboardRubricRecords(mergeWithLocal(cloudRubrics, localRubrics));
