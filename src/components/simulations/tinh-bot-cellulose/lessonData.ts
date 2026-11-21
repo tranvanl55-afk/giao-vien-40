@@ -623,7 +623,7 @@ export const CROSSWORD_CLUES: CrosswordClue[] = [
     id: 'cw-5',
     rowNumber: 5,
     question: '🇬🇧 [English Challenge] What gas is produced and released by green plants during photosynthesis?',
-    answerDisplay: 'OXYGEN (Khí Oxi)',
+    answerDisplay: 'OXYGEN (Khí oxygen)',
     acceptedAnswers: ['oxygen', 'o2', 'khí oxygen', 'oxi', 'khí oxi', 'khi oxi'],
     hint: '_ _ _ _ _ _',
     unlockedSlots: [9, 10, 11],
@@ -956,7 +956,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
       'Saccharose (Đường mía dùng hằng ngày)',
       'Fructose (Đường có nhiều trong quả ngọt và mật ong)',
       'Glucose (C₆H₁₂O₆ - Đường nho có vị ngọt)',
-      'Ethylic alcohol (Rượu cồn)',
+      'Ethylic alcohol (C₂H₅OH)',
     ],
     correctIndex: 2,
   },
@@ -1340,7 +1340,7 @@ export const STAGE2_TEST_QUESTIONS: Stage2TestQuestion[] = [
       {
         id: 'b7_1',
         label: 'Chất xúc tác phản ứng:',
-        placeholder: 'Xúc tác: Enzyme/HCl...',
+        placeholder: '...xúc tác gì?',
         acceptedAnswers: [
           'Enzyme/HCl',
           'enzyme/hcl',
@@ -1358,7 +1358,7 @@ export const STAGE2_TEST_QUESTIONS: Stage2TestQuestion[] = [
       {
         id: 'b7_2',
         label: 'Công thức phân tử glucose:',
-        placeholder: 'Công thức: C6H12O6...',
+        placeholder: '...công thức hoá học?',
         acceptedAnswers: ['C6H12O6', 'C₆H₁₂O₆', 'c6h12o6'],
       },
     ],
@@ -1527,7 +1527,7 @@ export const STAGE2_PART2_HYDROLYSIS_QUIZ: QuizQuestion[] = [
     tag: 'Sản phẩm thủy phân',
     question: 'Tinh bột và cellulose khi bị thủy phân hoàn toàn trong môi trường acid đun nóng hoặc dưới tác dụng của enzyme đều tạo thành sản phẩm duy nhất nào?',
     options: [
-      'Ethylic alcohol (C₂H₅OH - Rượu cồn)',
+      'Ethylic alcohol (C₂H₅OH)',
       'Glucose (C₆H₁₂O₆ - Đường nho)',
       'Saccharose (C₁₂H₂₂O₁₁ - Đường mía)',
       'Fructose (Đường mật ong)',

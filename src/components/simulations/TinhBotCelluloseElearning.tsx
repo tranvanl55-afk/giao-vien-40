@@ -182,9 +182,6 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const [dashboardLoadWarning, setDashboardLoadWarning] = useState<string | null>(null);
   const [dashboardSearchQuery, setDashboardSearchQuery] = useState<string>('');
   const [dashboardClassFilter, setDashboardClassFilter] = useState<string>('ALL');
-  const [showSheetHelp, setShowSheetHelp] = useState<boolean>(false);
-  const [scriptCopied, setScriptCopied] = useState<boolean>(false);
-  const [sheetTestFeedback, setSheetTestFeedback] = useState<string | null>(null);
   const [googleSheetWebhookUrl, setGoogleSheetWebhookUrl] = useState<string>(() => {
     try {
       const urlParam = new URLSearchParams(window.location.search).get('webhook')?.trim();
@@ -260,8 +257,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const [dragFeedback, setDragFeedback] = useState<{ text: string; isCorrect: boolean } | null>(null);
 
   // Phần II.1: Phản ứng màu với Iodine (Thí nghiệm + Bài tập)
-  const [iodineVideoUrl, setIodineVideoUrl] = useState<string>(STAGE2_PART2_VIDEO_URL);
-  const [showIodineVideoInput, setShowIodineVideoInput] = useState<boolean>(false);
+  const iodineVideoUrl = STAGE2_PART2_VIDEO_URL;
   const [videoIodineWatched, setVideoIodineWatched] = useState<boolean>(
     () => Boolean(savedProgress.videoIodineWatched)
   );
@@ -429,8 +425,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   );
 
   // Phần II.2: Phản ứng Thủy phân (Clip TN, Động học Canvas, PTHH & Bài tập)
-  const [hydrolysisVideoUrl, setHydrolysisVideoUrl] = useState<string>(STAGE2_PART2_HYDROLYSIS_VIDEO_URL);
-  const [showHydroVideoInput, setShowHydroVideoInput] = useState<boolean>(false);
+  const hydrolysisVideoUrl = STAGE2_PART2_HYDROLYSIS_VIDEO_URL;
   const [videoHydroWatched, setVideoHydroWatched] = useState<boolean>(
     () => Boolean(savedProgress.videoHydroWatched)
   );
@@ -492,8 +487,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     isHydroBlank1Right && isHydroBlank2Right && isHydroBlank3Right && isHydroBlank4Right;
 
   // Phần III: Ứng dụng (Video 1 bên, Điểm nóng 1 bên)
-  const [appVideoUrl, setAppVideoUrl] = useState<string>(STAGE2_PART3_VIDEO_URL);
-  const [showAppVideoInput, setShowAppVideoInput] = useState<boolean>(false);
+  const appVideoUrl = STAGE2_PART3_VIDEO_URL;
   const [video3Playing, setVideo3Playing] = useState(false);
   const [video3Watched, setVideo3Watched] = useState(() => Boolean(savedProgress.video3Watched));
   const [activeHotspotId, setActiveHotspotId] = useState<string>('hs-1');
@@ -659,15 +653,12 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
       }
 
       const missingReasons = [
-        hubResult.cloudError || 'Cloud Firestore chưa ghi được',
-        hubResult.sheetConfigured
-          ? 'Google Sheets gặp lỗi mạng khi gửi'
-          : 'Chưa dán Link Web App Apps Script trong Bảng Tổng hợp GV',
+        hubResult.cloudError || 'Cloud Firestore chưa ghi được (kiểm tra kết nối mạng / Firestore Rules)',
         sendIndividualEmails ? 'Email FormSubmit chưa xác nhận/lỗi mạng' : 'Gửi Email lẻ đang TẮT',
       ];
       return {
         ok: false,
-        text: `⚠️ Mới chỉ lưu ${itemLabel} trên máy này (xem trong Bảng Tổng hợp GV), CHƯA gửi ra ngoài được vì: ${missingReasons.join(' • ')}. Thầy mở "📊 Bảng Tổng hợp GV" để cấu hình hoặc bấm "Mailto dự phòng"!`,
+        text: `⚠️ Mới chỉ lưu ${itemLabel} trên máy này, CHƯA đồng bộ Cloud được vì: ${missingReasons.join(' • ')}. Em có thể bấm "Mailto dự phòng" để gửi trực tiếp cho Thầy!`,
       };
     },
     [sendIndividualEmails]
@@ -3568,9 +3559,6 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             setDragFeedback={setDragFeedback}
             handleAssignDragProp={handleAssignDragProp}
             iodineVideoUrl={iodineVideoUrl}
-            setIodineVideoUrl={setIodineVideoUrl}
-            showIodineVideoInput={showIodineVideoInput}
-            setShowIodineVideoInput={setShowIodineVideoInput}
             videoIodineWatched={videoIodineWatched}
             setVideoIodineWatched={setVideoIodineWatched}
             iodineTubeState={iodineTubeState}
@@ -3600,9 +3588,6 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             iodineQuizSubmitted={iodineQuizSubmitted}
             setIodineQuizSubmitted={setIodineQuizSubmitted}
             hydrolysisVideoUrl={hydrolysisVideoUrl}
-            setHydrolysisVideoUrl={setHydrolysisVideoUrl}
-            showHydroVideoInput={showHydroVideoInput}
-            setShowHydroVideoInput={setShowHydroVideoInput}
             videoHydroWatched={videoHydroWatched}
             setVideoHydroWatched={setVideoHydroWatched}
             hydrolysisDone={hydrolysisDone}
@@ -3627,9 +3612,6 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             hydroQuizSubmitted={hydroQuizSubmitted}
             setHydroQuizSubmitted={setHydroQuizSubmitted}
             appVideoUrl={appVideoUrl}
-            setAppVideoUrl={setAppVideoUrl}
-            showAppVideoInput={showAppVideoInput}
-            setShowAppVideoInput={setShowAppVideoInput}
             video3Watched={video3Watched}
             setVideo3Watched={setVideo3Watched}
             hotspotMode={hotspotMode}

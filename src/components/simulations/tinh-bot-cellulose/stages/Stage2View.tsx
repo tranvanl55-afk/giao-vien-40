@@ -90,9 +90,6 @@ interface Stage2ViewProps {
   handleAssignDragProp: (propId: string, zone: 'starch' | 'cellulose') => void;
   // Part 2a (Iodine)
   iodineVideoUrl: string;
-  setIodineVideoUrl: React.Dispatch<React.SetStateAction<string>>;
-  showIodineVideoInput: boolean;
-  setShowIodineVideoInput: React.Dispatch<React.SetStateAction<boolean>>;
   videoIodineWatched: boolean;
   setVideoIodineWatched: React.Dispatch<React.SetStateAction<boolean>>;
   iodineTubeState: 'initial' | 'blue';
@@ -123,9 +120,6 @@ interface Stage2ViewProps {
   setIodineQuizSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
   // Part 2b (Hydrolysis)
   hydrolysisVideoUrl: string;
-  setHydrolysisVideoUrl: React.Dispatch<React.SetStateAction<string>>;
-  showHydroVideoInput: boolean;
-  setShowHydroVideoInput: React.Dispatch<React.SetStateAction<boolean>>;
   videoHydroWatched: boolean;
   setVideoHydroWatched: React.Dispatch<React.SetStateAction<boolean>>;
   hydrolysisDone: boolean;
@@ -151,9 +145,6 @@ interface Stage2ViewProps {
   setHydroQuizSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
   // Part 3 (Applications / Hotspots)
   appVideoUrl: string;
-  setAppVideoUrl: React.Dispatch<React.SetStateAction<string>>;
-  showAppVideoInput: boolean;
-  setShowAppVideoInput: React.Dispatch<React.SetStateAction<boolean>>;
   video3Watched: boolean;
   setVideo3Watched: React.Dispatch<React.SetStateAction<boolean>>;
   hotspotMode: 'starch' | 'cellulose';
@@ -241,9 +232,6 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
   setDragFeedback,
   handleAssignDragProp,
   iodineVideoUrl,
-  setIodineVideoUrl,
-  showIodineVideoInput,
-  setShowIodineVideoInput,
   videoIodineWatched,
   setVideoIodineWatched,
   iodineTubeState,
@@ -273,9 +261,6 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
   iodineQuizSubmitted,
   setIodineQuizSubmitted,
   hydrolysisVideoUrl,
-  setHydrolysisVideoUrl,
-  showHydroVideoInput,
-  setShowHydroVideoInput,
   videoHydroWatched,
   setVideoHydroWatched,
   hydrolysisDone,
@@ -300,9 +285,6 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
   hydroQuizSubmitted,
   setHydroQuizSubmitted,
   appVideoUrl,
-  setAppVideoUrl,
-  showAppVideoInput,
-  setShowAppVideoInput,
   video3Watched,
   setVideo3Watched,
   hotspotMode,
