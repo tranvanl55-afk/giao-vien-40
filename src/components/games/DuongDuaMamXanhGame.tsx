@@ -19,6 +19,8 @@ import {
   Award,
   Lock,
 } from 'lucide-react';
+import { doc, onSnapshot, runTransaction, serverTimestamp, setDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
 import { TEACHER_PASSWORD } from '../simulations/tinh-bot-cellulose/lessonData';
 
 interface DuongDuaMamXanhGameProps {
@@ -164,6 +166,16 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
   const [startPassInput, setStartPassInput] = useState<string>('');
   const [startPassError, setStartPassError] = useState<string | null>(null);
   const autoAdvanceTimerRef = useRef<number | null>(null);
+  const [roomCode, setRoomCode] = useState<string>(() => {
+    try {
+      return localStorage.getItem('DUONG_DUA_MAM_XANH_ROOM_V1') || 'KHTN9-BAI30';
+    } catch {
+      return 'KHTN9-BAI30';
+    }
+  });
+  const [roomCodeInput, setRoomCodeInput] = useState<string>(roomCode);
+  const [syncStatus, setSyncStatus] = useState<'connecting' | 'live' | 'offline'>('connecting');
+  const prevRemoteStartedRef = useRef<boolean>(false);
 
   // Active mini-game state
   const [activeGame, setActiveGame] = useState<MiniGameId>(1);
@@ -210,6 +222,58 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
       // ignore
     }
   }, [teams]);
+
+  // Real-time multi-device sync via Firebase Firestore
+  useEffect(() => {
+    setSyncStatus('connecting');
+    const cleanRoom = roomCode.trim().toUpperCase() || 'KHTN9-BAI30';
+    try {
+      localStorage.setItem('DUONG_DUA_MAM_XANH_ROOM_V1', cleanRoom);
+    } catch {
+      // ignore
+    }
+    const roomRef = doc(db, 'duong_dua_mam_xanh_rooms', cleanRoom);
+
+    const unsub = onSnapshot(
+      roomRef,
+      (snap) => {
+        setSyncStatus('live');
+        if (!snap.exists()) {
+          const initScores: Record<string, number> = {};
+          INITIAL_TEAMS.forEach((t) => {
+            initScores[String(t.id)] = 0;
+          });
+          setDoc(
+            roomRef,
+            { scores: initScores, isTeacherStarted: false, updatedAt: serverTimestamp() },
+            { merge: true }
+          ).catch(() => {});
+          return;
+        }
+        const data = snap.data();
+        if (data?.scores && typeof data.scores === 'object') {
+          setTeams((prev) =>
+            prev.map((t) => ({
+              ...t,
+              score: Math.max(0, Math.min(MAX_SCORE, Number(data.scores[String(t.id)] ?? 0))),
+            }))
+          );
+        }
+        const remoteStarted = Boolean(data?.isTeacherStarted);
+        if (remoteStarted && !prevRemoteStartedRef.current) {
+          setIsTeacherStarted(true);
+          setGameStatus((curr) => (curr === 'ready' ? 'playing' : curr));
+        } else if (!remoteStarted && prevRemoteStartedRef.current) {
+          setIsTeacherStarted(false);
+        }
+        prevRemoteStartedRef.current = remoteStarted;
+      },
+      () => {
+        setSyncStatus('offline');
+      }
+    );
+    return () => unsub();
+  }, [roomCode]);
 
   const playSound = useCallback(
     (type: 'click' | 'correct' | 'wrong' | 'win' | 'drop' | 'cut') => {
@@ -311,8 +375,31 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
       );
       if (delta > 0) playSound('correct');
       else if (delta < 0) playSound('wrong');
+
+      const roomRef = doc(db, 'duong_dua_mam_xanh_rooms', roomCode);
+      runTransaction(db, async (tx) => {
+        const snap = await tx.get(roomRef);
+        const existingScores: Record<string, number> = snap.exists() ? snap.data()?.scores || {} : {};
+        const cur = Number(existingScores[String(teamId)] ?? 0);
+        const nextVal = Math.max(0, Math.min(MAX_SCORE, cur + delta));
+        const nextScores = { ...existingScores, [String(teamId)]: nextVal };
+        if (!snap.exists()) {
+          tx.set(roomRef, {
+            scores: nextScores,
+            isTeacherStarted: true,
+            updatedAt: serverTimestamp(),
+          });
+        } else {
+          tx.update(roomRef, {
+            scores: nextScores,
+            updatedAt: serverTimestamp(),
+          });
+        }
+      }).catch(() => {
+        setSyncStatus('offline');
+      });
     },
-    [playSound]
+    [playSound, roomCode]
   );
 
   const resetMiniGameState = useCallback((gameId: MiniGameId) => {
@@ -895,6 +982,15 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
     setActiveTeamId(1);
     setIsTeacherStarted(false);
     resetMiniGameState(1);
+    const resetScores: Record<string, number> = {};
+    INITIAL_TEAMS.forEach((t) => {
+      resetScores[String(t.id)] = 0;
+    });
+    setDoc(
+      doc(db, 'duong_dua_mam_xanh_rooms', roomCode),
+      { scores: resetScores, isTeacherStarted: false, updatedAt: serverTimestamp() },
+      { merge: true }
+    ).catch(() => {});
   };
 
   const handleTeacherStartConfirm = () => {
@@ -906,6 +1002,11 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
       resetMiniGameState(1);
       setGameStatus('playing');
       playSound('win');
+      setDoc(
+        doc(db, 'duong_dua_mam_xanh_rooms', roomCode),
+        { isTeacherStarted: true, updatedAt: serverTimestamp() },
+        { merge: true }
+      ).catch(() => {});
     } else {
       playSound('wrong');
       setStartPassError('Mật khẩu giáo viên chưa chính xác!');
@@ -942,6 +1043,38 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-[11px] font-bold">
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  syncStatus === 'live'
+                    ? 'bg-emerald-500 animate-pulse'
+                    : syncStatus === 'connecting'
+                    ? 'bg-amber-400 animate-pulse'
+                    : 'bg-rose-400'
+                }`}
+              />
+              <span className="text-slate-700">
+                {syncStatus === 'live' ? 'Đồng bộ Live:' : syncStatus === 'connecting' ? 'Đang kết nối...' : 'Offline:'}
+              </span>
+              <input
+                type="text"
+                value={roomCodeInput}
+                onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && roomCodeInput.trim()) {
+                    setRoomCode(roomCodeInput.trim().toUpperCase());
+                  }
+                }}
+                onBlur={() => {
+                  if (roomCodeInput.trim() && roomCodeInput.trim().toUpperCase() !== roomCode) {
+                    setRoomCode(roomCodeInput.trim().toUpperCase());
+                  }
+                }}
+                aria-label="Mã phòng đồng bộ"
+                className="w-24 bg-white border border-slate-300 rounded-md px-1.5 py-0.5 text-[11px] font-black text-indigo-950 outline-none"
+                title="Nhập cùng mã phòng trên các máy khác nhau để đồng bộ tiến độ thời gian thực"
+              />
+            </div>
             <button
               type="button"
               onClick={() => setIsJudgeQuickView((v) => !v)}
