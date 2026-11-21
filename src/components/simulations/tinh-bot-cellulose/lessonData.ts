@@ -1758,12 +1758,11 @@ export const HOTSPOT_APPLICATIONS: HotspotApplicationItem[] = [
 export const ALL_TASK_IDS = [
   'task-s1-padlet',
   'task-s1-crossword',
-  'task-s2-worksheet',
   'task-s2-part1',
   'task-s2-part2-iodine',
-  'task-s2-part2-hydrolysis',
+  'task-s2-part2-hydro',
   'task-s2-part3',
-  'task-s2-part4',
+  'task-s2-part4-test',
   'task-s2-part5',
   'task-s3-idea',
   'task-s3-process',
@@ -1771,9 +1770,10 @@ export const ALL_TASK_IDS = [
   'task-s4-maker',
   'task-s4-submit',
   'task-s5-booth',
+  'task-s5-presentation',
   'task-s5-vote',
   'task-s6-summary',
-  'task-s6-quiz',
   'task-s6-assessment',
+  'task-s6-video',
 ];
 

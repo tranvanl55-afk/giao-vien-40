@@ -1994,8 +1994,9 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   };
 
   const unlockAllTasksForTeacher = () => {
-    setUnlockedTaskIds(new Set(ALL_TASK_IDS));
-    setEverUnlockedTaskIds(new Set(ALL_TASK_IDS));
+    const allStageTaskIds = Object.values(STAGE_TASK_MAP).flat();
+    setUnlockedTaskIds(new Set(allStageTaskIds));
+    setEverUnlockedTaskIds(new Set(allStageTaskIds));
     setUnlockedClueIds(new Set(CROSSWORD_CLUES.map((c) => c.id)));
     setUnlockedQuizIds(new Set(QUIZ_QUESTIONS.map((q) => q.id)));
   };
