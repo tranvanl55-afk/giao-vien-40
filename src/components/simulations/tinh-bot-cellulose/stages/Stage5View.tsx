@@ -317,10 +317,10 @@ export function Stage5View({
                 ) : (
                   <RubricInteractivePanel
                     stageShortLabel="Chặng 5 (GV)"
-                    stageFullTitle="Chặng 5: Giáo viên chấm Sản phẩm STEAM tại Ngày hội Xanh (Chuẩn CV 3089)"
-                    rubricSubtitle="4 tiêu chí dành cho Giáo viên (25% Cơ sở khoa học Bài 30 – 35% Chất lượng & Công năng – 20% Sáng tạo STEAM – 20% Thuyết trình & Minh chứng)."
-                    feedbackLabel="💬 Nhận xét chuyên môn của Giáo viên về sản phẩm & giải pháp kỹ thuật của nhóm:"
-                    feedbackPlaceholder="Ví dụ: Sản phẩm bền đẹp, định lượng hợp lý, giải thích rõ vai trò Cellulose và Tinh bột..."
+                    stageFullTitle="Chặng 5: Giáo viên chấm Sản phẩm STEAM (4 tiêu chí đánh giá sản phẩm)"
+                    rubricSubtitle="4 tiêu chí tập trung đánh giá Sản phẩm (25% Khoa học Bài 30 – 35% Độ bền & Công năng – 20% Sáng tạo & Thẩm mỹ – 20% An toàn & Ứng dụng)."
+                    feedbackLabel="💬 Nhận xét của Giáo viên về chất lượng, độ bền và tính ứng dụng của sản phẩm:"
+                    feedbackPlaceholder="Ví dụ: Sản phẩm bền đẹp, bề mặt mịn, hạt mầm bố trí đều và an toàn sinh thái..."
                     criteria={STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA}
                     state={teacherProductRubricState}
                     onChangeState={setTeacherProductRubricState}
