@@ -2382,7 +2382,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
       <div
         onClick={() => {
           if (coverAudioBlocked && coverAudioRef.current) {
-            coverAudioRef.current.play().then(() => setCoverAudioBlocked(false)).catch(() => {});
+            coverAudioRef.current.play().then(() => setCoverAudioBlocked(false)).catch(() => { });
           }
           if (!coverBgRevealed) setCoverBgRevealed(true);
         }}
@@ -2395,7 +2395,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
           onPlaying={() => {
             if (coverVideoRef.current) {
               coverVideoRef.current.currentTime = 0;
-              coverVideoRef.current.play().catch(() => {});
+              coverVideoRef.current.play().catch(() => { });
             }
           }}
           onEnded={() => {
@@ -2462,7 +2462,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                 onClick={(e) => {
                   e.stopPropagation();
                   if (coverAudioRef.current) {
-                    coverAudioRef.current.play().then(() => setCoverAudioBlocked(false)).catch(() => {});
+                    coverAudioRef.current.play().then(() => setCoverAudioBlocked(false)).catch(() => { });
                   }
                 }}
                 className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 px-3 py-1 rounded-full bg-amber-400 text-indigo-950 font-black text-[11px] shadow-md whitespace-nowrap animate-bounce cursor-pointer"
@@ -2479,9 +2479,8 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
               e.stopPropagation();
               openIntroVideo('video1', true);
             }}
-            className={`group px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-linear-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:via-amber-600 hover:to-orange-700 text-white font-black text-xs sm:text-sm tracking-wide shadow-[0_10px_28px_rgba(249,115,22,0.55)] hover:scale-105 active:scale-95 transition-all duration-700 flex items-center justify-center gap-1.5 cursor-pointer ring-2 ring-white/85 whitespace-nowrap ${
-              coverBgRevealed ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
-            }`}
+            className={`group px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-linear-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:via-amber-600 hover:to-orange-700 text-white font-black text-xs sm:text-sm tracking-wide shadow-[0_10px_28px_rgba(249,115,22,0.55)] hover:scale-105 active:scale-95 transition-all duration-700 flex items-center justify-center gap-1.5 cursor-pointer ring-2 ring-white/85 whitespace-nowrap ${coverBgRevealed ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+              }`}
             title="Phát video mở đầu và bắt đầu dự án"
           >
             <Sparkles className="w-4 h-4 text-white group-hover:rotate-12 transition-transform shrink-0" />
@@ -2644,11 +2643,10 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                   type="button"
                   onClick={() => setShowVideoTranscript((prev) => !prev)}
                   title="Bật/tắt phụ đề lời thoại thuyết minh (Điều 10 QĐ 791)"
-                  className={`flex items-center gap-1 px-3 py-2 backdrop-blur-md rounded-full border text-xs font-bold cursor-pointer transition-all ${
-                    showVideoTranscript
-                      ? 'bg-emerald-500 text-white border-emerald-300'
-                      : 'text-white/85 hover:text-white bg-black/60 hover:bg-black/90 border-white/20'
-                  }`}
+                  className={`flex items-center gap-1 px-3 py-2 backdrop-blur-md rounded-full border text-xs font-bold cursor-pointer transition-all ${showVideoTranscript
+                    ? 'bg-emerald-500 text-white border-emerald-300'
+                    : 'text-white/85 hover:text-white bg-black/60 hover:bg-black/90 border-white/20'
+                    }`}
                 >
                   <span>💬 Phụ đề</span>
                 </button>
@@ -3521,12 +3519,12 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                         <div className="text-xl font-black text-orange-600">
                           {filteredSurveys.length > 0
                             ? (
-                                Math.round(
-                                  (filteredSurveys.reduce((s, r) => s + Number(r.totalPoints || 0), 0) /
-                                    filteredSurveys.length) *
-                                    100
-                                ) / 100
-                              )
+                              Math.round(
+                                (filteredSurveys.reduce((s, r) => s + Number(r.totalPoints || 0), 0) /
+                                  filteredSurveys.length) *
+                                100
+                              ) / 100
+                            )
                             : 0}{' '}
                           / 5.0
                         </div>
@@ -3555,13 +3553,13 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                           const avg =
                             filteredSurveys.length > 0
                               ? Math.round(
-                                  (filteredSurveys.reduce(
-                                    (s, r) => s + Number(r.criteriaScores?.[`s${item.num}`] ?? 0),
-                                    0
-                                  ) /
-                                    filteredSurveys.length) *
-                                    100
-                                ) / 100
+                                (filteredSurveys.reduce(
+                                  (s, r) => s + Number(r.criteriaScores?.[`s${item.num}`] ?? 0),
+                                  0
+                                ) /
+                                  filteredSurveys.length) *
+                                100
+                              ) / 100
                               : 0;
                           return (
                             <div
@@ -4109,7 +4107,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   <div className="flex flex-col gap-0.5">
     <span className="font-bold">🌱 Dự án Học tập STEAM KHTN 9 — Bài 30: Tinh bột &amp; Cellulose</span>
     <span className="text-[11px] text-indigo-900/65 font-medium">
-      Tác giả: Thầy Trần Văn Lĩnh (Tổ KHTN – Trường TH&amp;THCS Ngô Chí Quốc) • Chia sẻ miễn phí dùng chung ngành GDĐT (QĐ 791/QĐ-SGDĐT &amp; CV 3089)
+      Tác giả: Thầy Trần Văn Lĩnh (Tổ KHTN – Trường TH - THCS Ngô Chí Quốc) • Chia sẻ miễn phí dùng chung ngành GDĐT (QĐ 791/QĐ-SGDĐT &amp; CV 3089)
     </span>
   </div>
   <div className="flex flex-wrap items-center gap-2">

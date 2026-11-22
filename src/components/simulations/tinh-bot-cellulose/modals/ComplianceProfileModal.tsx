@@ -67,7 +67,7 @@ export const ComplianceProfileModal: React.FC<ComplianceProfileModalProps> = ({
                 Thông tin Website &amp; Định danh Học liệu số (Metadata Dublin Core)
               </h2>
               <p className="text-[11px] text-emerald-200 font-medium">
-                Trường TH&amp;THCS Ngô Chí Quốc • Chuẩn QĐ 791/QĐ-SGDĐT &amp; TCVN 7980:2015
+                Trường TH - THCS Ngô Chí Quốc • Chuẩn QĐ 791/QĐ-SGDĐT &amp; TCVN 7980:2015
               </p>
             </div>
           </div>

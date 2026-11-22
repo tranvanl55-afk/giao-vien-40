@@ -425,7 +425,7 @@ export function Profile({ onBack }: ProfileProps) {
 
           <div className="space-y-12">
             {[
-              { year: "2022 - NAY", title: "Giáo viên KHTN", place: "THCS Ngô Chí Quốc", desc: "Tích cực trong việc số hóa học liệu và ứng dụng AI vào giảng dạy trực tiếp." },
+              { year: "2022 - NAY", title: "Giáo viên KHTN", place: "Trường TH - THCS Ngô Chí Quốc", desc: "Tích cực trong việc số hóa học liệu và ứng dụng AI vào giảng dạy trực tiếp." },
               { year: "2019 - 2022", title: "Giáo viên Hóa học", place: "PTNK Thể Thao Olympic", desc: "Giảng dạy bộ môn Hóa học và bồi dưỡng học sinh năng khiếu." },
               { year: "2015 - 2018", title: "Giáo viên Hóa học", place: "THPT Sông Đốc", desc: "Giảng dạy bộ môn Hóa học cấp trung học phổ thông." }
             ].map((item, idx) => (

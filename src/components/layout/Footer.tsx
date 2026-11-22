@@ -15,7 +15,7 @@ export function Footer({ onProfileClick }: FooterProps) {
           onClick={onProfileClick}
           className="text-slate-300 tracking-wide font-semibold text-center md:text-left drop-shadow-sm cursor-pointer hover:text-cyan-400 transition-colors"
         >
-          {currentUser ? currentUser.displayName || "User" : "Trần Văn Lĩnh - THCS Ngô Chí Quốc"}
+          {currentUser ? currentUser.displayName || "User" : "Trần Văn Lĩnh - Trường TH - THCS Ngô Chí Quốc"}
         </p>
         <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-4">
           <div className="flex items-center gap-1 group">

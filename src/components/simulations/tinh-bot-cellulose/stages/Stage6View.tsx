@@ -1175,7 +1175,7 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 text-xs">
                           <div>
                             <span className="text-[11px] text-indigo-300 font-bold block mb-0.5">Đơn vị:</span>
-                            <span className="font-extrabold text-white">Trường THCS Ngô Chí Quốc — Tổ KHTN</span>
+                            <span className="font-extrabold text-white">Trường TH - THCS Ngô Chí Quốc — Tổ KHTN</span>
                           </div>
                           <div>
                             <span className="text-[11px] text-indigo-300 font-bold block mb-0.5">Lớp / Nhóm được đánh giá:</span>
@@ -1398,7 +1398,7 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
 
                         <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-indigo-100">
                           <div className="text-xs text-slate-600">
-                            Giáo viên ký nhận: <strong>{stage6TeacherName}</strong> (Tổ KHTN — THCS Ngô Chí Quốc)
+                            Giáo viên ký nhận: <strong>{stage6TeacherName}</strong> (Tổ KHTN — Trường TH - THCS Ngô Chí Quốc)
                           </div>
 
                           <div className="flex flex-wrap items-center gap-2">
