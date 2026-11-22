@@ -40,6 +40,8 @@ import {
   STAGE6_SELF_RUBRIC_CRITERIA,
   STAGE6_TEACHER_RUBRIC_CRITERIA,
 } from './rubricData';
+import { SURVEY_SECTIONS } from './components/Stage6SurveyBox';
+import { DUBLIN_CORE_METADATA } from './exportScormPackage';
 
 const FONT = 'Times New Roman';
 
@@ -406,6 +408,9 @@ export async function exportAllStagesToWord(): Promise<void> {
       headerBg: '1E1B4B',
       rows: [
         ['Môn học / Khối lớp', 'Khoa học tự nhiên 9 (Chủ đề Carbohydrate — Bài 30: Tinh bột và Cellulose)'],
+        ['Tác giả / Đơn vị', `${DUBLIN_CORE_METADATA.creator} • ${DUBLIN_CORE_METADATA.publisher}`],
+        ['Mã định danh ĐVKT (QĐ 791)', DUBLIN_CORE_METADATA.knowledgeUnitCode],
+        ['Chuẩn chia sẻ (QĐ 791)', DUBLIN_CORE_METADATA.rights],
         ['Không gian Padlet chung', PADLET_URL],
         ['Drive Ý tưởng & Video thuyết trình', IDEA_DRIVE_URL],
         ['Drive Poster / Infographic (Chặng 5)', STAGE5_POSTER_DRIVE_URL],
@@ -433,6 +438,21 @@ export async function exportAllStagesToWord(): Promise<void> {
   // CHẶNG 1
   // =========================================================================
   portraitChildren.push(stageHeading('CHẶNG 1: KHỞI ĐỘNG & THÀNH LẬP NHÓM (TẠI LỚP)'));
+  portraitChildren.push(subHeading('1.0. Nhiệm vụ & Bộ Tiêu chí Sản phẩm Xanh (Hoạt động 1 – CV 3089)'));
+  portraitChildren.push(
+    buildStyledTable({
+      headers: ['Tiêu chí', 'Yêu cầu sản phẩm tái sinh từ Cellulose & Tinh bột'],
+      colWidthsPct: [28, 72],
+      headerBg: '065F46',
+      rows: [
+        ['1. Khoa học (Bài 30)', 'Tận dụng sợi cellulose (bã mía, rơm, giấy vụn) & hồ tinh bột kết dính sinh học.'],
+        ['2. Kỹ thuật & Độ bền', 'Có quy trình 4 bước định lượng (g / ml); sản phẩm dai, giữ phom, không rã khi tưới nhẹ.'],
+        ['3. Sinh thái & An toàn', '100% nguyên liệu tự phân hủy, an toàn, tích hợp hạt giống nảy mầm tốt.'],
+        ['4. Thẩm mỹ & Chi phí', 'Tạo hình sáng tạo, tiết kiệm, có bao bì/nhãn thông điệp sống xanh.'],
+      ],
+    })
+  );
+
   portraitChildren.push(subHeading('1.1. Bảng phân công nhiệm vụ thành viên trong nhóm'));
   portraitChildren.push(
     buildStyledTable({
@@ -449,7 +469,7 @@ export async function exportAllStagesToWord(): Promise<void> {
     })
   );
 
-  portraitChildren.push(subHeading('1.2. Trò chơi giải ô chữ tìm từ khóa: "CELLULOSE"'));
+  portraitChildren.push(subHeading('1.2. Trò chơi giải ô chữ tìm từ khóa: "GREEN NEWSPAPER" (14 chữ cái)'));
   portraitChildren.push(
     buildStyledTable({
       headers: ['Hàng', 'Câu hỏi gợi ý', 'Đáp án', 'Gợi ý nhanh'],
@@ -536,39 +556,48 @@ export async function exportAllStagesToWord(): Promise<void> {
     })
   );
 
-  portraitChildren.push(subHeading('Phần IV. Bộ 12 câu hỏi kiểm tra kiến thức nền'));
-  portraitChildren.push(
-    buildStyledTable({
-      headers: ['Câu', 'Dạng bài', 'Nội dung câu hỏi', 'Đáp án & Giải thích'],
-      colWidthsPct: [8, 16, 36, 40],
-      centerCols: [0],
-      rows: STAGE2_TEST_QUESTIONS.map((q) => {
-        const answerLines: string[] = [];
-        if (q.options && q.correctOptionIndex !== undefined) {
-          q.options.forEach((opt, oi) => {
-            answerLines.push(`${oi === q.correctOptionIndex ? '✓ [ĐÚNG] ' : '• '}${opt}`);
-          });
-        }
-        if (q.subStatements) {
-          q.subStatements.forEach((s) => {
-            answerLines.push(`${s.id}) ${s.text} → [${s.isCorrect ? 'ĐÚNG' : 'SAI'}]`);
-          });
-        }
-        if (q.blanks) {
-          q.blanks.forEach((b) => {
-            answerLines.push(`${b.label} → ${b.acceptedAnswers.join(' / ')}`);
-          });
-        }
-        if (q.matchingPairs) {
-          q.matchingPairs.forEach((m) => {
-            answerLines.push(`${m.leftText} ⟷ ${m.rightText}`);
-          });
-        }
-        answerLines.push(`Giải thích: ${q.explanation}`);
-        return [`Câu ${q.id}`, q.tag, q.question, answerLines];
-      }),
-    })
-  );
+  portraitChildren.push(subHeading('Phần IV. Bộ 12 câu hỏi kiểm tra kiến thức nền (Chia 4 phần chuẩn)'));
+  const testGroups = [
+    { label: 'Phần I. Chọn đáp án đúng nhất (Câu 1 – 3)', items: STAGE2_TEST_QUESTIONS.filter((q) => q.type === 'multiple_choice') },
+    { label: 'Phần II. Câu hỏi Đúng / Sai (Câu 4 – 6)', items: STAGE2_TEST_QUESTIONS.filter((q) => q.type === 'true_false') },
+    { label: 'Phần III. Câu hỏi Điền khuyết (Câu 7 – 9)', items: STAGE2_TEST_QUESTIONS.filter((q) => q.type === 'fill_in') },
+    { label: 'Phần IV. Câu hỏi Ghép đôi (Câu 10 – 12)', items: STAGE2_TEST_QUESTIONS.filter((q) => q.type === 'matching') },
+  ];
+  testGroups.forEach((grp) => {
+    portraitChildren.push(makeParagraph(grp.label, { bold: true, color: '1E1B4B', before: 100, after: 60 }));
+    portraitChildren.push(
+      buildStyledTable({
+        headers: ['Câu', 'Nội dung câu hỏi', 'Đáp án & Giải thích'],
+        colWidthsPct: [10, 44, 46],
+        centerCols: [0],
+        rows: grp.items.map((q) => {
+          const answerLines: string[] = [];
+          if (q.options && q.correctOptionIndex !== undefined) {
+            q.options.forEach((opt, oi) => {
+              answerLines.push(`${oi === q.correctOptionIndex ? '✓ [ĐÚNG] ' : '• '}${opt}`);
+            });
+          }
+          if (q.subStatements) {
+            q.subStatements.forEach((s) => {
+              answerLines.push(`${s.text} → [${s.isCorrect ? 'ĐÚNG' : 'SAI'}]`);
+            });
+          }
+          if (q.blanks) {
+            q.blanks.forEach((b) => {
+              answerLines.push(`${b.label} → ${b.acceptedAnswers.join(' / ')}`);
+            });
+          }
+          if (q.matchingPairs) {
+            q.matchingPairs.forEach((m) => {
+              answerLines.push(`${m.leftText} ⟷ ${m.rightText}`);
+            });
+          }
+          answerLines.push(`Giải thích: ${q.explanation}`);
+          return [`Câu ${q.id}`, q.question, answerLines];
+        }),
+      })
+    );
+  });
 
   portraitChildren.push(subHeading('Phần V. Vận dụng kiến thức & Mở rộng thực tiễn'));
   portraitChildren.push(
@@ -594,42 +623,40 @@ export async function exportAllStagesToWord(): Promise<void> {
     })
   );
 
-  // =========================================================================
-  // CHẶNG 4 (đặt trong Portrait trước khi sang Landscape cho các bảng 7 cột)
-  // =========================================================================
-  portraitChildren.push(stageHeading('CHẶNG 4: HOÀN THIỆN SẢN PHẨM (TẠI NHÀ)'));
-  portraitChildren.push(
-    makeParagraph(`• Nộp ảnh & video nhật ký thực hiện sản phẩm lên Padlet: ${PADLET_URL}`, { after: 80 })
-  );
+  portraitChildren.push(subHeading('Câu hỏi định hướng khám phá S – T – E – A – M'));
   portraitChildren.push(
     buildStyledTable({
-      headers: ['Bước', 'Tên công đoạn', 'Hướng dẫn thực hiện', 'Kiểm tra'],
-      colWidthsPct: [10, 26, 52, 12],
-      centerCols: [0, 3],
-      rows: PROCESS_STEPS.map((st) => [`Bước ${st.step}`, st.title, st.detail, '☐ Xong']),
+      headers: ['Thành tố', 'Câu hỏi định hướng học sinh khám phá'],
+      colWidthsPct: [24, 76],
+      headerBg: '065F46',
+      rows: [
+        ['S — Science (Khoa học)', 'Làm sao kết hợp sợi Cellulose từ phế phẩm với hồ Tinh bột để tạo vật liệu tự phân hủy?'],
+        ['T — Technology (Công nghệ)', 'Nhóm sẽ dùng công cụ số nào để thiết kế quy trình, quay video và làm báo cáo song ngữ?'],
+        ['E — Engineering (Kỹ thuật)', 'Quy trình tách xơ → phối trộn → ép khuôn → sấy cần thực hiện theo các bước nào?'],
+        ['A — Art (Nghệ thuật)', 'Thiết kế kiểu dáng, màu sắc và thông điệp tiếng Anh như thế nào để sản phẩm xanh thu hút?'],
+        ['M — Math (Toán học)', 'Tỉ lệ phối trộn (gam xơ : ml nước : gam tinh bột), kích thước và chi phí dự kiến là bao nhiêu?'],
+      ],
     })
   );
 
   // =========================================================================
-  // SECTION LANDSCAPE CHO CÁC BẢNG MA TRẬN 7 CỘT (CHẶNG 3, CHẶNG 5, CHẶNG 6)
+  // CHẶNG 3 (SECTION LANDSCAPE ĐÚNG THỨ TỰ)
   // =========================================================================
-  const landscapeChildren: (Paragraph | Table)[] = [];
-
-  // CHẶNG 3
-  landscapeChildren.push(stageHeading('CHẶNG 3: Ý TƯỞNG & QUY TRÌNH (TẠI LỚP)'));
-  landscapeChildren.push(
+  const stage3Children: (Paragraph | Table)[] = [];
+  stage3Children.push(stageHeading('CHẶNG 3: Ý TƯỞNG & QUY TRÌNH (TẠI LỚP)'));
+  stage3Children.push(
     buildStyledTable({
       headers: ['Nhiệm vụ', 'Nội dung thực hiện & Link nộp bài'],
       colWidthsPct: [24, 76],
       rows: [
         ['3.1. Nộp ý tưởng', `Tải bản thiết kế ý tưởng lên Google Drive: ${IDEA_DRIVE_URL}`],
         ['3.2. Báo cáo tại lớp', 'Đại diện nhóm trình bày quy trình kỹ thuật và tiếp thu góp ý từ nhóm bạn & giáo viên.'],
-        ['3.3. Bảng kiểm 5 mức độ', 'Chấm nhanh theo 5 mức độ dưới đây để hoàn thiện bản thiết kế trước khi sang Chặng 4.'],
+        ['3.3. Bảng kiểm 5 mức độ', 'Đánh giá Ý tưởng & Quy trình theo Bảng kiểm 5 mức độ trực tiếp trên Website.'],
       ],
     })
   );
-  landscapeChildren.push(subHeading('3.3. Bảng kiểm 5 mức độ — Đánh giá Ý tưởng & Quy trình (Chặng 3)'));
-  landscapeChildren.push(
+  stage3Children.push(subHeading('3.3. Bảng kiểm 5 mức độ — Đánh giá Ý tưởng & Quy trình (Chặng 3)'));
+  stage3Children.push(
     buildChecklist5Table(
       '312E81',
       STAGE3_RUBRIC_CRITERIA.map((c, idx) => ({
@@ -639,6 +666,28 @@ export async function exportAllStagesToWord(): Promise<void> {
     )
   );
 
+  // =========================================================================
+  // CHẶNG 4 (SECTION PORTRAIT ĐÚNG THỨ TỰ)
+  // =========================================================================
+  const stage4Children: (Paragraph | Table)[] = [];
+  stage4Children.push(stageHeading('CHẶNG 4: HOÀN THIỆN SẢN PHẨM (TẠI NHÀ)'));
+  stage4Children.push(
+    makeParagraph(`• Nộp ảnh & video nhật ký thực hiện sản phẩm lên Padlet: ${PADLET_URL}`, { after: 80 })
+  );
+  stage4Children.push(
+    buildStyledTable({
+      headers: ['Bước', 'Tên công đoạn', 'Hướng dẫn thực hiện', 'Kiểm tra'],
+      colWidthsPct: [10, 26, 52, 12],
+      centerCols: [0, 3],
+      rows: PROCESS_STEPS.map((st) => [`Bước ${st.step}`, st.title, st.detail, '☐ Xong']),
+    })
+  );
+
+  // =========================================================================
+  // CHẶNG 5, CHẶNG 6 & PHIẾU KHẢO SÁT (SECTION LANDSCAPE ĐÚNG THỨ TỰ)
+  // =========================================================================
+  const landscapeChildren: (Paragraph | Table)[] = [];
+
   // CHẶNG 5
   landscapeChildren.push(stageHeading('CHẶNG 5: NGÀY HỘI XANH — TRƯNG BÀY & THUYẾT TRÌNH'));
   landscapeChildren.push(
@@ -646,13 +695,12 @@ export async function exportAllStagesToWord(): Promise<void> {
       headers: ['Nhiệm vụ', 'Nội dung thực hiện & Link nộp bài'],
       colWidthsPct: [24, 76],
       rows: [
-        ['5.1. Poster / Infographic', `Nộp Poster/Infographic của nhóm lên Google Drive: ${STAGE5_POSTER_DRIVE_URL}`],
-        ['5.2. Video thuyết trình', `Nộp Video minh họa khi thuyết trình lên Google Drive: ${STAGE5_PRESENTATION_DRIVE_URL}`],
-        ['5.3. Rubric trọng tâm', 'Sử dụng Analytical Rubric 5 mức dưới đây làm bộ tiêu chí chuẩn đánh giá sản phẩm dự án.'],
+        ['5.1. Gian hàng & Báo cáo', `Nộp Poster (${STAGE5_POSTER_DRIVE_URL}) và Video thuyết trình (${STAGE5_PRESENTATION_DRIVE_URL}) lên Google Drive.`],
+        ['5.2. Rubric trọng tâm', 'Đánh giá gian hàng Ngày hội Xanh trực tiếp theo Analytical Rubric 5 mức dưới đây.'],
       ],
     })
   );
-  landscapeChildren.push(subHeading('5.3. Analytical Rubric 5 mức — Đánh giá Sản phẩm, Poster & Thuyết trình (Chặng 5)'));
+  landscapeChildren.push(subHeading('5.2. Analytical Rubric 5 mức — Đánh giá Sản phẩm, Poster & Thuyết trình (Chặng 5)'));
   landscapeChildren.push(
     buildMatrix7ColTable(
       'TIÊU CHÍ\n(Trọng số)',
@@ -741,24 +789,62 @@ export async function exportAllStagesToWord(): Promise<void> {
     })
   );
 
+  // =========================================================================
+  // PHIẾU KHẢO SÁT Ý KIẾN HỌC SINH SAU CHỦ ĐỀ (TÁCH RIÊNG CUỐI DỰ ÁN)
+  // =========================================================================
+  const surveyChildren: (Paragraph | Table)[] = [];
+  surveyChildren.push(stageHeading('PHIẾU KHẢO SÁT Ý KIẾN HỌC SINH SAU CHỦ ĐỀ (TÁCH RIÊNG)'));
+  surveyChildren.push(
+    makeParagraph('Họ và tên (có thể để trống nếu ẩn danh): ....................................   Lớp: .........   Nhóm: .........   Ngày: ....../....../2026', { after: 100 })
+  );
+  surveyChildren.push(subHeading('PHẦN A. ĐÁNH GIÁ TRẢI NGHIỆM HỌC TẬP VÀ DỰ ÁN (1 → 5)'));
+  surveyChildren.push(
+    buildStyledTable({
+      headers: ['STT', 'Nội dung khảo sát', '1', '2', '3', '4', '5'],
+      colWidthsPct: [8, 67, 5, 5, 5, 5, 5],
+      centerCols: [0, 2, 3, 4, 5, 6],
+      rows: SURVEY_SECTIONS.flatMap((sec) => [
+        [sec.roman, sec.title, '', '', '', '', ''],
+        ...sec.items.map((item) => [String(item.num), item.text, '☐', '☐', '☐', '☐', '☐']),
+      ]),
+    })
+  );
+  surveyChildren.push(subHeading('PHẦN B. Ý KIẾN ĐÓNG GÓP VÀ PHẢN TƯ CÁ NHÂN'));
+  surveyChildren.push(
+    buildStyledTable({
+      headers: ['Nội dung', 'Phản hồi của học sinh'],
+      colWidthsPct: [38, 62],
+      headerBg: '065F46',
+      rows: [
+        ['Mức độ yêu thích chung', '☐ Rất thích     ☐ Thích     ☐ Bình thường     ☐ Chưa thích'],
+        ['1. Chặng / hoạt động ấn tượng nhất & lý do', '\n'],
+        ['2. Khó khăn khi chế tạo tại nhà & cách khắc phục', '\n'],
+        ['3. Góp ý cải tiến bài giảng / trò chơi / dự án', '\n'],
+      ],
+    })
+  );
+
   const doc = new Document({
     sections: [
       {
-        properties: {
-          page: {
-            margin: { top: 1000, bottom: 1000, left: 1200, right: 1000 },
-          },
-        },
+        properties: { page: { margin: { top: 1000, bottom: 1000, left: 1200, right: 1000 } } },
         children: portraitChildren,
       },
       {
-        properties: {
-          page: {
-            size: { orientation: PageOrientation.LANDSCAPE },
-            margin: { top: 850, bottom: 850, left: 900, right: 900 },
-          },
-        },
+        properties: { page: { size: { orientation: PageOrientation.LANDSCAPE }, margin: { top: 850, bottom: 850, left: 900, right: 900 } } },
+        children: stage3Children,
+      },
+      {
+        properties: { page: { margin: { top: 1000, bottom: 1000, left: 1200, right: 1000 } } },
+        children: stage4Children,
+      },
+      {
+        properties: { page: { size: { orientation: PageOrientation.LANDSCAPE }, margin: { top: 850, bottom: 850, left: 900, right: 900 } } },
         children: landscapeChildren,
+      },
+      {
+        properties: { page: { margin: { top: 1000, bottom: 1000, left: 1200, right: 1000 } } },
+        children: surveyChildren,
       },
     ],
   });
