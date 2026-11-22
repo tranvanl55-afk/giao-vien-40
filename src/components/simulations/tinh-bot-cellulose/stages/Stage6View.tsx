@@ -9,6 +9,7 @@ import {
   RotateCcw,
   ExternalLink,
   Printer,
+  Download,
   Users,
   Crown,
   User,
@@ -771,7 +772,35 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                             />
                           </div>
 
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                import('../exportFormDocx').then((m) =>
+                                  m.exportStage6SelfToWord({
+                                    studentName: stage6SelfStudentName,
+                                    className: stage6SelfClass,
+                                    groupName: stage6SelfGroup,
+                                    dateStr: stage6SelfDate,
+                                    scores: stage6SelfScores,
+                                    reflections: stage6SelfReflections,
+                                    signature: stage6SelfSignature,
+                                  })
+                                );
+                              }}
+                              className="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 font-black text-xs flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                              <span>Xuất Word</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => window.print()}
+                              className="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 font-black text-xs flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Printer className="w-3.5 h-3.5" />
+                              <span>Xuất PDF / In</span>
+                            </button>
                             <button
                               type="button"
                               onClick={() => {
@@ -1062,18 +1091,45 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                             Nhóm trưởng xác nhận: <strong>{stage6LeaderName}</strong> ({stage6LeaderGroup})
                           </div>
 
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setStage6LeaderSubmitted(true);
-                              confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
-                              alert('✓ Nhóm trưởng đã nộp bảng đánh giá các thành viên thành công!');
-                            }}
-                            className="px-5 py-2.5 rounded-xl bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer transition-all"
-                          >
-                            <CheckCircle2 className="w-4 h-4" />
-                            <span>{stage6LeaderSubmitted ? '✓ Đã nộp bảng đánh giá Nhóm trưởng' : 'Nộp bảng đánh giá của Nhóm trưởng'}</span>
-                          </button>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                import('../exportFormDocx').then((m) =>
+                                  m.exportStage6LeaderToWord({
+                                    leaderName: stage6LeaderName,
+                                    className: stage6LeaderClass,
+                                    groupName: stage6LeaderGroup,
+                                    members: stage6Members,
+                                  })
+                                );
+                              }}
+                              className="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 font-black text-xs flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                              <span>Xuất Word</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => window.print()}
+                              className="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 font-black text-xs flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Printer className="w-3.5 h-3.5" />
+                              <span>Xuất PDF / In</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setStage6LeaderSubmitted(true);
+                                confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+                                alert('✓ Nhóm trưởng đã nộp bảng đánh giá các thành viên thành công!');
+                              }}
+                              className="px-5 py-2.5 rounded-xl bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer transition-all"
+                            >
+                              <CheckCircle2 className="w-4 h-4" />
+                              <span>{stage6LeaderSubmitted ? '✓ Đã nộp bảng đánh giá Nhóm trưởng' : 'Nộp bảng đánh giá của Nhóm trưởng'}</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1338,7 +1394,35 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                             Giáo viên ký nhận: <strong>{stage6TeacherName}</strong> (Tổ KHTN — THCS Ngô Chí Quốc)
                           </div>
 
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                import('../exportFormDocx').then((m) =>
+                                  m.exportStage6TeacherToWord({
+                                    teacherName: stage6TeacherName,
+                                    className: stage6TeacherClass,
+                                    groupName: stage6TeacherGroup,
+                                    productName: stage6TeacherProduct,
+                                    scores: stage6TeacherScores,
+                                    strengths: stage6TeacherStrengths,
+                                    individualAdjustments: stage6TeacherIndividualAdjustments,
+                                  })
+                                );
+                              }}
+                              className="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 font-black text-xs flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                              <span>Xuất Word</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => window.print()}
+                              className="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 font-black text-xs flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Printer className="w-3.5 h-3.5" />
+                              <span>Xuất PDF / In</span>
+                            </button>
                             <button
                               type="button"
                               onClick={() => {

@@ -1,6 +1,6 @@
 /* cSpell:disable */
 import React from 'react';
-import { CheckCircle2, HelpCircle, Send, Mail, Printer } from 'lucide-react';
+import { CheckCircle2, HelpCircle, Send, Mail, Printer, Download } from 'lucide-react';
 import {
   type RubricLevelOption,
   type Stage3RubricCriterion,
@@ -209,11 +209,28 @@ export function RubricInteractivePanel({
             )}
             <button
               type="button"
+              onClick={() => {
+                import('../exportFormDocx').then((m) =>
+                  m.exportRubricFormToWord({
+                    stageShortLabel,
+                    stageFullTitle,
+                    criteria,
+                    state,
+                  })
+                );
+              }}
+              className="px-3.5 py-1.5 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-black flex items-center gap-1.5 cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Xuất Word (.docx)</span>
+            </button>
+            <button
+              type="button"
               onClick={() => window.print()}
               className="px-3.5 py-1.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 text-xs font-black flex items-center gap-1.5 cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>{isChecklistMode ? 'In bảng kiểm' : 'In phiếu Rubric'}</span>
+              <span>Xuất PDF / In</span>
             </button>
           </div>
         </div>

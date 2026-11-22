@@ -1,7 +1,7 @@
 /* cSpell:disable */
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
-import { CheckCircle2, Printer, Send } from 'lucide-react';
+import { CheckCircle2, Download, Printer, Send } from 'lucide-react';
 
 export interface SurveyQuestionItem {
   num: number;
@@ -375,11 +375,34 @@ export const Stage6SurveyBox: React.FC<Stage6SurveyBoxProps> = ({
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
+            onClick={() => {
+              import('../exportFormDocx').then((m) =>
+                m.exportSurveyFormToWord({
+                  studentName: studentName.trim(),
+                  className: className.trim(),
+                  groupName: groupName.trim(),
+                  surveyDate: surveyDate.trim(),
+                  sections: SURVEY_SECTIONS,
+                  ratings,
+                  interestLevel,
+                  favoriteStageNote: favoriteStageNote.trim(),
+                  difficultySolutionNote: difficultySolutionNote.trim(),
+                  suggestionNote: suggestionNote.trim(),
+                })
+              );
+            }}
+            className="px-4 py-2 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 font-black text-xs flex items-center gap-1.5 cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Xuất Word (.docx)</span>
+          </button>
+          <button
+            type="button"
             onClick={() => window.print()}
             className="px-4 py-2 rounded-full bg-white hover:bg-slate-100 text-indigo-950 border border-indigo-200 font-black text-xs flex items-center gap-1.5 cursor-pointer"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span>In phiếu</span>
+            <span>Xuất PDF / In</span>
           </button>
           <button
             type="button"
