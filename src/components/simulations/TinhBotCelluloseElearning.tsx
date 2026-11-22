@@ -2829,6 +2829,30 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
           <button
             type="button"
             onClick={() => {
+              import('./tinh-bot-cellulose/exportScormPackage').then((m) => m.downloadScorm12Zip());
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 font-extrabold text-xs cursor-pointer transition-colors"
+            title="Tải gói chuẩn SCORM 1.2 (.zip) để upload trực tiếp lên LMS"
+          >
+            <Download className="w-3.5 h-3.5 text-teal-700" />
+            <span>SCORM 1.2</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              import('./tinh-bot-cellulose/exportScormPackage').then((m) => m.downloadHtml5File());
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 font-extrabold text-xs cursor-pointer transition-colors"
+            title="Tải tệp HTML5 độc lập (.html) theo chuẩn Điều 3.9 QĐ 791"
+          >
+            <Download className="w-3.5 h-3.5 text-indigo-700" />
+            <span>HTML5</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
               if (!window.confirm('Thầy/Em có chắc chắn muốn đặt lại toàn bộ tiến trình học tập từ Chặng 1 trên máy này không?')) {
                 return;
               }

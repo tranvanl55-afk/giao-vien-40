@@ -13,30 +13,17 @@ import {
   X,
 } from 'lucide-react';
 
+import {
+  DUBLIN_CORE_METADATA,
+  downloadHtml5File,
+  downloadScorm12Zip,
+  getDefaultPublicLessonUrl,
+} from '../exportScormPackage';
+
 interface ComplianceProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
-const DUBLIN_CORE_METADATA = {
-  identifier: 'GDPT2018-KHTN9-B30-TINHBOT-CELLULOSE-2026',
-  knowledgeUnitCode: '01-06-09-30-01-A-3',
-  title: 'Chủ đề STEM/STEAM: Bắt đầu từ sự kết thúc (Bài 30: Tinh bột và Cellulose – KHTN 9)',
-  creator: 'Trần Văn Lĩnh (Tổ KHTN – Trường TH&THCS Ngô Chí Quốc)',
-  subject: 'Khoa học tự nhiên 9; Tinh bột; Cellulose; Glucose; Phản ứng thủy phân; Phản ứng Iodine; Giáo dục STEM/STEAM',
-  description:
-    'Học liệu số tương tác HTML5 tổ chức dạy học dự án STEAM theo tiến trình 5 hoạt động của Công văn 3089/BGDĐT-GDTrH, tích hợp thí nghiệm ảo, mô phỏng động học, kiểm tra đánh giá đa dạng 4 hình thức, bảng kiểm Rubric 5 mức và khảo sát phản hồi học sinh.',
-  publisher: 'Trường TH&THCS Ngô Chí Quốc – Sở GDĐT TP. Hồ Chí Minh',
-  contributor: 'Tổ chuyên môn KHTN – Trường TH&THCS Ngô Chí Quốc',
-  date: '2026-11-22',
-  type: 'Interactive Resource / Học liệu số tương tác (HTML5)',
-  format: 'text/html; application/pdf; application/vnd.openxmlformats-officedocument.wordprocessingml.document; video/mp4; video/webm; audio/mpeg; application/json',
-  source: 'Chương trình GDPT 2018 – Môn Khoa học tự nhiên lớp 9 (Thông tư 32/2018/TT-BGDĐT)',
-  language: 'vi-VN; en-US (New Words & English Challenge)',
-  relation: 'Hệ thống quản lý học liệu số dùng chung ngành GDĐT TP.HCM (QĐ 791/QĐ-SGDĐT)',
-  coverage: 'Trung học cơ sở (Lớp 9) – Năm học 2026–2027',
-  rights: 'Chia sẻ miễn phí dùng chung ngành GDĐT (CC BY-NC-SA 4.0) – Tuân thủ Điều 4 & Điều 5 QĐ 791/QĐ-SGDĐT',
-};
 
 const DUBLIN_CORE_ROWS: { element: string; label: string; value: string }[] = [
   { element: 'dc:title', label: 'Nhan đề (Title)', value: DUBLIN_CORE_METADATA.title },
@@ -92,10 +79,7 @@ export const ComplianceProfileModal: React.FC<ComplianceProfileModalProps> = ({
   const [copiedType, setCopiedType] = useState<'embed' | 'link' | null>(null);
   const [isBuildingScorm, setIsBuildingScorm] = useState(false);
 
-  const defaultPublicUrl =
-    typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')
-      ? `${window.location.origin}/lesson/du-an-tinh-bot-cellulose`
-      : 'https://giao-vien-40.netlify.app/lesson/du-an-tinh-bot-cellulose';
+  const defaultPublicUrl = getDefaultPublicLessonUrl();
   const [scormUrl, setScormUrl] = useState<string>(defaultPublicUrl);
 
   if (!isOpen) return null;
@@ -411,15 +395,25 @@ export const ComplianceProfileModal: React.FC<ComplianceProfileModalProps> = ({
                       Gói .zip đã có sẵn <code>imsmanifest.xml</code>, <code>index.html</code> kết nối SCORM API và <code>metadata-dublin-core.json</code>. Thầy tải về rồi bấm <strong>CHỌN FILE .ZIP → UPLOAD</strong> trên LMS là xong!
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    disabled={isBuildingScorm}
-                    onClick={handleDownloadScormZip}
-                    className="px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>{isBuildingScorm ? 'Đang đóng gói...' : 'Tải gói SCORM 1.2 (.ZIP)'}</span>
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      disabled={isBuildingScorm}
+                      onClick={handleDownloadScormZip}
+                      className="px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>{isBuildingScorm ? 'Đang đóng gói...' : 'Tải SCORM 1.2 (.ZIP)'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => downloadHtml5File(shareUrl)}
+                      className="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Tải HTML5 (.HTML)</span>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 bg-white/90 p-2 rounded-xl border border-emerald-200">
