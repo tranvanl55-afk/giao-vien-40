@@ -80,9 +80,9 @@ export function Stage4View({
             >
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {[
-                  { id: 'make', emoji: '🥣', title: '1. Chế tạo mẫu', desc: 'Thực hiện pha chế, đổ khuôn và làm khô sản phẩm.' },
-                  { id: 'test', emoji: '🔍', title: '2. Thử nghiệm thực tế', desc: 'Kiểm tra độ bền, độ dẻo và tinh chỉnh sản phẩm.' },
-                  { id: 'media', emoji: '📸', title: '3. Ghi hình minh chứng', desc: 'Chụp ảnh / quay video quá trình làm tại nhà.' },
+                  { id: 'make', emoji: '🥣', title: '1. Chế tạo mẫu', desc: 'Pha chế hồ tinh bột + sợi cellulose, đổ khuôn, tích hợp hạt giống đều (sấy < 45°C).' },
+                  { id: 'test', emoji: '🌱', title: '2. Thử nghiệm nảy mầm & phân hủy', desc: 'Kiểm tra độ bền/dẻo, tưới ẩm thử hạt nảy mầm & theo dõi quá trình tự phân hủy trong đất.' },
+                  { id: 'media', emoji: '📸', title: '3. Ghi hình minh chứng', desc: 'Chụp ảnh / quay video quá trình làm, hạt nảy mầm và sản phẩm phân hủy tại nhà.' },
                 ].map((item) => {
                   const checked = homeChecks.has(item.id);
                   return (

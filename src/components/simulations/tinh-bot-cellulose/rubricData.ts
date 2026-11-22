@@ -602,7 +602,7 @@ export const STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA: Stage3RubricCriterion[] = [
   {
     id: 's5-tea-quality',
     category: 'Sản phẩm & Quy trình',
-    title: '2. ĐỘ BỀN, KỸ THUẬT HOÀN THIỆN & CÔNG NĂNG SẢN PHẨM',
+    title: '2. ĐỘ BỀN, KỸ THUẬT HOÀN THIỆN & KHẢ NĂNG NẢY MẦM CỦA HẠT',
     weightPercent: 35,
     maxPoints: 3.5,
     levels: [
@@ -612,7 +612,7 @@ export const STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA: Stage3RubricCriterion[] = [
         percentage: 20,
         points: 0.7,
         bullets: [
-          'Sản phẩm chưa thành hình, bị rã, ẩm mốc hoặc không sử dụng được theo mục tiêu.',
+          'Sản phẩm chưa thành hình, bị rã, ẩm mốc; chưa tích hợp hạt giống hoặc hạt bị chết phôi, không nảy mầm.',
         ],
       },
       {
@@ -621,7 +621,7 @@ export const STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA: Stage3RubricCriterion[] = [
         percentage: 40,
         points: 1.4,
         bullets: [
-          'Sản phẩm thành hình nhưng độ bền kém, bề mặt thô ráp, hạt mầm phân bố chưa đều.',
+          'Sản phẩm thành hình nhưng độ bền kém, bề mặt thô; hạt mầm phân bố chưa đều, tỉ lệ nảy mầm thấp (< 40%).',
         ],
       },
       {
@@ -630,7 +630,7 @@ export const STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA: Stage3RubricCriterion[] = [
         percentage: 60,
         points: 2.1,
         bullets: [
-          'Sản phẩm chắc chắn, đáp ứng tốt công năng cơ bản (viết/gói/ươm cây), giữ được phom dáng.',
+          'Sản phẩm chắc chắn, đáp ứng tốt công năng cơ bản; hạt giống tích hợp tương đối đều và có nảy mầm khi tưới ẩm (≥ 50%).',
         ],
       },
       {
@@ -639,7 +639,7 @@ export const STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA: Stage3RubricCriterion[] = [
         percentage: 80,
         points: 2.8,
         bullets: [
-          'Sản phẩm bền đẹp, bề mặt mịn đồng đều, chịu ẩm nhẹ tốt; hạt mầm tích hợp đều và nảy mầm đạt.',
+          'Sản phẩm bền đẹp, bề mặt mịn đồng đều, chịu ẩm nhẹ tốt; hạt mầm tích hợp đều và nảy mầm khỏe, đạt tỉ lệ cao (≥ 75%).',
         ],
       },
       {
@@ -648,7 +648,7 @@ export const STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA: Stage3RubricCriterion[] = [
         percentage: 100,
         points: 3.5,
         bullets: [
-          'Hoàn thiện sắc sảo như sản phẩm thương mại xanh: bền chắc, chịu lực/ẩm tốt, công năng hoạt động hoàn hảo.',
+          'Hoàn thiện sắc sảo như sản phẩm thương mại xanh: bền chắc, chịu lực/ẩm tốt; hạt giống nảy mầm đồng loạt (≥ 90%) có minh chứng đối chứng rõ ràng.',
         ],
       },
     ],
@@ -700,7 +700,7 @@ export const STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA: Stage3RubricCriterion[] = [
   {
     id: 's5-tea-safety',
     category: 'Sản phẩm & Quy trình',
-    title: '4. TÍNH AN TOÀN, SINH THÁI & KHẢ NĂNG ỨNG DỤNG THỰC TẾ',
+    title: '4. QUÁ TRÌNH TỰ PHÂN HỦY SINH HỌC, AN TOÀN & ỨNG DỤNG THỰC TẾ',
     weightPercent: 20,
     maxPoints: 2.0,
     levels: [
@@ -709,35 +709,35 @@ export const STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA: Stage3RubricCriterion[] = [
         label: 'Cần cố gắng',
         percentage: 20,
         points: 0.4,
-        bullets: ['Sản phẩm còn lẫn tạp chất/hóa chất tẩy rửa không an toàn hoặc khó ứng dụng thực tế.'],
+        bullets: ['Sản phẩm còn lẫn tạp chất/hóa chất tẩy rửa hoặc keo nhựa khó phân hủy, không an toàn khi gieo trồng.'],
       },
       {
         level: 2,
         label: 'Đạt',
         percentage: 40,
         points: 0.8,
-        bullets: ['Sản phẩm an toàn khi cầm nắm nhưng tính ứng dụng thay thế đồ nhựa còn hạn chế.'],
+        bullets: ['Sản phẩm an toàn khi cầm nắm nhưng chưa kiểm chứng quá trình tự phân hủy trong đất/nước, tính ứng dụng còn hạn chế.'],
       },
       {
         level: 3,
         label: 'Khá',
         percentage: 60,
         points: 1.2,
-        bullets: ['100% nguyên liệu an toàn, tự phân hủy sinh học và có thể sử dụng thay thế sản phẩm nhựa dùng 1 lần.'],
+        bullets: ['100% nguyên liệu an toàn, bắt đầu mềm và tự phân hủy sinh học trong đất ẩm; có thể thay thế đồ nhựa dùng 1 lần.'],
       },
       {
         level: 4,
         label: 'Tốt',
         percentage: 80,
         points: 1.6,
-        bullets: ['Thân thiện môi trường tuyệt đối, chi phí chế tạo thấp, phù hợp áp dụng rộng rãi trong đời sống.'],
+        bullets: ['Quá trình phân hủy sinh học diễn ra rõ rệt, tan rã tự nhiên thành mùn hữu cơ nuôi cây, không để lại vi nhựa hay chất độc.'],
       },
       {
         level: 5,
         label: 'Xuất sắc',
         percentage: 100,
         points: 2.0,
-        bullets: ['Giá trị sinh thái cao, chi phí tối ưu, sẵn sàng nhân rộng sản xuất tại trường học hoặc cộng đồng.'],
+        bullets: ['Vòng đời Xanh khép kín: sản phẩm phân hủy hoàn toàn trong đất thành chất dinh dưỡng cho hạt nảy mầm, chi phí tối ưu, sẵn sàng nhân rộng.'],
       },
     ],
   },
