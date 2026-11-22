@@ -23,6 +23,7 @@ import { LockedTaskBox } from '../components/LockedTaskBox';
 
 interface Stage1ViewProps {
   guideBanner: React.ReactNode;
+  isReviewMode: boolean;
   unlockedTaskIds: Set<string>;
   unlockTask: (id: string) => void;
   lockTask: (id: string) => void;
@@ -56,6 +57,7 @@ interface Stage1ViewProps {
 
 export function Stage1View({
   guideBanner,
+  isReviewMode,
   unlockedTaskIds,
   unlockTask,
   lockTask,
@@ -194,6 +196,11 @@ export function Stage1View({
                   <span className="text-xs font-black uppercase text-indigo-950">
                     🔑 Kéo chữ cái đã mở thả vào các ô &ldquo;?&rdquo; bên dưới (hoặc chọn ô số {activeKeywordSlot + 1} rồi bấm chữ) • Đã ghép {placedKeywordSlots.size}/{FULL_KEYWORD_LETTERS.length}:
                   </span>
+                  {isReviewMode && (
+                    <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 text-[11px] font-black">
+                      💡 Đáp án từ khóa: GREEN NEWSPAPER
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
@@ -394,6 +401,12 @@ export function Stage1View({
                         <span className="text-orange-600 font-black">Thử thách {clue.rowNumber}: </span>
                         {clue.question}
                       </p>
+
+                      {isReviewMode && !solved && (
+                        <div className="text-[11px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1">
+                          💡 Đáp án: {clue.answerDisplay}
+                        </div>
+                      )}
 
                       {solved ? (
                         <div className="flex items-center justify-between flex-wrap gap-1.5 bg-white p-2 rounded-xl border border-emerald-200">

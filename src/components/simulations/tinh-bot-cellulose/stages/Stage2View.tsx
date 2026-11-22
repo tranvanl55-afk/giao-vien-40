@@ -1784,6 +1784,11 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
                               <span>
                                 <strong>{String.fromCharCode(65 + oIdx)}.</strong> {opt}
                               </span>
+                              {!iodineQuizSubmitted && isTeacherMode && isRight && (
+                                <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0">
+                                  ✓ Đáp án đúng
+                                </span>
+                              )}
                               {iodineQuizSubmitted && isRight && (
                                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                               )}
@@ -2305,6 +2310,11 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
                               <span>
                                 <strong>{String.fromCharCode(65 + oIdx)}.</strong> {opt}
                               </span>
+                              {!hydroQuizSubmitted && isTeacherMode && isRight && (
+                                <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0">
+                                  ✓ Đáp án đúng
+                                </span>
+                              )}
                               {hydroQuizSubmitted && isRight && (
                                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                               )}
@@ -2918,6 +2928,11 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
                                 <span>
                                   <strong>{String.fromCharCode(65 + oIdx)}.</strong> {opt}
                                 </span>
+                                {!isTestSubmitted && isTeacherMode && isRight && (
+                                  <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0">
+                                    ✓ Đáp án đúng
+                                  </span>
+                                )}
                                 {isTestSubmitted && isRight && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
                                 {isTestSubmitted && isPicked && !isRight && <XCircle className="w-4 h-4 text-rose-600 shrink-0" />}
                               </button>
@@ -2968,6 +2983,11 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
                                   >
                                     ✗ Sai
                                   </button>
+                                  {!isTestSubmitted && isTeacherMode && (
+                                    <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0">
+                                      ✓ {sub.isCorrect ? 'Đúng' : 'Sai'}
+                                    </span>
+                                  )}
                                   {isTestSubmitted && isRight && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
                                   {isTestSubmitted && isAnswered && !isRight && <XCircle className="w-4 h-4 text-rose-600 shrink-0" />}
                                 </div>
@@ -3001,7 +3021,7 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
                                       : 'bg-indigo-50/40 border-indigo-200 text-indigo-950 focus:border-indigo-600 focus:bg-white'
                                       }`}
                                   />
-                                  {isTestSubmitted && (
+                                  {(isTestSubmitted || isTeacherMode) && (
                                     <div className="mt-1 text-[10px] font-bold text-slate-500">
                                       Đáp án đúng: <span className="text-emerald-700 font-extrabold">{b.acceptedAnswers[0]}</span>
                                     </div>
@@ -3051,6 +3071,11 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
                                       </option>
                                     ))}
                                   </select>
+                                  {!isTestSubmitted && isTeacherMode && (
+                                    <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0">
+                                      ✓ Đáp án: {pair.rightKey}
+                                    </span>
+                                  )}
                                   {isTestSubmitted && (
                                     <span className="font-black text-xs">
                                       {isRight ? '✅' : `❌ (Đáp án: ${pair.rightKey})`}
@@ -3063,8 +3088,8 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
                         </div>
                       )}
 
-                      {/* Giải thích chi tiết khi đã nộp bài */}
-                      {isTestSubmitted && (
+                      {/* Giải thích chi tiết khi đã nộp bài hoặc ở chế độ Giám khảo/GV */}
+                      {(isTestSubmitted || isTeacherMode) && (
                         <div className="bg-amber-50/80 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-950 leading-relaxed">
                           💡 <strong>Giải thích khoa học:</strong> {q.explanation}
                         </div>

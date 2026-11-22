@@ -38,6 +38,7 @@ export interface Stage6Reflections {
 
 interface Stage6ViewProps {
   guideBanner: React.ReactNode;
+  isReviewMode: boolean;
   unlockedTaskIds: Set<string>;
   everUnlockedTaskIds: Set<string>;
   unlockTask: (id: string) => void;
@@ -109,6 +110,7 @@ interface Stage6ViewProps {
 
 export const Stage6View: React.FC<Stage6ViewProps> = ({
   guideBanner,
+  isReviewMode,
   unlockedTaskIds,
   everUnlockedTaskIds,
   unlockTask,
@@ -420,6 +422,11 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                                     {['A.', 'B.', 'C.', 'D.'][oIdx]}
                                   </span>
                                   <span className="flex-1">{opt}</span>
+                                  {!quizSubmitted && isReviewMode && isCorrect && (
+                                    <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0">
+                                      ✓ Đáp án đúng
+                                    </span>
+                                  )}
                                   {quizSubmitted && isCorrect && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
                                   {quizSubmitted && isChosen && !isCorrect && <XCircle className="w-3.5 h-3.5 text-rose-600" />}
                                 </button>

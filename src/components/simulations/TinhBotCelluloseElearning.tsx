@@ -3746,6 +3746,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         {activeStage === 'stage-1' && (
           <Stage1View
             guideBanner={renderStageGuideBanner('stage-1')}
+            isReviewMode={isTeacherMode || isJudgeMode}
             unlockedTaskIds={unlockedTaskIds}
             unlockTask={unlockTask}
             lockTask={lockTask}
@@ -3988,6 +3989,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         {activeStage === 'stage-6' && (
           <Stage6View
             guideBanner={renderStageGuideBanner('stage-6')}
+            isReviewMode={isTeacherMode || isJudgeMode}
             unlockedTaskIds={unlockedTaskIds}
             everUnlockedTaskIds={everUnlockedTaskIds}
             unlockTask={unlockTask}
