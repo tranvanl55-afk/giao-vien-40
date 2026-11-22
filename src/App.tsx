@@ -118,10 +118,7 @@ export default function App() {
       );
     }
 
-    const isPublicTinhBotUnlocked =
-      typeof window !== 'undefined' && sessionStorage.getItem('public_tinhbot_unlocked') === 'true';
-
-    if (location.pathname === '/lesson/du-an-tinh-bot-cellulose' && isPublicTinhBotUnlocked) {
+    if (location.pathname === '/lesson/du-an-tinh-bot-cellulose') {
       return (
         <ErrorBoundary onBack={() => navigate('/')}>
           <Suspense fallback={<CatLoader />}>

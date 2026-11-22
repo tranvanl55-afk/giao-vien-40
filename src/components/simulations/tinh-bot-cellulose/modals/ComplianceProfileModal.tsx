@@ -94,8 +94,8 @@ export const ComplianceProfileModal: React.FC<ComplianceProfileModalProps> = ({
 
   const defaultPublicUrl =
     typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')
-      ? window.location.href
-      : 'https://giao-vien-40.netlify.app/';
+      ? `${window.location.origin}/lesson/du-an-tinh-bot-cellulose`
+      : 'https://giao-vien-40.netlify.app/lesson/du-an-tinh-bot-cellulose';
   const [scormUrl, setScormUrl] = useState<string>(defaultPublicUrl);
 
   if (!isOpen) return null;
