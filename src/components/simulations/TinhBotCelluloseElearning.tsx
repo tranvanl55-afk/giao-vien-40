@@ -4058,47 +4058,49 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
           />
         )}
 
-        {/* PHIẾU KHẢO SÁT Ý KIẾN HỌC SINH SAU CHỦ ĐỀ (TÁCH RIÊNG CUỐI TRANG, KHÔNG TÍNH CHẶNG) */}
-        <section className="mt-2 bg-white/90 border-2 border-emerald-200 rounded-3xl shadow-sm overflow-hidden">
-          <button
-            type="button"
-            onClick={() => setShowStandaloneSurvey((v) => !v)}
-            className="w-full px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 bg-linear-to-r from-emerald-50 via-teal-50 to-indigo-50 hover:from-emerald-100/80 hover:to-indigo-100/80 transition-colors cursor-pointer text-left"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-lg shadow-xs shrink-0">
-                📝
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs sm:text-sm font-black text-indigo-950 uppercase">
-                    Phiếu khảo sát ý kiến học sinh sau chủ đề
-                  </span>
-                  {stage6SurveySubmitted && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500 text-white text-[11px] font-black">
-                      ✓ Đã gửi
-                    </span>
-                  )}
+        {/* PHIẾU KHẢO SÁT Ý KIẾN HỌC SINH SAU CHỦ ĐỀ (CHỈ HIỆN SAU CHẶNG 6, KHÔNG TÍNH CHẶNG) */}
+        {activeStage === 'stage-6' && (
+          <section className="mt-2 bg-white/90 border-2 border-emerald-200 rounded-3xl shadow-sm overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowStandaloneSurvey((v) => !v)}
+              className="w-full px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 bg-linear-to-r from-emerald-50 via-teal-50 to-indigo-50 hover:from-emerald-100/80 hover:to-indigo-100/80 transition-colors cursor-pointer text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-lg shadow-xs shrink-0">
+                  📝
                 </div>
-                <p className="text-[11px] font-medium text-emerald-900/80">
-                  Mục tách riêng cuối dự án (không tính vào tiến độ chặng) — ghi nhận trải nghiệm &amp; sự tiến bộ của học sinh.
-                </p>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs sm:text-sm font-black text-indigo-950 uppercase">
+                      Phiếu khảo sát ý kiến học sinh sau chủ đề
+                    </span>
+                    {stage6SurveySubmitted && (
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500 text-white text-[11px] font-black">
+                        ✓ Đã gửi
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] font-medium text-emerald-900/80">
+                    Mục tách riêng cuối dự án (không tính vào tiến độ chặng) — ghi nhận trải nghiệm &amp; sự tiến bộ của học sinh.
+                  </p>
+                </div>
               </div>
-            </div>
-            <span className="px-4 py-1.5 rounded-full bg-emerald-600 text-white text-xs font-black shrink-0">
-              {showStandaloneSurvey ? 'Thu gọn ▲' : 'Mở phiếu khảo sát ▼'}
-            </span>
-          </button>
+              <span className="px-4 py-1.5 rounded-full bg-emerald-600 text-white text-xs font-black shrink-0">
+                {showStandaloneSurvey ? 'Thu gọn ▲' : 'Mở phiếu khảo sát ▼'}
+              </span>
+            </button>
 
-          {showStandaloneSurvey && (
-            <div className="p-4 sm:p-5 border-t border-emerald-100">
-              <Stage6SurveyBox
-                isSubmitted={stage6SurveySubmitted}
-                onSubmitSurvey={handleSubmitStage6Survey}
-              />
-            </div>
-          )}
-        </section>
+            {showStandaloneSurvey && (
+              <div className="p-4 sm:p-5 border-t border-emerald-100">
+                <Stage6SurveyBox
+                  isSubmitted={stage6SurveySubmitted}
+                  onSubmitSurvey={handleSubmitStage6Survey}
+                />
+              </div>
+            )}
+          </section>
+        )}
 
 {/* FOOTER BẢN QUYỀN & TÀI LIỆU THAM KHẢO */}
 <footer className="mt-2 pt-3 border-t border-indigo-200/60 flex flex-wrap items-center justify-between gap-3 text-xs text-indigo-900/75">
