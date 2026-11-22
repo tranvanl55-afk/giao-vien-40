@@ -1776,6 +1776,5 @@ export const ALL_TASK_IDS = [
   'task-s6-summary',
   'task-s6-assessment',
   'task-s6-video',
-  'task-s6-survey',
 ];
 

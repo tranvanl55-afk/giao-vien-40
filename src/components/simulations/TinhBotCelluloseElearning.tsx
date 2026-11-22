@@ -58,6 +58,7 @@ import { Stage4View } from './tinh-bot-cellulose/stages/Stage4View';
 import { Stage5View } from './tinh-bot-cellulose/stages/Stage5View';
 import { Stage6View } from './tinh-bot-cellulose/stages/Stage6View';
 import {
+  Stage6SurveyBox,
   SURVEY_SECTIONS,
   SURVEY_INTEREST_OPTIONS,
   type Stage6SurveySubmissionPayload,
@@ -187,6 +188,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const [dashboardRubricRecords, setDashboardRubricRecords] = useState<Stage3RubricSubmissionRecord[]>([]);
   const [dashboardSurveyRecords, setDashboardSurveyRecords] = useState<Stage3RubricSubmissionRecord[]>([]);
   const [stage6SurveySubmitted, setStage6SurveySubmitted] = useState<boolean>(false);
+  const [showStandaloneSurvey, setShowStandaloneSurvey] = useState<boolean>(false);
   const [isLoadingDashboard, setIsLoadingDashboard] = useState<boolean>(false);
   const [dashboardLoadWarning, setDashboardLoadWarning] = useState<string | null>(null);
   const [dashboardSearchQuery, setDashboardSearchQuery] = useState<string>('');
@@ -1540,7 +1542,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     'stage-3': ['task-s3-idea', 'task-s3-process', 'task-s3-peer'],
     'stage-4': ['task-s4-maker', 'task-s4-submit'],
     'stage-5': ['task-s5-booth', 'task-s5-presentation', 'task-s5-vote'],
-    'stage-6': ['task-s6-summary', 'task-s6-assessment', 'task-s6-video', 'task-s6-survey'],
+    'stage-6': ['task-s6-summary', 'task-s6-assessment', 'task-s6-video'],
   };
 
   const isTaskIdCompleted = (taskId: string): boolean => {
@@ -1583,8 +1585,6 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         return stage6SelfSubmitted || stage6LeaderSubmitted || stage6TeacherSubmitted;
       case 'task-s6-video':
         return stage6SummaryVideoConfirmed;
-      case 'task-s6-survey':
-        return stage6SurveySubmitted;
       default:
         return false;
     }
@@ -4055,10 +4055,51 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             setStage6TeacherIndividualAdjustments={setStage6TeacherIndividualAdjustments}
             stage6TeacherSubmitted={stage6TeacherSubmitted}
             setStage6TeacherSubmitted={setStage6TeacherSubmitted}
-            stage6SurveySubmitted={stage6SurveySubmitted}
-            handleSubmitStage6Survey={handleSubmitStage6Survey}
           />
         )}
+
+        {/* PHIẾU KHẢO SÁT Ý KIẾN HỌC SINH SAU CHỦ ĐỀ (TÁCH RIÊNG CUỐI TRANG, KHÔNG TÍNH CHẶNG) */}
+        <section className="mt-2 bg-white/90 border-2 border-emerald-200 rounded-3xl shadow-sm overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setShowStandaloneSurvey((v) => !v)}
+            className="w-full px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 bg-linear-to-r from-emerald-50 via-teal-50 to-indigo-50 hover:from-emerald-100/80 hover:to-indigo-100/80 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-lg shadow-xs shrink-0">
+                📝
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs sm:text-sm font-black text-indigo-950 uppercase">
+                    Phiếu khảo sát ý kiến học sinh sau chủ đề
+                  </span>
+                  {stage6SurveySubmitted && (
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500 text-white text-[11px] font-black">
+                      ✓ Đã gửi
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] font-medium text-emerald-900/80">
+                  Mục tách riêng cuối dự án (không tính vào tiến độ chặng) — ghi nhận trải nghiệm &amp; sự tiến bộ của học sinh.
+                </p>
+              </div>
+            </div>
+            <span className="px-4 py-1.5 rounded-full bg-emerald-600 text-white text-xs font-black shrink-0">
+              {showStandaloneSurvey ? 'Thu gọn ▲' : 'Mở phiếu khảo sát ▼'}
+            </span>
+          </button>
+
+          {showStandaloneSurvey && (
+            <div className="p-4 sm:p-5 border-t border-emerald-100">
+              <Stage6SurveyBox
+                isSubmitted={stage6SurveySubmitted}
+                onSubmitSurvey={handleSubmitStage6Survey}
+              />
+            </div>
+          )}
+        </section>
+
 {/* FOOTER BẢN QUYỀN & TÀI LIỆU THAM KHẢO */}
 <footer className="mt-2 pt-3 border-t border-indigo-200/60 flex flex-wrap items-center justify-between gap-3 text-xs text-indigo-900/75">
   <div className="flex flex-col gap-0.5">
