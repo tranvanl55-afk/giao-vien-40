@@ -542,6 +542,207 @@ export const STAGE5_RUBRIC_CRITERIA: Stage3RubricCriterion[] = [
   },
 ];
 
+// Rubric Chặng 5 dành riêng cho GIÁO VIÊN chấm Sản phẩm STEAM tại Ngày hội Xanh (4 Tiêu chí × 5 Mức độ = 10 điểm)
+export const STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA: Stage3RubricCriterion[] = [
+  {
+    id: 's5-tea-science',
+    category: 'Sản phẩm & Quy trình',
+    title: '1. CƠ SỞ KHOA HỌC BÀI 30 (TINH BỘT & CELLULOSE)',
+    weightPercent: 25,
+    maxPoints: 2.5,
+    levels: [
+      {
+        level: 1,
+        label: 'Cần cố gắng',
+        percentage: 20,
+        points: 0.5,
+        bullets: [
+          'Chưa giải thích được vai trò sợi cellulose và chất kết dính hồ tinh bột.',
+          'Nhầm lẫn tính chất vật lí/hóa học cơ bản của tinh bột và cellulose.',
+        ],
+      },
+      {
+        level: 2,
+        label: 'Đạt',
+        percentage: 40,
+        points: 1.0,
+        bullets: [
+          'Nêu được đúng tên nguyên liệu giàu cellulose và tinh bột nhưng giải thích cơ chế còn sơ sài.',
+        ],
+      },
+      {
+        level: 3,
+        label: 'Khá',
+        percentage: 60,
+        points: 1.5,
+        bullets: [
+          'Giải thích đúng vai trò khung sợi cellulose và chất kết dính sinh học hồ tinh bột khi tạo sản phẩm.',
+        ],
+      },
+      {
+        level: 4,
+        label: 'Tốt',
+        percentage: 80,
+        points: 2.0,
+        bullets: [
+          'Phân tích rõ bản chất liên kết sợi, tính bền, khả năng phân hủy sinh học gắn chặt kiến thức KHTN 9.',
+        ],
+      },
+      {
+        level: 5,
+        label: 'Xuất sắc',
+        percentage: 100,
+        points: 2.5,
+        bullets: [
+          'Vận dụng sâu sắc kiến thức Bài 30 để tối ưu tỉ lệ phối trộn; có số liệu đối chứng khoa học thuyết phục.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 's5-tea-quality',
+    category: 'Sản phẩm & Quy trình',
+    title: '2. CHẤT LƯỢNG KỸ THUẬT, ĐỘ BỀN & CÔNG NĂNG SẢN PHẨM',
+    weightPercent: 35,
+    maxPoints: 3.5,
+    levels: [
+      {
+        level: 1,
+        label: 'Cần cố gắng',
+        percentage: 20,
+        points: 0.7,
+        bullets: [
+          'Sản phẩm chưa thành hình, bị rã, ẩm mốc hoặc không sử dụng được theo mục tiêu.',
+        ],
+      },
+      {
+        level: 2,
+        label: 'Đạt',
+        percentage: 40,
+        points: 1.4,
+        bullets: [
+          'Sản phẩm thành hình nhưng độ bền kém, bề mặt thô, hạt mầm phân bố chưa đều.',
+        ],
+      },
+      {
+        level: 3,
+        label: 'Khá',
+        percentage: 60,
+        points: 2.1,
+        bullets: [
+          'Sản phẩm chắc chắn, đáp ứng công năng cơ bản (viết/gói/ươm cây), an toàn không hóa chất độc hại.',
+        ],
+      },
+      {
+        level: 4,
+        label: 'Tốt',
+        percentage: 80,
+        points: 2.8,
+        bullets: [
+          'Sản phẩm bền đẹp, bề mặt mịn, chịu ẩm nhẹ tốt; hạt mầm tích hợp đều và nảy mầm thử nghiệm đạt.',
+        ],
+      },
+      {
+        level: 5,
+        label: 'Xuất sắc',
+        percentage: 100,
+        points: 3.5,
+        bullets: [
+          'Hoàn thiện xuất sắc như sản phẩm thương mại xanh: bền, thẩm mỹ cao, đóng gói nhãn mác và hướng dẫn sử dụng chuẩn.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 's5-tea-creativity',
+    category: 'Poster Khoa học',
+    title: '3. TÍNH SÁNG TẠO & CẢI TIẾN QUY TRÌNH STEAM',
+    weightPercent: 20,
+    maxPoints: 2.0,
+    levels: [
+      {
+        level: 1,
+        label: 'Cần cố gắng',
+        percentage: 20,
+        points: 0.4,
+        bullets: ['Sao chép rập khuôn mẫu có sẵn, không có điều chỉnh cải tiến.'],
+      },
+      {
+        level: 2,
+        label: 'Đạt',
+        percentage: 40,
+        points: 0.8,
+        bullets: ['Có thử nghiệm tạo sản phẩm nhưng chưa ghi nhận bước tinh chỉnh tỉ lệ.'],
+      },
+      {
+        level: 3,
+        label: 'Khá',
+        percentage: 60,
+        points: 1.2,
+        bullets: ['Có sáng tạo trong tạo hình hoặc tận dụng phế phẩm địa phương sẵn có.'],
+      },
+      {
+        level: 4,
+        label: 'Tốt',
+        percentage: 80,
+        points: 1.6,
+        bullets: ['Kết hợp linh hoạt ≥ 2 nguồn phế phẩm, có thử nghiệm so sánh để cải tiến chất lượng mẫu.'],
+      },
+      {
+        level: 5,
+        label: 'Xuất sắc',
+        percentage: 100,
+        points: 2.0,
+        bullets: ['Giải pháp đột phá, tính thực tiễn và khả năng nhân rộng cao, tiết kiệm chi phí tối đa.'],
+      },
+    ],
+  },
+  {
+    id: 's5-tea-present',
+    category: 'Thuyết trình & Phản biện',
+    title: '4. THUYẾT TRÌNH, PHẢN BIỆN & MINH CHỨNG SỐ',
+    weightPercent: 20,
+    maxPoints: 2.0,
+    levels: [
+      {
+        level: 1,
+        label: 'Cần cố gắng',
+        percentage: 20,
+        points: 0.4,
+        bullets: ['Thiếu minh chứng Padlet/Poster; không trả lời được câu hỏi phản biện của GV.'],
+      },
+      {
+        level: 2,
+        label: 'Đạt',
+        percentage: 40,
+        points: 0.8,
+        bullets: ['Trình bày đủ ý cơ bản nhưng còn lệ thuộc giấy, minh chứng số chưa đầy đủ.'],
+      },
+      {
+        level: 3,
+        label: 'Khá',
+        percentage: 60,
+        points: 1.2,
+        bullets: ['Thuyết trình rõ ràng, phối hợp nhóm tốt, có đủ Poster và nhật ký Padlet.'],
+      },
+      {
+        level: 4,
+        label: 'Tốt',
+        percentage: 80,
+        points: 1.6,
+        bullets: ['Trình bày cuốn hút, trả lời phản biện có căn cứ khoa học; sử dụng thuật ngữ tiếng Anh hợp lí.'],
+      },
+      {
+        level: 5,
+        label: 'Xuất sắc',
+        percentage: 100,
+        points: 2.0,
+        bullets: ['Làm chủ sân khấu, thuyết trình song ngữ tự tin, phản biện sắc sảo bằng số liệu thực nghiệm.'],
+      },
+    ],
+  },
+];
+
 
 export interface RubricFormState {
   selections: Record<string, 1 | 2 | 3 | 4 | 5>;
