@@ -1064,12 +1064,12 @@
       },
       {
         id: 6,
-        question: "Vì sao đun nóng hồ tinh bột với iodine thì mất màu xanh tím, nhưng khi để nguội màu xanh tím lại xuất hiện trở lại?",
+        question: "Vì sao hồ tinh bột tạo màu xanh tím với dung dịch iodine (I₂), còn cellulose thì không có phản ứng này?",
         options: [
-          "Do iodine đã bay hơi hoàn toàn khi đun sôi",
-          "Do cấu trúc xoắn duỗi ra khi nóng, để nguội lại cuộn xoắn hấp phụ iodine",
-          "Do tinh bột đã bị oxy hóa hoàn toàn thành carbonic",
-          "Do iodine bị phân hủy thành các ion không màu"
+          "Do tinh bột không tan trong nước lạnh như cellulose",
+          "Do cấu trúc xoắn của tinh bột giữ được các phân tử iodine, còn cellulose mạch thẳng không xoắn",
+          "Do tinh bột có phản ứng oxy hóa khử với iodine tạo chất kết tủa",
+          "Do phân tử khối của cellulose nhỏ hơn nhiều so với tinh bột"
         ],
         correctIndex: 1 // B
       },
@@ -1097,10 +1097,11 @@
       }
     ];
 
-    const STORAGE_KEY = 'BODY_POSE_QUIZ_QUESTIONS_V4';
+    const STORAGE_KEY = 'BODY_POSE_QUIZ_QUESTIONS_V5';
 
     let questions = [];
     try {
+      localStorage.removeItem('BODY_POSE_QUIZ_QUESTIONS_V4');
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         questions = JSON.parse(saved);
