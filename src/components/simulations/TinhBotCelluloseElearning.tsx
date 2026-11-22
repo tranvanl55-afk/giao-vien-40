@@ -3954,6 +3954,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             toggleSetItem={toggleSetItem}
             productSubmitted={productSubmitted}
             setProductSubmitted={setProductSubmitted}
+            submitRubricEvaluation={submitRubricEvaluation}
             isNextStageUnlocked={isStageUnlocked('stage-5')}
             onNextStage={() => switchStage('stage-5')}
           />

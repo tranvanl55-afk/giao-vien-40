@@ -683,6 +683,18 @@ export async function exportAllStagesToWord(): Promise<void> {
       rows: PROCESS_STEPS.map((st) => [`Bước ${st.step}`, st.title, st.detail, '☐ Xong']),
     })
   );
+  stage4Children.push(subHeading('4.3. Rubric dành cho Giáo viên — Đánh giá Sản phẩm STEAM (HS tham khảo khi chế tạo)'));
+  stage4Children.push(
+    buildMatrix7ColTable(
+      'TIÊU CHÍ SP\n(Trọng số)',
+      '065F46',
+      STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA.map((c) => ({
+        leftLines: [`[${c.category}]`, c.title, `Trọng số: ${c.weightPercent}% (Tối đa ${c.maxPoints}đ)`],
+        levels: c.levels.map((lv) => ({ points: lv.points, lines: lv.bullets })),
+        maxPoints: c.maxPoints,
+      }))
+    )
+  );
 
   // =========================================================================
   // CHẶNG 5, CHẶNG 6 & PHIẾU KHẢO SÁT (SECTION LANDSCAPE ĐÚNG THỨ TỰ)
@@ -707,18 +719,6 @@ export async function exportAllStagesToWord(): Promise<void> {
       'TIÊU CHÍ\n(Trọng số)',
       '1E1B4B',
       STAGE5_RUBRIC_CRITERIA.map((c) => ({
-        leftLines: [`[${c.category}]`, c.title, `Trọng số: ${c.weightPercent}% (Tối đa ${c.maxPoints}đ)`],
-        levels: c.levels.map((lv) => ({ points: lv.points, lines: lv.bullets })),
-        maxPoints: c.maxPoints,
-      }))
-    )
-  );
-  landscapeChildren.push(subHeading('5.2B. Rubric dành cho Giáo viên — Chấm Sản phẩm STEAM (Chặng 5)'));
-  landscapeChildren.push(
-    buildMatrix7ColTable(
-      'TIÊU CHÍ GV\n(Trọng số)',
-      '065F46',
-      STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA.map((c) => ({
         leftLines: [`[${c.category}]`, c.title, `Trọng số: ${c.weightPercent}% (Tối đa ${c.maxPoints}đ)`],
         levels: c.levels.map((lv) => ({ points: lv.points, lines: lv.bullets })),
         maxPoints: c.maxPoints,

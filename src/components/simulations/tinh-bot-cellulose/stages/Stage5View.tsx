@@ -17,9 +17,6 @@ import {
   type Stage3RubricCriterion,
   type RubricFormState,
   STAGE5_RUBRIC_CRITERIA,
-  STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA,
-  createInitialRubricFormState,
-  getRubricSummary,
 } from '../rubricData';
 import { LockedTaskBox } from '../components/LockedTaskBox';
 import { RubricInteractivePanel } from '../components/RubricInteractivePanel';
@@ -70,17 +67,6 @@ export function Stage5View({
   isNextStageUnlocked,
   onNextStage,
 }: Stage5ViewProps) {
-  const [evalRoleTab, setEvalRoleTab] = React.useState<'peer' | 'teacher'>('peer');
-  const [teacherProductRubricState, setTeacherProductRubricState] = React.useState<RubricFormState>(() => ({
-    ...createInitialRubricFormState(),
-    evaluatorMode: 'self',
-    evaluatorGroup: 'GV Trần Văn Lĩnh',
-  }));
-  const teacherProductSummary = getRubricSummary(
-    STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA,
-    teacherProductRubricState
-  );
-
   return (
 <div className="flex flex-col gap-4 animate-in fade-in duration-200">
             {guideBanner}
@@ -236,11 +222,11 @@ export function Stage5View({
               </div>
             </LockedTaskBox>
 
-            {/* Ô 5.2. ĐÁNH GIÁ ĐỒNG ĐẲNG & RUBRIC GIÁO VIÊN CHẤM SẢN PHẨM NGÀY HỘI XANH */}
+            {/* Ô 5.2. ĐÁNH GIÁ ĐỒNG ĐẲNG & RUBRIC NGÀY HỘI XANH (SẢN PHẨM, POSTER & THUYẾT TRÌNH) */}
             <LockedTaskBox
               taskId="task-s5-vote"
               badgeText="Chặng 5 • Ô 5.2"
-              title="5.2. Đánh giá Sản phẩm Ngày hội Xanh (HS Đồng đẳng & Giáo viên chấm Sản phẩm)"
+              title="5.2. Đánh giá Sản phẩm, Poster & Thuyết trình theo Rubric (3 Tiêu chí × 5 Mức độ)"
               emoji="⭐"
               isUnlocked={unlockedTaskIds.has('task-s5-vote')}
               isCompleted={voteConfirmed}
@@ -248,95 +234,36 @@ export function Stage5View({
               onLock={lockTask}
             >
               <div className="flex flex-col gap-4">
-                <div className="flex flex-wrap items-center justify-between gap-2 bg-indigo-50/70 p-2 rounded-2xl border border-indigo-200">
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setEvalRoleTab('peer')}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-black cursor-pointer transition-all ${
-                        evalRoleTab === 'peer'
-                          ? 'bg-linear-to-r from-indigo-600 to-purple-600 text-white shadow-xs'
-                          : 'bg-white text-indigo-900 hover:bg-indigo-100'
-                      }`}
-                    >
-                      👥 HS Chấm đồng đẳng (3 tiêu chí)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEvalRoleTab('teacher')}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-black cursor-pointer transition-all ${
-                        evalRoleTab === 'teacher'
-                          ? 'bg-linear-to-r from-emerald-600 to-teal-600 text-white shadow-xs'
-                          : 'bg-white text-indigo-900 hover:bg-indigo-100'
-                      }`}
-                    >
-                      👩‍🏫 Giáo viên chấm Sản phẩm (4 tiêu chí CV 3089)
-                    </button>
-                  </div>
-
-                  <span className="text-xs font-black px-3 py-1.5 rounded-full bg-white border border-indigo-200 text-indigo-950">
-                    {evalRoleTab === 'peer' ? (
-                      <>
-                        Điểm Rubric HS:{' '}
-                        <strong className="text-orange-600">{stage5RubricSummary.totalPoints}/10</strong> (
-                        {stage5RubricSummary.answeredCount}/{STAGE5_RUBRIC_CRITERIA.length} tiêu chí)
-                      </>
-                    ) : (
-                      <>
-                        Điểm GV chấm SP:{' '}
-                        <strong className="text-emerald-700">{teacherProductSummary.totalPoints}/10</strong> (
-                        {teacherProductSummary.answeredCount}/{STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA.length} tiêu chí)
-                      </>
-                    )}
+                <div className="flex items-center justify-end">
+                  <span className="text-xs font-black px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-950">
+                    Điểm Rubric:{' '}
+                    <strong className="text-orange-600">{stage5RubricSummary.totalPoints}/10</strong> (
+                    {stage5RubricSummary.answeredCount}/{STAGE5_RUBRIC_CRITERIA.length} tiêu chí)
                   </span>
                 </div>
 
-                {evalRoleTab === 'peer' ? (
-                  <RubricInteractivePanel
-                    stageShortLabel="Chặng 5"
-                    stageFullTitle="Chặng 5: Ngày hội xanh — Báo cáo sản phẩm tại lớp"
-                    rubricSubtitle="3 tiêu chí (40% Sản phẩm tái sinh – 30% Poster khoa học Bài 30 – 30% Thuyết trình & Phản biện)."
-                    feedbackLabel="💬 Nhận xét phản hồi Gian hàng & Báo cáo (Ưu điểm sản phẩm, Poster, phong thái thuyết trình & Góp ý):"
-                    feedbackPlaceholder="Ví dụ: Sản phẩm tái sinh độ dai tốt, hạt mầm bố trí đều. Poster trình bày rõ quy trình Bài 30 và nhóm thuyết trình tự tin, phản biện thuyết phục..."
-                    criteria={STAGE5_RUBRIC_CRITERIA}
-                    state={stage5RubricState}
-                    onChangeState={setStage5RubricState}
-                    onResetConfirm={() => setVoteConfirmed(false)}
-                    onSubmit={() =>
-                      submitRubricEvaluation({
-                        stage: 'stage-5',
-                        stageLabel: 'Chặng 5',
-                        criteria: STAGE5_RUBRIC_CRITERIA,
-                        state: stage5RubricState,
-                        setState: setStage5RubricState,
-                        onConfirmed: () => setVoteConfirmed(true),
-                      })
-                    }
-                    teacherEmail={TEACHER_EMAIL}
-                  />
-                ) : (
-                  <RubricInteractivePanel
-                    stageShortLabel="Chặng 5 (GV)"
-                    stageFullTitle="Chặng 5: Giáo viên chấm Sản phẩm STEAM (4 tiêu chí đánh giá sản phẩm)"
-                    rubricSubtitle="4 tiêu chí tập trung đánh giá Sản phẩm (25% Khoa học Bài 30 – 35% Độ bền & Công năng – 20% Sáng tạo & Thẩm mỹ – 20% An toàn & Ứng dụng)."
-                    feedbackLabel="💬 Nhận xét của Giáo viên về chất lượng, độ bền và tính ứng dụng của sản phẩm:"
-                    feedbackPlaceholder="Ví dụ: Sản phẩm bền đẹp, bề mặt mịn, hạt mầm bố trí đều và an toàn sinh thái..."
-                    criteria={STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA}
-                    state={teacherProductRubricState}
-                    onChangeState={setTeacherProductRubricState}
-                    onSubmit={() =>
-                      submitRubricEvaluation({
-                        stage: 'stage-5',
-                        stageLabel: 'Chặng 5 (GV chấm SP)',
-                        criteria: STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA,
-                        state: teacherProductRubricState,
-                        setState: setTeacherProductRubricState,
-                        onConfirmed: () => setVoteConfirmed(true),
-                      })
-                    }
-                    teacherEmail={TEACHER_EMAIL}
-                  />
-                )}
+                <RubricInteractivePanel
+                  stageShortLabel="Chặng 5"
+                  stageFullTitle="Chặng 5: Ngày hội xanh — Báo cáo sản phẩm tại lớp"
+                  rubricSubtitle="3 tiêu chí (40% Sản phẩm tái sinh – 30% Poster khoa học Bài 30 – 30% Thuyết trình & Phản biện)."
+                  feedbackLabel="💬 Nhận xét phản hồi Gian hàng & Báo cáo (Ưu điểm sản phẩm, Poster, phong thái thuyết trình & Góp ý):"
+                  feedbackPlaceholder="Ví dụ: Sản phẩm tái sinh độ dai tốt, hạt mầm bố trí đều. Poster trình bày rõ quy trình Bài 30 và nhóm thuyết trình tự tin, phản biện thuyết phục..."
+                  criteria={STAGE5_RUBRIC_CRITERIA}
+                  state={stage5RubricState}
+                  onChangeState={setStage5RubricState}
+                  onResetConfirm={() => setVoteConfirmed(false)}
+                  onSubmit={() =>
+                    submitRubricEvaluation({
+                      stage: 'stage-5',
+                      stageLabel: 'Chặng 5',
+                      criteria: STAGE5_RUBRIC_CRITERIA,
+                      state: stage5RubricState,
+                      setState: setStage5RubricState,
+                      onConfirmed: () => setVoteConfirmed(true),
+                    })
+                  }
+                  teacherEmail={TEACHER_EMAIL}
+                />
               </div>
             </LockedTaskBox>
 

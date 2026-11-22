@@ -7,8 +7,16 @@ import {
   Unlock,
   ChevronRight,
 } from 'lucide-react';
-import { PADLET_URL } from '../lessonData';
+import { PADLET_URL, TEACHER_EMAIL } from '../lessonData';
+import {
+  type Stage3RubricCriterion,
+  type RubricFormState,
+  STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA,
+  createInitialRubricFormState,
+  getRubricSummary,
+} from '../rubricData';
 import { LockedTaskBox } from '../components/LockedTaskBox';
+import { RubricInteractivePanel } from '../components/RubricInteractivePanel';
 
 interface Stage4ViewProps {
   guideBanner: React.ReactNode;
@@ -20,6 +28,14 @@ interface Stage4ViewProps {
   toggleSetItem: (setter: React.Dispatch<React.SetStateAction<Set<string>>>, val: string) => void;
   productSubmitted: boolean;
   setProductSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
+  submitRubricEvaluation: (params: {
+    stage: 'stage-3' | 'stage-5';
+    stageLabel: string;
+    criteria: Stage3RubricCriterion[];
+    state: RubricFormState;
+    setState: React.Dispatch<React.SetStateAction<RubricFormState>>;
+    onConfirmed: () => void;
+  }) => Promise<void>;
   isNextStageUnlocked: boolean;
   onNextStage: () => void;
 }
@@ -34,9 +50,21 @@ export function Stage4View({
   toggleSetItem,
   productSubmitted,
   setProductSubmitted,
+  submitRubricEvaluation,
   isNextStageUnlocked,
   onNextStage,
 }: Stage4ViewProps) {
+  const [showProductRubric, setShowProductRubric] = React.useState(false);
+  const [productRubricState, setProductRubricState] = React.useState<RubricFormState>(() => ({
+    ...createInitialRubricFormState(),
+    evaluatorMode: 'self',
+    evaluatorGroup: 'GV Trần Văn Lĩnh',
+  }));
+  const productRubricSummary = getRubricSummary(
+    STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA,
+    productRubricState
+  );
+
   return (
 <div className="flex flex-col gap-4 animate-in fade-in duration-200">
             {guideBanner}
@@ -113,6 +141,63 @@ export function Stage4View({
                 </button>
               </div>
             </LockedTaskBox>
+
+            {/* RUBRIC GIÁO VIÊN ĐÁNH GIÁ SẢN PHẨM (HS THAM KHẢO TIÊU CHÍ KHI CHẾ TẠO TẠI NHÀ) */}
+            <div className="bg-white/95 border-2 border-emerald-200 rounded-3xl shadow-xs overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setShowProductRubric((v) => !v)}
+                className="w-full px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 bg-linear-to-r from-emerald-50 to-teal-50 hover:from-emerald-100/80 hover:to-teal-100/80 transition-colors cursor-pointer text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-base shrink-0 shadow-xs">
+                    📋
+                  </div>
+                  <div>
+                    <div className="text-xs sm:text-sm font-black text-indigo-950">
+                      Tiêu chí Giáo viên chấm Sản phẩm STEAM (HS tham khảo trước khi hoàn thiện)
+                    </div>
+                    <p className="text-[11px] font-medium text-emerald-900/80">
+                      4 tiêu chí xoay quanh chất lượng sản phẩm (25% Khoa học Bài 30 • 35% Độ bền &amp; Công năng • 20% Sáng tạo &amp; Thẩm mỹ • 20% An toàn &amp; Ứng dụng) — GV có thể chấm &amp; xuất Word/PDF.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-full bg-white border border-emerald-200 text-emerald-800">
+                    {productRubricSummary.totalPoints}/10đ
+                  </span>
+                  <span className="px-3.5 py-1.5 rounded-full bg-emerald-600 text-white text-xs font-black">
+                    {showProductRubric ? 'Thu gọn ▲' : 'Xem tiêu chí ▼'}
+                  </span>
+                </div>
+              </button>
+
+              {showProductRubric && (
+                <div className="p-4 sm:p-5 border-t border-emerald-100">
+                  <RubricInteractivePanel
+                    stageShortLabel="Chặng 4 (Sản phẩm)"
+                    stageFullTitle="Chặng 4: Tiêu chí Giáo viên đánh giá Sản phẩm STEAM (HS tham khảo khi chế tạo)"
+                    rubricSubtitle="4 tiêu chí tập trung đánh giá Sản phẩm (25% Khoa học Bài 30 – 35% Độ bền & Công năng – 20% Sáng tạo & Thẩm mỹ – 20% An toàn & Ứng dụng)."
+                    feedbackLabel="💬 Nhận xét của Giáo viên về chất lượng, độ bền và tính ứng dụng của sản phẩm:"
+                    feedbackPlaceholder="Ví dụ: Sản phẩm bền đẹp, bề mặt mịn, hạt mầm bố trí đều và an toàn sinh thái..."
+                    criteria={STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA}
+                    state={productRubricState}
+                    onChangeState={setProductRubricState}
+                    onSubmit={() =>
+                      submitRubricEvaluation({
+                        stage: 'stage-5',
+                        stageLabel: 'Chặng 4 (GV chấm SP)',
+                        criteria: STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA,
+                        state: productRubricState,
+                        setState: setProductRubricState,
+                        onConfirmed: () => {},
+                      })
+                    }
+                    teacherEmail={TEACHER_EMAIL}
+                  />
+                </div>
+              )}
+            </div>
 
             <div className="flex justify-end">
               <button
