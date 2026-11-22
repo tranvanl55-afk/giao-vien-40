@@ -1308,8 +1308,8 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
           {activeGame === 1 && (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {[
-                { id: 'cold', title: 'Hồ tinh bột nguội (25°C)', expected: 'blue' as const, note: 'Amylose xoắn giữ chặt phân tử I₂ → xanh tím' },
-                { id: 'hot', title: 'Hồ tinh bột đun nóng (80°C)', expected: 'amber' as const, note: 'Mạch xoắn giãn ra khi đun nóng → mất màu xanh tím' },
+                { id: 'cold', title: 'Hồ tinh bột (nhiệt độ thường)', expected: 'blue' as const, note: 'Tinh bột + I₂ → hợp chất màu xanh tím đặc trưng' },
+                { id: 'glucose', title: 'Dung dịch đường Glucose', expected: 'amber' as const, note: 'Đường đơn không phản ứng màu với I₂' },
                 { id: 'cotton', title: 'Sợi bông Cellulose nguyên chất', expected: 'amber' as const, note: 'Mạch thẳng không xoắn → không đổi xanh tím' },
                 { id: 'water', title: 'Nước cất tinh khiết', expected: 'amber' as const, note: 'Dung môi đối chứng' },
               ].map((tube) => {
