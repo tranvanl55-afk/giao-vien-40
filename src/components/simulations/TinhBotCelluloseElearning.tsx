@@ -2808,10 +2808,10 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             type="button"
             onClick={() => setShowComplianceModal(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-extrabold text-xs border border-emerald-200 cursor-pointer"
-            title="Hồ sơ Học liệu số & Chủ đề STEM chuẩn QĐ 791/QĐ-SGDĐT và CV 3089/BGDĐT-GDTrH"
+            title="Thông tin Website, Mã định danh & Metadata Dublin Core"
           >
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Hồ sơ QĐ 791</span>
+            <span>Thông tin</span>
           </button>
 
           <button
@@ -4117,7 +4117,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
       className="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer transition-all"
     >
       <ShieldCheck className="w-3.5 h-3.5" />
-      <span>Hồ sơ QĐ 791 &amp; CV 3089</span>
+      <span>Thông tin Website</span>
     </button>
     <button
       type="button"
