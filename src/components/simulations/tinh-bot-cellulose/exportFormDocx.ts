@@ -112,7 +112,7 @@ export async function exportRubricFormToWord(params: {
           children: [
             cell(c.title, { bold: true }),
             cell(`${c.weightPercent}% (Tối đa ${c.maxPoints}đ)`, { align: AlignmentType.CENTER }),
-            cell(lvObj ? `Mức ${lvObj.level}/5: ${lvObj.desc}` : 'Chưa chấm'),
+            cell(lvObj ? `Mức ${lvObj.level}/5 (${lvObj.label}): ${lvObj.bullets.join('; ')}` : 'Chưa chấm'),
             cell(pt !== undefined ? `${pt}đ` : '—', { bold: true, align: AlignmentType.CENTER }),
           ],
         });
@@ -181,7 +181,7 @@ export async function exportStage6SelfToWord(params: {
           children: [
             cell(c.title, { bold: true }),
             cell(lv ? `Mức ${lv.level}: ${lv.text}` : `${pt}đ`),
-            cell(`${pt} / ${c.maxScore}`, { bold: true, align: AlignmentType.CENTER }),
+            cell(`${pt} / ${c.maxPoints}`, { bold: true, align: AlignmentType.CENTER }),
           ],
         });
       }),
@@ -294,7 +294,7 @@ export async function exportStage6TeacherToWord(params: {
         return new TableRow({
           children: [
             cell(c.title, { bold: true }),
-            cell(`${c.maxScore}đ`, { align: AlignmentType.CENTER }),
+            cell(`${c.maxPoints}đ`, { align: AlignmentType.CENTER }),
             cell(`${pt}đ`, { bold: true, align: AlignmentType.CENTER }),
           ],
         });
