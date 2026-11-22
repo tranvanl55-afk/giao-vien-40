@@ -27,6 +27,10 @@ import {
   getStage6RankInfo,
 } from '../rubricData';
 import { LockedTaskBox } from '../components/LockedTaskBox';
+import {
+  Stage6SurveyBox,
+  type Stage6SurveySubmissionPayload,
+} from '../components/Stage6SurveyBox';
 
 export interface Stage6Reflections {
   contribution: string;
@@ -104,6 +108,8 @@ interface Stage6ViewProps {
   setStage6TeacherIndividualAdjustments: React.Dispatch<React.SetStateAction<string>>;
   stage6TeacherSubmitted: boolean;
   setStage6TeacherSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
+  stage6SurveySubmitted: boolean;
+  handleSubmitStage6Survey: (payload: Stage6SurveySubmissionPayload) => Promise<{ ok: boolean; text: string }>;
 }
 
 export const Stage6View: React.FC<Stage6ViewProps> = ({
@@ -175,6 +181,8 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
   setStage6TeacherIndividualAdjustments,
   stage6TeacherSubmitted,
   setStage6TeacherSubmitted,
+  stage6SurveySubmitted,
+  handleSubmitStage6Survey,
 }) => {
   return (
           <div className="flex flex-col gap-4 animate-in fade-in duration-200">
@@ -1420,6 +1428,25 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                   </button>
                 </div>
               </div>
+            </LockedTaskBox>
+
+            {/* ============================================================
+                CHẶNG 6 • Ô 6.4: PHIẾU KHẢO SÁT Ý KIẾN HỌC SINH SAU CHỦ ĐỀ
+               ============================================================ */}
+            <LockedTaskBox
+              taskId="task-s6-survey"
+              badgeText="Chặng 6 • Ô 6.4"
+              title="6.4. Phiếu khảo sát ý kiến học sinh sau chủ đề (Đo lường tiến bộ & phản hồi)"
+              emoji="📝"
+              isUnlocked={unlockedTaskIds.has('task-s6-survey')}
+              isCompleted={stage6SurveySubmitted}
+              onUnlock={unlockTask}
+              onLock={lockTask}
+            >
+              <Stage6SurveyBox
+                isSubmitted={stage6SurveySubmitted}
+                onSubmitSurvey={handleSubmitStage6Survey}
+              />
             </LockedTaskBox>
     </div>
   );

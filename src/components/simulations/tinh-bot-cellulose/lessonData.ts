@@ -44,6 +44,7 @@ export const FIRESTORE_STAGE2_TESTS_COLLECTION = 'khtn9_bai30_stage2_tests';
 export const FIRESTORE_STAGE3_RUBRICS_COLLECTION = 'khtn9_bai30_stage3_rubrics';
 export const LOCAL_TESTS_CACHE_KEY = 'KHTN9_BAI30_STAGE2_TESTS_V1';
 export const LOCAL_RUBRICS_CACHE_KEY = 'KHTN9_BAI30_RUBRICS_V3';
+export const LOCAL_SURVEYS_CACHE_KEY = 'KHTN9_BAI30_SURVEYS_V1';
 export const LEGACY_RUBRICS_CACHE_KEYS = ['KHTN9_BAI30_STAGE3_RUBRICS_V1', 'KHTN9_BAI30_STAGE3_RUBRICS_V2'];
 export const LOCAL_SHEET_WEBHOOK_KEY = 'KHTN9_BAI30_SHEET_WEBHOOK_V1';
 export const LOCAL_SEND_INDIVIDUAL_EMAIL_KEY = 'KHTN9_BAI30_SEND_INDIVIDUAL_EMAIL_V1';
@@ -1775,5 +1776,6 @@ export const ALL_TASK_IDS = [
   'task-s6-summary',
   'task-s6-assessment',
   'task-s6-video',
+  'task-s6-survey',
 ];
 

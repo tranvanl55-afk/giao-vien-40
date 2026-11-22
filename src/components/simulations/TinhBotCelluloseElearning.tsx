@@ -43,6 +43,7 @@ import {
   Crown,
   User,
   Check,
+  ShieldCheck,
   PenTool,
   Volume2,
   FolderOpen,
@@ -56,7 +57,13 @@ import { Stage3View } from './tinh-bot-cellulose/stages/Stage3View';
 import { Stage4View } from './tinh-bot-cellulose/stages/Stage4View';
 import { Stage5View } from './tinh-bot-cellulose/stages/Stage5View';
 import { Stage6View } from './tinh-bot-cellulose/stages/Stage6View';
+import {
+  SURVEY_SECTIONS,
+  SURVEY_INTEREST_OPTIONS,
+  type Stage6SurveySubmissionPayload,
+} from './tinh-bot-cellulose/components/Stage6SurveyBox';
 import { NewWordsModal } from './tinh-bot-cellulose/modals/NewWordsModal';
+import { ComplianceProfileModal } from './tinh-bot-cellulose/modals/ComplianceProfileModal';
 import { ReferencesModal } from './tinh-bot-cellulose/modals/ReferencesModal';
 import { StageGuideModal } from './tinh-bot-cellulose/modals/StageGuideModal';
 import { NarratorOverlay } from './tinh-bot-cellulose/components/NarratorOverlay';
@@ -95,6 +102,7 @@ import {
   FIRESTORE_STAGE3_RUBRICS_COLLECTION,
   LOCAL_TESTS_CACHE_KEY,
   LOCAL_RUBRICS_CACHE_KEY,
+  LOCAL_SURVEYS_CACHE_KEY,
   LEGACY_RUBRICS_CACHE_KEYS,
   LOCAL_SHEET_WEBHOOK_KEY,
   LOCAL_SEND_INDIVIDUAL_EMAIL_KEY,
@@ -168,16 +176,17 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const [stageLockMessage, setStageLockMessage] = useState<string | null>(null);
   const [showReferencesModal, setShowReferencesModal] = useState<boolean>(false);
   const [showNewWordsModal, setShowNewWordsModal] = useState<boolean>(false);
-  // Chế độ Học sinh (khóa theo chặng) vs Chế độ Giáo viên (xem tất cả các chặng, pass: 01011993)
+  const [showComplianceModal, setShowComplianceModal] = useState<boolean>(false);
+  const [showVideoTranscript, setShowVideoTranscript] = useState<boolean>(false);
+  // Chế độ Học sinh (khóa theo chặng) vs Chế độ Giáo viên (mở tự do cho LMS; chỉ riêng Game Body Pose giữ pass)
   const [isTeacherMode, setIsTeacherMode] = useState<boolean>(false);
   const [isJudgeMode, setIsJudgeMode] = useState<boolean>(false);
-  const [showTeacherModal, setShowTeacherModal] = useState<boolean>(false);
-  const [teacherPassInput, setTeacherPassInput] = useState<string>('');
-  const [teacherPassError, setTeacherPassError] = useState<string | null>(null);
   const [showTeacherDashboard, setShowTeacherDashboard] = useState<boolean>(false);
-  const [teacherDashboardTab, setTeacherDashboardTab] = useState<'rubrics' | 'tests'>('rubrics');
+  const [teacherDashboardTab, setTeacherDashboardTab] = useState<'rubrics' | 'tests' | 'surveys'>('rubrics');
   const [dashboardTestRecords, setDashboardTestRecords] = useState<Stage2TestSubmissionRecord[]>([]);
   const [dashboardRubricRecords, setDashboardRubricRecords] = useState<Stage3RubricSubmissionRecord[]>([]);
+  const [dashboardSurveyRecords, setDashboardSurveyRecords] = useState<Stage3RubricSubmissionRecord[]>([]);
+  const [stage6SurveySubmitted, setStage6SurveySubmitted] = useState<boolean>(false);
   const [isLoadingDashboard, setIsLoadingDashboard] = useState<boolean>(false);
   const [dashboardLoadWarning, setDashboardLoadWarning] = useState<string | null>(null);
   const [dashboardSearchQuery, setDashboardSearchQuery] = useState<string>('');
@@ -695,6 +704,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
 
     const localTests = readLocalRecords<Stage2TestSubmissionRecord>(LOCAL_TESTS_CACHE_KEY);
     const localRubrics = readLocalRecords<Stage3RubricSubmissionRecord>(LOCAL_RUBRICS_CACHE_KEY);
+    const localSurveys = readLocalRecords<Stage3RubricSubmissionRecord>(LOCAL_SURVEYS_CACHE_KEY);
 
     try {
       const [testsSnap, rubricsSnap] = await Promise.all([
@@ -706,18 +716,25 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         id: d.id,
         ...(d.data() as Omit<Stage2TestSubmissionRecord, 'id'>),
       }));
-      const cloudRubrics: Stage3RubricSubmissionRecord[] = rubricsSnap.docs
-        .map((d) => ({
-          id: d.id,
-          ...(d.data() as Omit<Stage3RubricSubmissionRecord, 'id'>),
-        }))
-        .filter((r) => !String(r.evaluatorGroup || '').startsWith('MAM_XANH_'));
+      const allCloudRubricDocs: Stage3RubricSubmissionRecord[] = rubricsSnap.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<Stage3RubricSubmissionRecord, 'id'>),
+      }));
+      const cloudRubrics = allCloudRubricDocs.filter((r) => {
+        const grp = String(r.evaluatorGroup || '');
+        return !grp.startsWith('MAM_XANH_') && !grp.startsWith('SURVEY_');
+      });
+      const cloudSurveys = allCloudRubricDocs.filter((r) =>
+        String(r.evaluatorGroup || '').startsWith('SURVEY_')
+      );
 
       setDashboardTestRecords(mergeWithLocal(cloudTests, localTests));
       setDashboardRubricRecords(mergeWithLocal(cloudRubrics, localRubrics));
+      setDashboardSurveyRecords(mergeWithLocal(cloudSurveys, localSurveys));
     } catch {
       setDashboardTestRecords(localTests);
       setDashboardRubricRecords(localRubrics);
+      setDashboardSurveyRecords(localSurveys);
       setDashboardLoadWarning(
         'Đang hiển thị dữ liệu lưu cục bộ trên máy này (không kết nối được Firestore hoặc Firestore chưa cấp quyền đọc/ghi công khai).'
       );
@@ -726,10 +743,15 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     }
   }, [readLocalRecords]);
 
-  const handleDeleteDashboardRecord = async (type: 'tests' | 'rubrics', id: string) => {
+  const handleDeleteDashboardRecord = async (type: 'tests' | 'rubrics' | 'surveys', id: string) => {
     const colName =
       type === 'tests' ? FIRESTORE_STAGE2_TESTS_COLLECTION : FIRESTORE_STAGE3_RUBRICS_COLLECTION;
-    const localKey = type === 'tests' ? LOCAL_TESTS_CACHE_KEY : LOCAL_RUBRICS_CACHE_KEY;
+    const localKey =
+      type === 'tests'
+        ? LOCAL_TESTS_CACHE_KEY
+        : type === 'surveys'
+          ? LOCAL_SURVEYS_CACHE_KEY
+          : LOCAL_RUBRICS_CACHE_KEY;
 
     if (!id.startsWith('local-')) {
       try {
@@ -740,6 +762,16 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     }
     if (type === 'tests') {
       setDashboardTestRecords((prev) => {
+        const next = prev.filter((item) => item.id !== id);
+        try {
+          window.localStorage.setItem(localKey, JSON.stringify(next.filter((i) => i.id.startsWith('local-'))));
+        } catch {
+          // ignore
+        }
+        return next;
+      });
+    } else if (type === 'surveys') {
+      setDashboardSurveyRecords((prev) => {
         const next = prev.filter((item) => item.id !== id);
         try {
           window.localStorage.setItem(localKey, JSON.stringify(next.filter((i) => i.id.startsWith('local-'))));
@@ -759,6 +791,66 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         return next;
       });
     }
+  };
+
+  const handleSubmitStage6Survey = async (
+    payload: Stage6SurveySubmissionPayload
+  ): Promise<{ ok: boolean; text: string }> => {
+    const nowMs = Date.now();
+    const submittedAtStr = new Date(nowMs).toLocaleString('vi-VN');
+    const scoreEntries = Object.entries(payload.ratings);
+    const avgScore =
+      scoreEntries.length > 0
+        ? Math.round((scoreEntries.reduce((sum, [, val]) => sum + val, 0) / scoreEntries.length) * 100) / 100
+        : 0;
+    const criteriaScores = Object.fromEntries(
+      Array.from({ length: 8 }, (_, idx) => [`s${idx + 1}`, payload.ratings[idx + 1] ?? 0])
+    );
+    const criteriaSummary = Array.from(
+      { length: 8 },
+      (_, idx) => `C${idx + 1}:${payload.ratings[idx + 1] ?? 0}`
+    ).join(' | ');
+    const openNotes = [
+      payload.favoriteStageNote ? `[Ấn tượng] ${payload.favoriteStageNote}` : '',
+      payload.difficultySolutionNote ? `[Khó khăn & Khắc phục] ${payload.difficultySolutionNote}` : '',
+      payload.suggestionNote ? `[Góp ý] ${payload.suggestionNote}` : '',
+    ]
+      .filter(Boolean)
+      .join(' • ');
+
+    const hubResult = await persistSubmissionRecord<Stage3RubricSubmissionRecord>(
+      FIRESTORE_STAGE3_RUBRICS_COLLECTION,
+      LOCAL_SURVEYS_CACHE_KEY,
+      {
+        stage: 'stage-6',
+        stageLabel: 'Khảo sát cuối dự án',
+        mode: 'self',
+        evaluatorGroup: `SURVEY_HS: ${payload.studentName || 'Ẩn danh'}`,
+        targetGroup: payload.groupName || 'Cá nhân',
+        className: payload.className || '9A',
+        criteriaScores,
+        criteriaSummary,
+        totalPoints: avgScore,
+        rank: payload.interestLevel || 'Thích',
+        feedbackNote: openNotes || `Ngày khảo sát: ${payload.surveyDate}`,
+        submittedAt: submittedAtStr,
+        createdAtMs: nowMs,
+      },
+      {
+        sheetType: 'stage6_survey',
+        submittedAt: submittedAtStr,
+        studentName: payload.studentName || 'Ẩn danh',
+        className: payload.className,
+        groupName: payload.groupName,
+        criteriaSummary,
+        avgScore,
+        interestLevel: payload.interestLevel,
+        feedbackNote: openNotes,
+      }
+    );
+
+    setStage6SurveySubmitted(true);
+    return buildSubmissionFeedbackMessage('phiếu khảo sát cuối dự án', hubResult, false);
   };
 
   const exportRecordsToCsv = (filename: string, headers: string[], rows: (string | number)[][]) => {
@@ -1448,7 +1540,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     'stage-3': ['task-s3-idea', 'task-s3-process', 'task-s3-peer'],
     'stage-4': ['task-s4-maker', 'task-s4-submit'],
     'stage-5': ['task-s5-booth', 'task-s5-presentation', 'task-s5-vote'],
-    'stage-6': ['task-s6-summary', 'task-s6-assessment', 'task-s6-video'],
+    'stage-6': ['task-s6-summary', 'task-s6-assessment', 'task-s6-video', 'task-s6-survey'],
   };
 
   const isTaskIdCompleted = (taskId: string): boolean => {
@@ -1491,6 +1583,8 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         return stage6SelfSubmitted || stage6LeaderSubmitted || stage6TeacherSubmitted;
       case 'task-s6-video':
         return stage6SummaryVideoConfirmed;
+      case 'task-s6-survey':
+        return stage6SurveySubmitted;
       default:
         return false;
     }
@@ -1805,7 +1899,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
 
   // Mở khóa trò chơi vận động Body Pose Quiz bằng mật khẩu Giáo viên
   const handleUnlockPoseGame = () => {
-    if (poseGamePassInput.trim() === TEACHER_PASSWORD || isTeacherMode) {
+    if (poseGamePassInput.trim() === TEACHER_PASSWORD) {
       setIsPoseGameUnlocked(true);
       setPoseGamePassError(null);
       try {
@@ -1977,19 +2071,6 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         return isStage1Done && isStage2Done && isStage3Done && isStage4Done;
       case 'stage-6':
         return isStage1Done && isStage2Done && isStage3Done && isStage4Done && isStage5Done;
-    }
-  };
-
-  const handleTeacherLogin = () => {
-    if (teacherPassInput.trim() === TEACHER_PASSWORD) {
-      setIsTeacherMode(true);
-      setIsJudgeMode(false);
-      setShowTeacherModal(false);
-      setTeacherPassInput('');
-      setTeacherPassError(null);
-      setStageLockMessage(null);
-    } else {
-      setTeacherPassError('Mật khẩu Giáo viên chưa đúng! Vui lòng thử lại.');
     }
   };
 
@@ -2561,6 +2642,19 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
               <div className="flex items-center gap-2">
                 <button
                   type="button"
+                  onClick={() => setShowVideoTranscript((prev) => !prev)}
+                  title="Bật/tắt phụ đề lời thoại thuyết minh (Điều 10 QĐ 791)"
+                  className={`flex items-center gap-1 px-3 py-2 backdrop-blur-md rounded-full border text-xs font-bold cursor-pointer transition-all ${
+                    showVideoTranscript
+                      ? 'bg-emerald-500 text-white border-emerald-300'
+                      : 'text-white/85 hover:text-white bg-black/60 hover:bg-black/90 border-white/20'
+                  }`}
+                >
+                  <span>💬 Phụ đề</span>
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => setIsVideoCoverFit((prev) => !prev)}
                   title={isVideoCoverFit ? 'Chuyển sang vừa khung hình (Contain)' : 'Bung tràn toàn màn hình (Cover)'}
                   className="hidden md:flex items-center gap-1 text-white/80 hover:text-white px-3 py-2 bg-black/60 hover:bg-black/90 backdrop-blur-md rounded-full border border-white/20 text-xs font-bold cursor-pointer transition-all"
@@ -2588,6 +2682,20 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                 </button>
               </div>
             </div>
+
+            {/* PHỤ ĐỀ LỜI THOẠI (ĐIỀU 10 QĐ 791/QĐ-SGDĐT) */}
+            {showVideoTranscript && (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="absolute bottom-14 inset-x-4 z-30 flex justify-center pointer-events-none"
+              >
+                <div className="max-w-3xl bg-black/85 text-white px-5 py-2.5 rounded-2xl border border-white/20 text-xs sm:text-sm font-medium text-center leading-relaxed shadow-xl backdrop-blur-md">
+                  {introVideoStep === 'video1'
+                    ? '“Trong dự án này, các em sẽ trải qua 6 chặng thử thách từ khám phá kiến thức Tinh bột và Cellulose đến chế tạo sản phẩm xanh Bắt đầu từ sự kết thúc.”'
+                    : '“Và đây là lộ trình 6 chặng của chúng ta: Chặng 1 Khởi động, Chặng 2 Kiến thức nền tại nhà, Chặng 3 Thiết kế quy trình, Chặng 4 Chế tạo sản phẩm, Chặng 5 Ngày hội xanh và Chặng 6 Tổng kết dự án.”'}
+                </div>
+              </div>
+            )}
 
             {/* FOOTER BAR GỢI Ý CHÂN TRANG (TỰ ĐỘNG ẨN CÙNG OVERLAY) */}
             <div
@@ -2698,6 +2806,16 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
 
           <button
             type="button"
+            onClick={() => setShowComplianceModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-extrabold text-xs border border-emerald-200 cursor-pointer"
+            title="Hồ sơ Học liệu số & Chủ đề STEM chuẩn QĐ 791/QĐ-SGDĐT và CV 3089/BGDĐT-GDTrH"
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Hồ sơ QĐ 791</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => {
               import('./tinh-bot-cellulose/exportProjectDocx').then((m) => m.exportAllStagesToWord());
             }}
@@ -2771,11 +2889,9 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             <button
               type="button"
               onClick={() => {
-                if (!isTeacherMode) {
-                  setTeacherPassInput('');
-                  setTeacherPassError(null);
-                  setShowTeacherModal(true);
-                }
+                setIsTeacherMode(true);
+                setIsJudgeMode(false);
+                setStageLockMessage(null);
               }}
               className={`px-3 py-1 rounded-full text-xs font-black flex items-center gap-1 transition-all cursor-pointer ${isTeacherMode
                 ? 'bg-linear-to-r from-emerald-500 to-teal-500 text-white shadow-xs'
@@ -2824,73 +2940,6 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         </div>
       </header>
 
-      {/* Hộp thoại nhập mật khẩu Giáo viên */}
-      {showTeacherModal && (
-        <div className="fixed inset-0 z-50 bg-indigo-950/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border-2 border-indigo-100 rounded-3xl p-6 max-w-sm w-full shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-9 h-9 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center font-black">
-                  <Unlock className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-black text-indigo-950">Kích hoạt Chế độ Giáo viên</h3>
-                  <p className="text-[11px] font-medium text-indigo-900/60">
-                    Mở khóa xem toàn bộ 6 chặng của dự án
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowTeacherModal(false)}
-                className="text-indigo-400 hover:text-indigo-900 text-xs font-bold px-2 py-1 cursor-pointer"
-              >
-                Đóng
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label htmlFor="teacher-password-input" className="text-xs font-bold text-indigo-950">
-                Nhập mật khẩu Giáo viên:
-              </label>
-              <input
-                id="teacher-password-input"
-                type="password"
-                value={teacherPassInput}
-                onChange={(e) => {
-                  setTeacherPassInput(e.target.value);
-                  setTeacherPassError(null);
-                }}
-                onKeyDown={(e) => e.key === 'Enter' && handleTeacherLogin()}
-                placeholder="Nhập mật khẩu..."
-                autoFocus
-                className="w-full px-3.5 py-2.5 rounded-xl bg-indigo-50/60 border border-indigo-200 text-sm font-bold text-indigo-950 focus:outline-none focus:border-orange-500"
-              />
-              {teacherPassError && (
-                <p className="text-xs font-bold text-rose-600">{teacherPassError}</p>
-              )}
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => setShowTeacherModal(false)}
-                className="px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-900 text-xs font-bold cursor-pointer"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                onClick={handleTeacherLogin}
-                className="px-5 py-2 rounded-full bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-black shadow-xs cursor-pointer"
-              >
-                Xác nhận mở khóa
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* BẢNG TỔNG HỢP KẾT QUẢ & THỐNG KÊ GIÁO VIÊN (GOM 50+ BÀI NỘP THÀNH 1 BẢNG + XUẤT EXCEL) */}
       {showTeacherDashboard && (() => {
         const searchLower = dashboardSearchQuery.trim().toLowerCase();
@@ -2898,6 +2947,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
           new Set([
             ...dashboardTestRecords.map((r) => r.studentClass).filter(Boolean),
             ...dashboardRubricRecords.map((r) => r.className).filter(Boolean),
+            ...dashboardSurveyRecords.map((r) => r.className).filter(Boolean),
           ])
         ).sort();
 
@@ -2912,6 +2962,16 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         });
 
         const filteredRubrics = dashboardRubricRecords.filter((r) => {
+          const matchClass = dashboardClassFilter === 'ALL' || r.className === dashboardClassFilter;
+          const matchSearch =
+            !searchLower ||
+            r.evaluatorGroup.toLowerCase().includes(searchLower) ||
+            r.targetGroup.toLowerCase().includes(searchLower) ||
+            r.feedbackNote.toLowerCase().includes(searchLower);
+          return matchClass && matchSearch;
+        });
+
+        const filteredSurveys = dashboardSurveyRecords.filter((r) => {
           const matchClass = dashboardClassFilter === 'ALL' || r.className === dashboardClassFilter;
           const matchSearch =
             !searchLower ||
@@ -3102,6 +3162,17 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                     >
                       <Table2 className="w-3.5 h-3.5" />
                       <span>Kiểm tra 12 câu Chặng 2 ({filteredTests.length} bài)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTeacherDashboardTab('surveys')}
+                      className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 cursor-pointer transition-all ${teacherDashboardTab === 'surveys'
+                        ? 'bg-linear-to-r from-amber-500 to-orange-500 text-white shadow-xs'
+                        : 'bg-indigo-50 text-indigo-900 hover:bg-indigo-100'
+                        }`}
+                    >
+                      <BarChart3 className="w-3.5 h-3.5" />
+                      <span>Khảo sát HS ({filteredSurveys.length} phiếu)</span>
                     </button>
                   </div>
 
@@ -3305,7 +3376,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                       </div>
                     </div>
                   </div>
-                ) : (
+                ) : teacherDashboardTab === 'tests' ? (
                   /* NỘI DUNG TAB 2: TỔNG HỢP BÀI KIỂM TRA 12 CÂU CHẶNG 2 */
                   <div className="flex flex-col gap-4">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -3401,6 +3472,180 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                                       onClick={() => handleDeleteDashboardRecord('tests', t.id)}
                                       className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
                                       title="Xóa bài nộp này"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  /* NỘI DUNG TAB 3: TỔNG HỢP PHIẾU KHẢO SÁT HỌC SINH SAU CHỦ ĐỀ */
+                  <div className="flex flex-col gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div className="bg-white rounded-2xl p-3.5 border border-indigo-100 shadow-2xs">
+                        <div className="text-[11px] font-bold text-slate-500">Tổng phiếu khảo sát</div>
+                        <div className="text-xl font-black text-indigo-950">{filteredSurveys.length} phiếu</div>
+                      </div>
+                      <div className="bg-white rounded-2xl p-3.5 border border-indigo-100 shadow-2xs">
+                        <div className="text-[11px] font-bold text-slate-500">Điểm hài lòng TB</div>
+                        <div className="text-xl font-black text-orange-600">
+                          {filteredSurveys.length > 0
+                            ? (
+                                Math.round(
+                                  (filteredSurveys.reduce((s, r) => s + Number(r.totalPoints || 0), 0) /
+                                    filteredSurveys.length) *
+                                    100
+                                ) / 100
+                              )
+                            : 0}{' '}
+                          / 5.0
+                        </div>
+                      </div>
+                      {SURVEY_INTEREST_OPTIONS.slice(0, 2).map((opt) => {
+                        const count = filteredSurveys.filter((r) => r.rank === opt).length;
+                        const pct = filteredSurveys.length > 0 ? Math.round((count / filteredSurveys.length) * 100) : 0;
+                        return (
+                          <div key={opt} className="bg-white rounded-2xl p-3.5 border border-indigo-100 shadow-2xs">
+                            <div className="text-[11px] font-bold text-slate-500">{opt}</div>
+                            <div className="text-xl font-black text-emerald-600">
+                              {count} HS ({pct}%)
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Trung bình từng tiêu chí 1..8 */}
+                    <div className="bg-white rounded-2xl border border-indigo-100 p-3.5 shadow-2xs">
+                      <div className="text-xs font-black text-indigo-950 mb-2">
+                        📊 Điểm trung bình từng tiêu chí (Thang 1 → 5):
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {SURVEY_SECTIONS.flatMap((sec) => sec.items).map((item) => {
+                          const avg =
+                            filteredSurveys.length > 0
+                              ? Math.round(
+                                  (filteredSurveys.reduce(
+                                    (s, r) => s + Number(r.criteriaScores?.[`s${item.num}`] ?? 0),
+                                    0
+                                  ) /
+                                    filteredSurveys.length) *
+                                    100
+                                ) / 100
+                              : 0;
+                          return (
+                            <div
+                              key={item.num}
+                              className="flex items-center justify-between gap-2 bg-indigo-50/50 rounded-xl px-3 py-2 text-xs"
+                            >
+                              <span className="font-medium text-indigo-950 line-clamp-1">
+                                <strong>Câu {item.num}:</strong> {item.text}
+                              </span>
+                              <span className="font-black text-emerald-700 shrink-0">{avg}/5</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl border border-indigo-100 p-4 shadow-2xs flex flex-col gap-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h3 className="text-xs md:text-sm font-black text-indigo-950">
+                          📋 Danh sách phiếu khảo sát học sinh ({filteredSurveys.length} phiếu)
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            exportRecordsToCsv(
+                              'Khao_sat_hoc_sinh_Bai30.csv',
+                              [
+                                'Thời gian',
+                                'Học sinh',
+                                'Lớp',
+                                'Nhóm',
+                                'Câu 1',
+                                'Câu 2',
+                                'Câu 3',
+                                'Câu 4',
+                                'Câu 5',
+                                'Câu 6',
+                                'Câu 7',
+                                'Câu 8',
+                                'TB (/5)',
+                                'Yêu thích',
+                                'Ý kiến & Phản tư',
+                              ],
+                              filteredSurveys.map((r) => [
+                                r.submittedAt,
+                                String(r.evaluatorGroup || '').replace(/^SURVEY_HS:\s*/, '') || 'Ẩn danh',
+                                r.className,
+                                r.targetGroup,
+                                r.criteriaScores?.s1 ?? '',
+                                r.criteriaScores?.s2 ?? '',
+                                r.criteriaScores?.s3 ?? '',
+                                r.criteriaScores?.s4 ?? '',
+                                r.criteriaScores?.s5 ?? '',
+                                r.criteriaScores?.s6 ?? '',
+                                r.criteriaScores?.s7 ?? '',
+                                r.criteriaScores?.s8 ?? '',
+                                r.totalPoints,
+                                r.rank,
+                                r.feedbackNote || '',
+                              ])
+                            )
+                          }
+                          disabled={filteredSurveys.length === 0}
+                          className="px-4 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-black text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Xuất Excel Khảo sát (.CSV)</span>
+                        </button>
+                      </div>
+
+                      {filteredSurveys.length === 0 ? (
+                        <div className="text-center py-6 text-xs font-bold text-slate-400">
+                          Chưa có phiếu khảo sát nào được gửi lên.
+                        </div>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left border-collapse text-xs">
+                            <thead>
+                              <tr className="bg-indigo-50 text-indigo-950 border-b border-indigo-200">
+                                <th className="p-2.5 font-black">Học sinh / Nhóm</th>
+                                <th className="p-2.5 font-black">Lớp</th>
+                                <th className="p-2.5 font-black">8 tiêu chí (1–5)</th>
+                                <th className="p-2.5 font-black text-center">TB</th>
+                                <th className="p-2.5 font-black text-center">Yêu thích</th>
+                                <th className="p-2.5 font-black">Ý kiến đóng góp</th>
+                                <th className="p-2.5 font-black text-center">Xóa</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {filteredSurveys.map((r) => (
+                                <tr key={r.id} className="hover:bg-slate-50">
+                                  <td className="p-2.5 font-bold text-indigo-950">
+                                    {String(r.evaluatorGroup || '').replace(/^SURVEY_HS:\s*/, '') || 'Ẩn danh'}
+                                    <div className="text-[10px] font-medium text-slate-500">
+                                      {r.targetGroup} • {r.submittedAt}
+                                    </div>
+                                  </td>
+                                  <td className="p-2.5 font-bold">{r.className}</td>
+                                  <td className="p-2.5 font-mono text-[11px] text-slate-700">{r.criteriaSummary}</td>
+                                  <td className="p-2.5 text-center font-black text-orange-600">{r.totalPoints}/5</td>
+                                  <td className="p-2.5 text-center font-bold text-emerald-700">{r.rank}</td>
+                                  <td className="p-2.5 text-[11px] text-slate-700 max-w-xs">{r.feedbackNote || '—'}</td>
+                                  <td className="p-2.5 text-center">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteDashboardRecord('surveys', r.id)}
+                                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+                                      title="Xóa phiếu này"
                                     >
                                       <Trash2 className="w-3.5 h-3.5" />
                                     </button>
@@ -3737,7 +3982,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             setStage6GameMode={setStage6GameMode}
             poseGameKey={poseGameKey}
             setPoseGameKey={setPoseGameKey}
-            isPoseGameUnlocked={isPoseGameUnlocked || isTeacherMode}
+            isPoseGameUnlocked={isPoseGameUnlocked}
             poseGamePassInput={poseGamePassInput}
             setPoseGamePassInput={setPoseGamePassInput}
             poseGamePassError={poseGamePassError}
@@ -3786,14 +4031,27 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             setStage6TeacherIndividualAdjustments={setStage6TeacherIndividualAdjustments}
             stage6TeacherSubmitted={stage6TeacherSubmitted}
             setStage6TeacherSubmitted={setStage6TeacherSubmitted}
+            stage6SurveySubmitted={stage6SurveySubmitted}
+            handleSubmitStage6Survey={handleSubmitStage6Survey}
           />
         )}
 {/* FOOTER BẢN QUYỀN & TÀI LIỆU THAM KHẢO */}
 <footer className="mt-2 pt-3 border-t border-indigo-200/60 flex flex-wrap items-center justify-between gap-3 text-xs text-indigo-900/75">
-  <div className="flex items-center gap-2 font-bold">
-    <span>🌱 Dự án Học tập STEAM KHTN 9 — Bài 30: Tinh bột &amp; Cellulose</span>
+  <div className="flex flex-col gap-0.5">
+    <span className="font-bold">🌱 Dự án Học tập STEAM KHTN 9 — Bài 30: Tinh bột &amp; Cellulose</span>
+    <span className="text-[11px] text-indigo-900/65 font-medium">
+      Tác giả: Thầy Trần Văn Lĩnh (Tổ KHTN – Trường TH&amp;THCS Ngô Chí Quốc) • Chia sẻ miễn phí dùng chung ngành GDĐT (QĐ 791/QĐ-SGDĐT &amp; CV 3089)
+    </span>
   </div>
   <div className="flex flex-wrap items-center gap-2">
+    <button
+      type="button"
+      onClick={() => setShowComplianceModal(true)}
+      className="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer transition-all"
+    >
+      <ShieldCheck className="w-3.5 h-3.5" />
+      <span>Hồ sơ QĐ 791 &amp; CV 3089</span>
+    </button>
     <button
       type="button"
       onClick={() => setShowNewWordsModal(true)}
@@ -3817,6 +4075,8 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
       <NewWordsModal isOpen={showNewWordsModal} onClose={() => setShowNewWordsModal(false)} />
 
       <ReferencesModal isOpen={showReferencesModal} onClose={() => setShowReferencesModal(false)} />
+
+      <ComplianceProfileModal isOpen={showComplianceModal} onClose={() => setShowComplianceModal(false)} />
 
       <NarratorOverlay
         isExpanded={isNarratorExpanded}

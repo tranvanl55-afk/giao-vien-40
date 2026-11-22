@@ -89,6 +89,31 @@ export function Stage1View({
   return (
 <div className="flex flex-col gap-4 animate-in fade-in duration-200">
             {guideBanner}
+            {/* Bộ tiêu chí sản phẩm STEAM (Hoạt động 1 - CV 3089/BGDĐT-GDTrH) */}
+            <div className="bg-white/90 border border-emerald-200 rounded-2xl p-3.5 shadow-2xs">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <span className="text-xs font-black text-emerald-900 uppercase">
+                  🎯 Nhiệm vụ &amp; Bộ Tiêu chí Sản phẩm Xanh (CV 3089)
+                </span>
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Tái sinh từ Cellulose &amp; Tinh bột
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px] font-medium text-indigo-950">
+                <div className="bg-emerald-50/70 rounded-xl px-3 py-2 border border-emerald-100">
+                  <strong>1. Khoa học (Bài 30):</strong> Tận dụng sợi cellulose (bã mía, rơm, giấy vụn) &amp; hồ tinh bột kết dính sinh học.
+                </div>
+                <div className="bg-sky-50/70 rounded-xl px-3 py-2 border border-sky-100">
+                  <strong>2. Kỹ thuật &amp; Độ bền:</strong> Có quy trình 4 bước định lượng (g / ml); sản phẩm dai, giữ phom, không rã khi tưới nhẹ.
+                </div>
+                <div className="bg-amber-50/70 rounded-xl px-3 py-2 border border-amber-100">
+                  <strong>3. Sinh thái &amp; An toàn:</strong> 100% nguyên liệu tự phân hủy, an toàn, tích hợp hạt giống nảy mầm tốt.
+                </div>
+                <div className="bg-purple-50/70 rounded-xl px-3 py-2 border border-purple-100">
+                  <strong>4. Thẩm mỹ &amp; Chi phí:</strong> Tạo hình sáng tạo, tiết kiệm, có bao bì/nhãn thông điệp sống xanh.
+                </div>
+              </div>
+            </div>
             <LockedTaskBox
               taskId="task-s1-padlet"
               badgeText="Chặng 1 • Nhiệm vụ 1"
