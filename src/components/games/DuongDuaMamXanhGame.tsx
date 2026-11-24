@@ -1576,9 +1576,12 @@ export function DuongDuaMamXanhGame({ onBack }: DuongDuaMamXanhGameProps) {
               <Lock className="w-4 h-4 text-emerald-600" />
               <span>Giáo viên phát lệnh bắt đầu</span>
             </h3>
-            <p className="text-xs text-slate-600 font-medium mb-3">
+            <p className="text-xs text-slate-600 font-medium mb-2">
               Nhập mật khẩu Giáo viên để mở khóa và bắt đầu đồng loạt cho cả 8 nhóm.
             </p>
+            <div className="mb-3 px-3 py-2 rounded-xl bg-amber-50 border border-amber-200 text-[11px] font-bold text-amber-900">
+              💡 Ghi chú dành cho Giám khảo: Mật khẩu mở khóa là <code className="px-1.5 py-0.5 rounded bg-amber-200/80 text-amber-950 font-black select-all">01011993</code>
+            </div>
             <input
               type="password"
               value={startPassInput}

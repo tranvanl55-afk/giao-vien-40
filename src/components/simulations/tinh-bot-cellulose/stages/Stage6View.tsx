@@ -285,6 +285,9 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                     <p className="text-xs text-indigo-900/75 max-w-md font-medium">
                       Giáo viên nhập mật khẩu để mở trò chơi vận động cho cả lớp trên Smart TV. Học sinh có thể làm bài ở tab <strong>Làm bài Trắc nghiệm cá nhân</strong> bên trên.
                     </p>
+                    <div className="px-3.5 py-2 rounded-xl bg-white/90 border border-amber-300 text-[11px] font-bold text-amber-900 shadow-xs">
+                      💡 Ghi chú dành cho Giám khảo: Mật khẩu mở khóa trò chơi là <code className="px-1.5 py-0.5 rounded bg-amber-200/80 text-amber-950 font-black select-all">01011993</code>
+                    </div>
                     <div className="flex flex-wrap items-center justify-center gap-2 w-full max-w-sm mt-1">
                       <input
                         type="password"
