@@ -12,7 +12,6 @@ import {
   type Stage3RubricCriterion,
   type RubricFormState,
   STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA,
-  createInitialRubricFormState,
   getRubricSummary,
 } from '../rubricData';
 import { LockedTaskBox } from '../components/LockedTaskBox';
@@ -28,6 +27,8 @@ interface Stage4ViewProps {
   toggleSetItem: (setter: React.Dispatch<React.SetStateAction<Set<string>>>, val: string) => void;
   productSubmitted: boolean;
   setProductSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
+  productRubricState: RubricFormState;
+  setProductRubricState: React.Dispatch<React.SetStateAction<RubricFormState>>;
   submitRubricEvaluation: (params: {
     stage: 'stage-3' | 'stage-5';
     stageLabel: string;
@@ -50,16 +51,13 @@ export function Stage4View({
   toggleSetItem,
   productSubmitted,
   setProductSubmitted,
+  productRubricState,
+  setProductRubricState,
   submitRubricEvaluation,
   isNextStageUnlocked,
   onNextStage,
 }: Stage4ViewProps) {
   const [showProductRubric, setShowProductRubric] = React.useState(false);
-  const [productRubricState, setProductRubricState] = React.useState<RubricFormState>(() => ({
-    ...createInitialRubricFormState(),
-    evaluatorMode: 'self',
-    evaluatorGroup: 'GV Trần Văn Lĩnh',
-  }));
   const productRubricSummary = getRubricSummary(
     STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA,
     productRubricState

@@ -272,10 +272,18 @@ export async function exportStage6TeacherToWord(params: {
   scores: Record<string, number>;
   strengths: string;
   individualAdjustments: string;
+  productScore?: number;
+  productWeightPct?: number;
+  projectFinalScore?: number;
 }) {
   const total =
     Math.round(STAGE6_TEACHER_RUBRIC_CRITERIA.reduce((acc, c) => acc + (params.scores[c.id] ?? 0), 0) * 10) / 10;
   const rank = getStage6RankInfo(total);
+  const hasCombined =
+    typeof params.productScore === 'number' &&
+    typeof params.productWeightPct === 'number' &&
+    typeof params.projectFinalScore === 'number';
+  const combinedRank = hasCombined ? getStage6RankInfo(params.projectFinalScore as number) : null;
 
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
@@ -309,7 +317,15 @@ export async function exportStage6TeacherToWord(params: {
           p('PHIẾU GIÁO VIÊN ĐÁNH GIÁ QUÁ TRÌNH NHÓM & BÁO CÁO STEAM (CHẶNG 6)', { bold: true, size: 28, align: AlignmentType.CENTER }),
           p(`Giáo viên: ${params.teacherName}   |   Lớp: ${params.className}   |   Nhóm: ${params.groupName}`),
           p(`Sản phẩm: ${params.productName}`),
-          p(`Tổng điểm: ${total}/10 điểm (${rank.label})`, { bold: true, after: 140 }),
+          p(`Tổng điểm Quá trình & Báo cáo (Chặng 6): ${total}/10 điểm (${rank.label})`, { bold: true, after: hasCombined ? 80 : 140 }),
+          ...(hasCombined && combinedRank
+            ? [
+                p(
+                  `TỔNG ĐIỂM DỰ ÁN STEAM (${params.productWeightPct}% Sản phẩm Chặng 4 [${params.productScore}/10đ] + ${100 - (params.productWeightPct ?? 50)}% Quá trình & Báo cáo Chặng 6 [${total}/10đ]): ${params.projectFinalScore}/10 điểm (${combinedRank.label})`,
+                  { bold: true, after: 140 }
+                ),
+              ]
+            : []),
           table,
           p(`Nhận xét chung (Ưu điểm & Hướng phát triển): ${params.strengths || '—'}`),
           p(`Điều chỉnh điểm cá nhân: ${params.individualAdjustments || 'Không có'}`),

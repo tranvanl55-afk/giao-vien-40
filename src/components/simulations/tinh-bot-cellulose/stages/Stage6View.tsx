@@ -106,6 +106,9 @@ interface Stage6ViewProps {
   setStage6TeacherIndividualAdjustments: React.Dispatch<React.SetStateAction<string>>;
   stage6TeacherSubmitted: boolean;
   setStage6TeacherSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
+  stage4ProductScore: number;
+  stage4ProductAnsweredCount: number;
+  showToast: (text: string, type?: 'success' | 'warning') => void;
 }
 
 export const Stage6View: React.FC<Stage6ViewProps> = ({
@@ -178,7 +181,12 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
   setStage6TeacherIndividualAdjustments,
   stage6TeacherSubmitted,
   setStage6TeacherSubmitted,
+  stage4ProductScore,
+  stage4ProductAnsweredCount,
+  showToast,
 }) => {
+  const [productWeightPct, setProductWeightPct] = React.useState<number>(50);
+  const [manualProductScore, setManualProductScore] = React.useState<string>('');
   return (
           <div className="flex flex-col gap-4 animate-in fade-in duration-200">
             {guideBanner}
@@ -816,7 +824,7 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                               onClick={() => {
                                 setStage6SelfSubmitted(true);
                                 confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
-                                alert('✓ Em đã hoàn thành và lưu phiếu Tự đánh giá cá nhân thành công!');
+                                showToast('✓ Em đã hoàn thành và lưu phiếu Tự đánh giá cá nhân thành công!', 'success');
                               }}
                               className="px-5 py-2.5 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer transition-all"
                             >
@@ -1132,7 +1140,7 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                               onClick={() => {
                                 setStage6LeaderSubmitted(true);
                                 confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
-                                alert('✓ Nhóm trưởng đã nộp bảng đánh giá các thành viên thành công!');
+                                showToast('✓ Nhóm trưởng đã nộp bảng đánh giá các thành viên thành công!', 'success');
                               }}
                               className="px-5 py-2.5 rounded-xl bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer transition-all"
                             >
@@ -1154,6 +1162,19 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                     STAGE6_TEACHER_RUBRIC_CRITERIA.reduce((acc, c) => acc + (stage6TeacherScores[c.id] ?? 0), 0) * 10
                   ) / 10;
                   const teacherRank = getStage6RankInfo(teacherTotal);
+                  const parsedManual = manualProductScore.trim() === '' ? null : Number(manualProductScore);
+                  const effectiveProductScore =
+                    parsedManual !== null && !Number.isNaN(parsedManual)
+                      ? Math.max(0, Math.min(10, Math.round(parsedManual * 10) / 10))
+                      : stage4ProductAnsweredCount > 0
+                        ? Math.round(stage4ProductScore * 10) / 10
+                        : null;
+                  const groupWeightPct = 100 - productWeightPct;
+                  const projectFinalScore =
+                    effectiveProductScore !== null
+                      ? Math.round(((effectiveProductScore * productWeightPct + teacherTotal * groupWeightPct) / 100) * 10) / 10
+                      : null;
+                  const projectFinalRank = projectFinalScore !== null ? getStage6RankInfo(projectFinalScore) : null;
 
                   return (
                     <div className="flex flex-col gap-4 animate-in fade-in duration-200">
@@ -1335,6 +1356,102 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                         </table>
                       </div>
 
+                      {/* KHỐI TỔNG ĐIỂM DỰ ÁN STEAM (GỘP RUBRIC SẢN PHẨM CHẶNG 4 + RUBRIC NHÓM CHẶNG 6) */}
+                      <div className="bg-linear-to-r from-emerald-50 via-teal-50 to-indigo-50 rounded-2xl p-4 md:p-5 border-2 border-emerald-200 shadow-xs flex flex-col gap-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-200/80 pb-2.5">
+                          <div>
+                            <h4 className="text-xs md:text-sm font-black text-emerald-950 uppercase">
+                              🏆 TỔNG ĐIỂM DỰ ÁN STEAM (GỘP 2 RUBRIC GIÁO VIÊN)
+                            </h4>
+                            <p className="text-xs text-emerald-900/80 font-medium">
+                              Tự động lấy điểm Sản phẩm từ Chặng 4 (hoặc nhập nhanh) kết hợp điểm Quá trình &amp; Báo cáo Chặng 6.
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {[
+                              { pct: 50, label: '50% SP / 50% Nhóm' },
+                              { pct: 60, label: '60% SP / 40% Nhóm' },
+                              { pct: 40, label: '40% SP / 60% Nhóm' },
+                            ].map((opt) => (
+                              <button
+                                key={opt.pct}
+                                type="button"
+                                onClick={() => setProductWeightPct(opt.pct)}
+                                className={`px-2.5 py-1 rounded-full text-xs font-black cursor-pointer transition-colors ${
+                                  productWeightPct === opt.pct
+                                    ? 'bg-emerald-600 text-white shadow-xs'
+                                    : 'bg-white text-emerald-900 border border-emerald-200 hover:bg-emerald-100'
+                                }`}
+                              >
+                                {opt.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-stretch">
+                          <div className="bg-white rounded-xl p-3 border border-emerald-200 flex flex-col justify-between gap-1.5">
+                            <span className="text-xs font-black text-emerald-900">
+                              1. Điểm Sản phẩm (Chặng 4 • {productWeightPct}%)
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="number"
+                                min={0}
+                                max={10}
+                                step={0.1}
+                                value={
+                                  manualProductScore !== ''
+                                    ? manualProductScore
+                                    : stage4ProductAnsweredCount > 0
+                                      ? String(Math.round(stage4ProductScore * 10) / 10)
+                                      : ''
+                                }
+                                onChange={(e) => setManualProductScore(e.target.value)}
+                                placeholder="VD: 9.0"
+                                className="w-24 px-2.5 py-1.5 rounded-lg border-2 border-emerald-300 bg-emerald-50/40 text-sm font-black text-emerald-950 outline-none focus:border-emerald-500"
+                              />
+                              <span className="text-xs font-bold text-slate-500">/ 10.0đ</span>
+                            </div>
+                            <span className="text-xs text-slate-600">
+                              {stage4ProductAnsweredCount > 0 && manualProductScore === ''
+                                ? `Đã đồng bộ từ Chặng 4 (${stage4ProductAnsweredCount}/4 tiêu chí)`
+                                : 'Chấm ở Chặng 4 hoặc nhập trực tiếp tại đây'}
+                            </span>
+                          </div>
+
+                          <div className="bg-white rounded-xl p-3 border border-indigo-200 flex flex-col justify-between gap-1.5">
+                            <span className="text-xs font-black text-indigo-900">
+                              2. Quá trình &amp; Báo cáo (Chặng 6 • {groupWeightPct}%)
+                            </span>
+                            <div className="text-2xl font-black text-indigo-700">
+                              {teacherTotal} <span className="text-xs font-bold text-slate-500">/ 10.0đ</span>
+                            </div>
+                            <span className="text-xs text-slate-600">Tự động từ 5 tiêu chí bảng trên</span>
+                          </div>
+
+                          <div className="bg-indigo-950 text-white rounded-xl p-3 border border-indigo-800 flex flex-col justify-between gap-1.5">
+                            <span className="text-xs font-black uppercase text-amber-300">
+                              Điểm Tổng kết Dự án (100%)
+                            </span>
+                            {projectFinalScore !== null && projectFinalRank ? (
+                              <>
+                                <div className="text-2xl font-black text-white">
+                                  {projectFinalScore} <span className="text-xs font-bold text-amber-200">/ 10.0đ</span>
+                                </div>
+                                <span className={`self-start px-2.5 py-0.5 rounded-full text-xs font-black ${projectFinalRank.colorClass}`}>
+                                  {projectFinalRank.badge}
+                                </span>
+                              </>
+                            ) : (
+                              <div className="text-xs text-indigo-200 font-medium leading-relaxed">
+                                Nhập điểm Sản phẩm Chặng 4 (ô bên trái) để hệ thống tự tính điểm tổng kết dự án.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
                       {/* KHUNG NHẬN XÉT CỦA GIÁO VIÊN & PHÂN HÓA ĐIỂM THÀNH VIÊN */}
                       <div className="bg-white rounded-2xl p-4 md:p-5 border border-indigo-200 shadow-sm flex flex-col gap-4">
                         <h4 className="text-xs md:text-sm font-black text-indigo-950 uppercase border-b border-indigo-100 pb-2 flex items-center gap-1.5">
@@ -1417,6 +1534,9 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                                     scores: stage6TeacherScores,
                                     strengths: stage6TeacherStrengths,
                                     individualAdjustments: stage6TeacherIndividualAdjustments,
+                                    productScore: effectiveProductScore ?? undefined,
+                                    productWeightPct: effectiveProductScore !== null ? productWeightPct : undefined,
+                                    projectFinalScore: projectFinalScore ?? undefined,
                                   })
                                 );
                               }}
@@ -1438,7 +1558,7 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                               onClick={() => {
                                 setStage6TeacherSubmitted(true);
                                 confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-                                alert('✓ Thầy/Cô đã hoàn tất và nộp Phiếu đánh giá dự án STEM thành công!');
+                                showToast('✓ Thầy/Cô đã hoàn tất và nộp Phiếu đánh giá dự án STEAM thành công!', 'success');
                               }}
                               className="px-5 py-2.5 rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer transition-all"
                             >

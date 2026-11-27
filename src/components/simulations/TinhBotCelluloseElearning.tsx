@@ -137,6 +137,7 @@ import {
   type RubricFormState,
   STAGE3_RUBRIC_CRITERIA,
   STAGE5_RUBRIC_CRITERIA,
+  STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA,
   createInitialRubricFormState,
   getCriterionPointFromState,
   getRubricSummary,
@@ -758,8 +759,14 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     if (!id.startsWith('local-')) {
       try {
         await deleteDoc(doc(db, colName, id));
-      } catch {
-        // Bỏ qua nếu không xóa được trên cloud
+      } catch (err) {
+        const rawErr = err instanceof Error ? err.message : String(err);
+        setDashboardLoadWarning(
+          rawErr.includes('permission') || rawErr.includes('PERMISSION_DENIED')
+            ? '🔒 Chưa xóa được trên Cloud: chỉ Giáo viên đã đăng nhập tài khoản website mới có quyền xóa bài nộp (bảo vệ dữ liệu học sinh).'
+            : '⚠️ Chưa xóa được trên Cloud do lỗi kết nối mạng. Vui lòng thử lại.'
+        );
+        return;
       }
     }
     if (type === 'tests') {
@@ -878,7 +885,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   // Hàm nộp bài kiểm tra 12 câu -> Lưu tập trung về Bảng Tổng hợp GV (+ tùy chọn Email / Google Sheet)
   const handleSendTestToTeacherEmail = async () => {
     if (!testStudentName.trim()) {
-      alert('Vui lòng nhập đầy đủ Họ và tên học sinh trước khi nộp bài!');
+      showToast('⚠️ Vui lòng nhập đầy đủ Họ và tên học sinh trước khi nộp bài!', 'warning');
       return;
     }
     const finalScore = calculateTestScore();
@@ -1002,6 +1009,41 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   // Chặng 4: Hoàn thiện sản phẩm (Tại nhà)
   const [homeChecks, setHomeChecks] = useState<Set<string>>(() => new Set(savedProgress.homeChecks || []));
   const [productSubmitted, setProductSubmitted] = useState(() => Boolean(savedProgress.productSubmitted));
+  const [stage4ProductRubricState, setStage4ProductRubricState] = useState<RubricFormState>(() => ({
+    ...createInitialRubricFormState(),
+    evaluatorMode: 'self',
+    evaluatorGroup: 'GV Trần Văn Lĩnh',
+  }));
+  const stage4ProductRubricSummary = getRubricSummary(
+    STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA,
+    stage4ProductRubricState
+  );
+
+  // Thông báo trong giao diện (thay thế alert() chặn màn hình trên Smart TV)
+  const [toastNotification, setToastNotification] = useState<{
+    type: 'success' | 'warning';
+    text: string;
+  } | null>(null);
+  const toastTimerRef = useRef<number | null>(null);
+
+  const showToast = useCallback((text: string, type: 'success' | 'warning' = 'success') => {
+    setToastNotification({ text, type });
+    if (toastTimerRef.current !== null) {
+      window.clearTimeout(toastTimerRef.current);
+    }
+    toastTimerRef.current = window.setTimeout(() => {
+      setToastNotification(null);
+      toastTimerRef.current = null;
+    }, 4500);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current !== null) {
+        window.clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, []);
 
   // Chặng 5: Ngày hội xanh & Đánh giá Rubric (3 Tiêu chí × 5 Mức) (Báo cáo tại lớp)
   const [boothChecks, setBoothChecks] = useState<Set<string>>(() => new Set(savedProgress.boothChecks || []));
@@ -2859,21 +2901,33 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
           <button
             type="button"
             onClick={() => {
-              if (!window.confirm('Thầy/Em có chắc chắn muốn đặt lại toàn bộ tiến trình học tập từ Chặng 1 trên máy này không?')) {
+              if (
+                !window.confirm(
+                  'Xóa toàn bộ tiến trình & dữ liệu lưu tạm trên máy này để bắt đầu lớp mới?\n(Lưu ý: Dữ liệu đã đồng bộ lên Cloud Firestore của Giáo viên KHÔNG bị ảnh hưởng.)'
+                )
+              ) {
                 return;
               }
               try {
-                window.localStorage.removeItem(LOCAL_PROGRESS_CACHE_KEY);
+                [
+                  LOCAL_PROGRESS_CACHE_KEY,
+                  LOCAL_TESTS_CACHE_KEY,
+                  LOCAL_RUBRICS_CACHE_KEY,
+                  LOCAL_SURVEYS_CACHE_KEY,
+                  ...LEGACY_PROGRESS_CACHE_KEYS,
+                  ...LEGACY_RUBRICS_CACHE_KEYS,
+                ].forEach((k) => window.localStorage.removeItem(k));
+                window.sessionStorage.removeItem('pose_game_unlocked');
               } catch {
                 // ignore
               }
               window.location.reload();
             }}
             className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-slate-200 font-bold text-xs cursor-pointer transition-colors"
-            title="Xóa tiến trình lưu tạm trên máy này để học lại từ đầu"
+            title="Xóa toàn bộ cache cục bộ trên máy dùng chung để bắt đầu lớp mới (không xóa dữ liệu trên Cloud)"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Làm lại</span>
+            <span className="hidden sm:inline">Lớp mới</span>
           </button>
 
           <h1 className="text-sm md:text-base font-black text-indigo-950 ml-1">
@@ -3962,6 +4016,8 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             toggleSetItem={toggleSetItem}
             productSubmitted={productSubmitted}
             setProductSubmitted={setProductSubmitted}
+            productRubricState={stage4ProductRubricState}
+            setProductRubricState={setStage4ProductRubricState}
             submitRubricEvaluation={submitRubricEvaluation}
             isNextStageUnlocked={isStageUnlocked('stage-5')}
             onNextStage={() => switchStage('stage-5')}
@@ -4064,6 +4120,9 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             setStage6TeacherIndividualAdjustments={setStage6TeacherIndividualAdjustments}
             stage6TeacherSubmitted={stage6TeacherSubmitted}
             setStage6TeacherSubmitted={setStage6TeacherSubmitted}
+            stage4ProductScore={stage4ProductRubricSummary.totalPoints}
+            stage4ProductAnsweredCount={stage4ProductRubricSummary.answeredCount}
+            showToast={showToast}
           />
         )}
 
@@ -4179,6 +4238,35 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
           setStageLockMessage(null);
         }}
       />
+
+      {/* Toast thông báo trong giao diện (thay thế alert() chặn màn hình trên Smart TV) */}
+      {toastNotification && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={`fixed bottom-5 right-5 z-50 max-w-md px-4 py-3 rounded-2xl shadow-xl border-2 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200 ${
+            toastNotification.type === 'warning'
+              ? 'bg-amber-50 border-amber-400 text-amber-950'
+              : 'bg-emerald-600 border-emerald-400 text-white'
+          }`}
+        >
+          <span className="text-xs sm:text-sm font-black leading-snug flex-1">
+            {toastNotification.text}
+          </span>
+          <button
+            type="button"
+            onClick={() => setToastNotification(null)}
+            aria-label="Đóng thông báo"
+            className={`px-2 py-0.5 rounded-lg text-xs font-black cursor-pointer ${
+              toastNotification.type === 'warning'
+                ? 'bg-amber-200/80 hover:bg-amber-300 text-amber-950'
+                : 'bg-white/20 hover:bg-white/30 text-white'
+            }`}
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }
