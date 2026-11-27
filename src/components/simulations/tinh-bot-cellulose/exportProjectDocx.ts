@@ -780,7 +780,7 @@ export async function exportAllStagesToWord(): Promise<void> {
     )
   );
 
-  landscapeChildren.push(subHeading('6.2C. Rubric chi tiết — Giáo viên đánh giá sản phẩm nhóm'));
+  landscapeChildren.push(subHeading('6.2C. Rubric chi tiết — Giáo viên đánh giá quá trình nhóm & báo cáo (tách riêng với Rubric Sản phẩm Chặng 4)'));
   landscapeChildren.push(
     buildMatrix7ColTable(
       'TIÊU CHÍ GIÁO VIÊN',

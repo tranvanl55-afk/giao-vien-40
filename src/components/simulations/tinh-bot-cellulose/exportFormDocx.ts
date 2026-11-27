@@ -306,7 +306,7 @@ export async function exportStage6TeacherToWord(params: {
     sections: [
       {
         children: [
-          p('PHIẾU GIÁO VIÊN ĐÁNH GIÁ DỰ ÁN STEAM (CHẶNG 6)', { bold: true, size: 28, align: AlignmentType.CENTER }),
+          p('PHIẾU GIÁO VIÊN ĐÁNH GIÁ QUÁ TRÌNH NHÓM & BÁO CÁO STEAM (CHẶNG 6)', { bold: true, size: 28, align: AlignmentType.CENTER }),
           p(`Giáo viên: ${params.teacherName}   |   Lớp: ${params.className}   |   Nhóm: ${params.groupName}`),
           p(`Sản phẩm: ${params.productName}`),
           p(`Tổng điểm: ${total}/10 điểm (${rank.label})`, { bold: true, after: 140 }),

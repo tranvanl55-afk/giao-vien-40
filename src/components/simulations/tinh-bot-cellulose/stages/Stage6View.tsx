@@ -1161,16 +1161,16 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                       <div className="bg-linear-to-r from-indigo-950 via-purple-950 to-slate-900 text-white p-5 rounded-2xl border border-indigo-600/50 shadow-md">
                         <div className="text-center flex flex-col gap-1 pb-3 border-b border-indigo-800/60">
                           <h3 className="text-xs md:text-sm font-black uppercase text-amber-300 tracking-wider">
-                            PHIẾU ĐÁNH GIÁ TỔNG HỢP QUÁ TRÌNH &amp; SẢN PHẨM DỰ ÁN STEM (DÀNH CHO GIÁO VIÊN)
+                            PHIẾU ĐÁNH GIÁ QUÁ TRÌNH NHÓM &amp; BÁO CÁO DỰ ÁN STEAM (DÀNH CHO GIÁO VIÊN)
                           </h3>
                           <h2 className="text-sm md:text-base font-black text-white uppercase">
                             DỰ ÁN: &ldquo;BẮT ĐẦU TỪ SỰ KẾT THÚC&rdquo; — CHỦ ĐỀ: TINH BỘT &amp; CELLULOSE (KHTN 9)
                           </h2>
                           <div className="text-[11px] text-slate-300 italic">
-                            Thang đo Analytical Rubric 5 mức • Thang điểm 10 (100%) | Chuẩn hóa theo Hướng dẫn thiết kế &amp; sử dụng Rubric (PGS.TS Lê Văn Hảo - HUIT ver 1.0)
+                            Thang đo Analytical Rubric 5 mức • Thang điểm 10 (100%) | Tách riêng với Rubric chấm Sản phẩm STEAM ở Chặng 4 (không trùng tiêu chí)
                           </div>
                           <div className="text-[10px] text-indigo-300 font-bold">
-                            7 Tiêu chí xuyên suốt dự án: Padlet (10%) – Ý tưởng xanh (15%) – Quy trình &amp; An toàn (15%) – Sản phẩm tái sinh (20%) – Poster (15%) – Video tổng kết (15%) – Thuyết trình (10%)
+                            5 Tiêu chí đánh giá nhóm &amp; báo cáo: Hợp tác Padlet (20%) – Quy trình &amp; An toàn (20%) – Poster khoa học (20%) – Video tổng kết (20%) – Thuyết trình &amp; Phản biện (20%)
                           </div>
                         </div>
 

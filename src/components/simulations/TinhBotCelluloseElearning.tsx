@@ -1112,18 +1112,26 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const [stage6TeacherName, setStage6TeacherName] = useState<string>(
     () => savedProgress.stage6TeacherName || 'Thầy Trần Văn Lĩnh'
   );
-  const [stage6TeacherScores, setStage6TeacherScores] = useState<Record<string, number>>(
-    () =>
-      savedProgress.stage6TeacherScores || {
-        s6_tea_padlet: 1.0,
-        s6_tea_science: 1.5,
-        s6_tea_process: 1.5,
-        s6_tea_product: 1.6,
-        s6_tea_poster: 1.5,
-        s6_tea_video: 1.2,
-        s6_tea_presentation: 1.0,
-      }
-  );
+  const [stage6TeacherScores, setStage6TeacherScores] = useState<Record<string, number>>(() => {
+    const validPts = new Set([0.4, 0.8, 1.2, 1.6, 2.0]);
+    const requiredIds = ['s6_tea_padlet', 's6_tea_process', 's6_tea_poster', 's6_tea_video', 's6_tea_presentation'];
+    const saved = savedProgress.stage6TeacherScores as Record<string, number> | undefined;
+    if (
+      saved &&
+      !('s6_tea_science' in saved) &&
+      !('s6_tea_product' in saved) &&
+      requiredIds.every((id) => typeof saved[id] === 'number' && validPts.has(saved[id]))
+    ) {
+      return saved;
+    }
+    return {
+      s6_tea_padlet: 2.0,
+      s6_tea_process: 2.0,
+      s6_tea_poster: 2.0,
+      s6_tea_video: 1.6,
+      s6_tea_presentation: 2.0,
+    };
+  });
   const [stage6TeacherStrengths, setStage6TeacherStrengths] = useState<string>(
     () =>
       savedProgress.stage6TeacherStrengths ||
@@ -4103,41 +4111,41 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
           </section>
         )}
 
-{/* FOOTER BẢN QUYỀN & TÀI LIỆU THAM KHẢO */}
-<footer className="mt-2 pt-3 border-t border-indigo-200/60 flex flex-wrap items-center justify-between gap-3 text-xs text-indigo-900/75">
-  <div className="flex flex-col gap-0.5">
-    <span className="font-bold">🌱 Dự án Học tập STEAM KHTN 9 — Bài 30: Tinh bột &amp; Cellulose</span>
-    <span className="text-[11px] text-indigo-900/65 font-medium">
-      Tác giả: Thầy Trần Văn Lĩnh (Tổ KHTN – Trường TH - THCS Ngô Chí Quốc) • Chia sẻ miễn phí dùng chung ngành GDĐT (QĐ 791/QĐ-SGDĐT &amp; CV 3089)
-    </span>
-  </div>
-  <div className="flex flex-wrap items-center gap-2">
-    <button
-      type="button"
-      onClick={() => setShowComplianceModal(true)}
-      className="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer transition-all"
-    >
-      <ShieldCheck className="w-3.5 h-3.5" />
-      <span>Thông tin Website</span>
-    </button>
-    <button
-      type="button"
-      onClick={() => setShowNewWordsModal(true)}
-      className="px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer transition-all"
-    >
-      <Volume2 className="w-3.5 h-3.5" />
-      <span>🇬🇧 New Words (Từ vựng Tiếng Anh KHTN)</span>
-    </button>
-    <button
-      type="button"
-      onClick={() => setShowReferencesModal(true)}
-      className="px-4 py-2 rounded-full bg-white hover:bg-indigo-50 text-indigo-950 font-black text-xs border border-indigo-200 shadow-2xs flex items-center gap-1.5 cursor-pointer transition-all"
-    >
-      <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
-      <span>📚 Danh mục Tài liệu tham khảo &amp; Nguồn học liệu</span>
-    </button>
-  </div>
-</footer>
+        {/* FOOTER BẢN QUYỀN & TÀI LIỆU THAM KHẢO */}
+        <footer className="mt-2 pt-3 border-t border-indigo-200/60 flex flex-wrap items-center justify-between gap-3 text-xs text-indigo-900/75">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-bold">🌱 Dự án Học tập STEAM KHTN 9 — Bài 30: Tinh bột &amp; Cellulose</span>
+            <span className="text-[11px] text-indigo-900/65 font-medium">
+              Tác giả: Thầy Trần Văn Lĩnh (Tổ KHTN – Trường TH - THCS Ngô Chí Quốc) • Chia sẻ miễn phí dùng chung ngành GDĐT (QĐ 791/QĐ-SGDĐT &amp; CV 3089)
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowComplianceModal(true)}
+              className="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer transition-all"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Thông tin Website</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowNewWordsModal(true)}
+              className="px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer transition-all"
+            >
+              <Volume2 className="w-3.5 h-3.5" />
+              <span>🇬🇧 New Words (Từ vựng Tiếng Anh KHTN)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowReferencesModal(true)}
+              className="px-4 py-2 rounded-full bg-white hover:bg-indigo-50 text-indigo-950 font-black text-xs border border-indigo-200 shadow-2xs flex items-center gap-1.5 cursor-pointer transition-all"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
+              <span>📚 Danh mục Tài liệu tham khảo &amp; Nguồn học liệu</span>
+            </button>
+          </div>
+        </footer>
       </main >
 
       <NewWordsModal isOpen={showNewWordsModal} onClose={() => setShowNewWordsModal(false)} />
