@@ -214,6 +214,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
       const email = sp.get('email')?.trim() || '';
       const rawPadlet = sp.get('padlet')?.trim() || '';
       const padlet = rawPadlet.startsWith('https://') || rawPadlet.startsWith('http://') ? rawPadlet : '';
+      const isScorm = sp.get('scorm') === '1';
       if (lop) window.localStorage.setItem('KHTN9_BAI30_CUSTOM_CLASS_V1', lop);
       if (gv) window.localStorage.setItem('KHTN9_BAI30_CUSTOM_TEACHER_NAME_V1', gv);
       if (truong) window.localStorage.setItem('KHTN9_BAI30_CUSTOM_SCHOOL_V1', truong);
@@ -226,11 +227,14 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         email: email || window.localStorage.getItem('KHTN9_BAI30_CUSTOM_TEACHER_EMAIL_V1') || '',
         padlet: padlet || window.localStorage.getItem('KHTN9_BAI30_CUSTOM_PADLET_V1') || '',
         fromUrlLop: Boolean(lop),
+        isScorm,
       };
     } catch {
-      return { lop: '', gv: '', truong: '', email: '', padlet: '', fromUrlLop: false };
+      return { lop: '', gv: '', truong: '', email: '', padlet: '', fromUrlLop: false, isScorm: false };
     }
   })();
+
+  const isScormStudentOnly = initialClassParams.isScorm;
 
   const [customClassCode] = useState<string>(initialClassParams.lop);
   const [customTeacherName] = useState<string>(initialClassParams.gv);
@@ -1492,8 +1496,8 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     ).join(' | ');
     const combinedSummary =
       typeof combinedInfo?.projectFinalScore === 'number' &&
-      typeof combinedInfo?.productScore === 'number' &&
-      typeof combinedInfo?.productWeightPct === 'number'
+        typeof combinedInfo?.productScore === 'number' &&
+        typeof combinedInfo?.productWeightPct === 'number'
         ? `[Tổng điểm dự án: ${combinedInfo.projectFinalScore}/10đ (${combinedInfo.productWeightPct}% SP ${combinedInfo.productScore}đ + ${100 - combinedInfo.productWeightPct}% Nhóm ${teacherTotal}đ)]`
         : '';
     const teacherFeedbackText = [
@@ -3039,25 +3043,29 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             <span>Xuất Word</span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => setScormExportModal('scorm')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 font-extrabold text-xs cursor-pointer transition-colors"
-            title="Cài đặt Email, Padlet riêng và tải gói chuẩn SCORM 1.2 (.zip) để upload lên LMS"
-          >
-            <Download className="w-3.5 h-3.5 text-teal-700" />
-            <span>SCORM 1.2</span>
-          </button>
+          {!isScormStudentOnly && (
+            <>
+              <button
+                type="button"
+                onClick={() => setScormExportModal('scorm')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 font-extrabold text-xs cursor-pointer transition-colors"
+                title="Cài đặt Email, Padlet riêng và tải gói chuẩn SCORM 1.2 (.zip) để upload lên LMS"
+              >
+                <Download className="w-3.5 h-3.5 text-teal-700" />
+                <span>SCORM 1.2</span>
+              </button>
 
-          <button
-            type="button"
-            onClick={() => setScormExportModal('html5')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 font-extrabold text-xs cursor-pointer transition-colors"
-            title="Cài đặt Email, Padlet riêng và tải tệp HTML5 độc lập (.html) theo chuẩn Điều 3.9 QĐ 791"
-          >
-            <Download className="w-3.5 h-3.5 text-indigo-700" />
-            <span>HTML5</span>
-          </button>
+              <button
+                type="button"
+                onClick={() => setScormExportModal('html5')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 font-extrabold text-xs cursor-pointer transition-colors"
+                title="Cài đặt Email, Padlet riêng và tải tệp HTML5 độc lập (.html) theo chuẩn Điều 3.9 QĐ 791"
+              >
+                <Download className="w-3.5 h-3.5 text-indigo-700" />
+                <span>HTML5</span>
+              </button>
+            </>
+          )}
 
           <button
             type="button"
@@ -3097,7 +3105,8 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Chuyển đổi Chế độ Học sinh / Giáo viên */}
+          {/* Chuyển đổi Chế độ Học sinh / Giáo viên (ẩn khi chạy trong gói SCORM/HTML5 cho HS) */}
+          {!isScormStudentOnly && (
           <div className="flex items-center bg-indigo-50/90 p-1 rounded-full border border-indigo-200/80 shadow-xs">
             <button
               type="button"
@@ -3147,8 +3156,9 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
               <span>GV</span>
             </button>
           </div>
+          )}
 
-          {(isTeacherMode || isJudgeMode) && (
+          {!isScormStudentOnly && (isTeacherMode || isJudgeMode) && (
             <>
               <button
                 type="button"
@@ -3972,337 +3982,337 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             </div>
           }
         >
-        {activeStage === 'stage-1' && (
-          <Stage1View
-            guideBanner={renderStageGuideBanner('stage-1')}
-            isReviewMode={isTeacherMode || isJudgeMode}
-            unlockedTaskIds={unlockedTaskIds}
-            unlockTask={unlockTask}
-            lockTask={lockTask}
-            showPadletEmbed={showPadletEmbed}
-            setShowPadletEmbed={setShowPadletEmbed}
-            teamNameInput={teamNameInput}
-            setTeamNameInput={setTeamNameInput}
-            padletConfirmed={padletConfirmed}
-            setPadletConfirmed={setPadletConfirmed}
-            unlockedClueIds={unlockedClueIds}
-            setUnlockedClueIds={setUnlockedClueIds}
-            clueInputs={clueInputs}
-            setClueInputs={setClueInputs}
-            solvedClueIds={solvedClueIds}
-            clueFeedback={clueFeedback}
-            handleCheckClue={handleCheckClue}
-            placedKeywordSlots={placedKeywordSlots}
-            usedTileIndices={usedTileIndices}
-            activeKeywordSlot={activeKeywordSlot}
-            setActiveKeywordSlot={setActiveKeywordSlot}
-            draggedTileIdx={draggedTileIdx}
-            setDraggedTileIdx={setDraggedTileIdx}
-            dragOverSlotIdx={dragOverSlotIdx}
-            setDragOverSlotIdx={setDragOverSlotIdx}
-            unlockedPoolTileIndices={unlockedPoolTileIndices}
-            handlePlaceLetter={handlePlaceLetter}
-            isKeywordComplete={isKeywordComplete}
-            padletUrl={effectivePadletUrl}
-            isNextStageUnlocked={isStageUnlocked('stage-2')}
-            onNextStage={() => switchStage('stage-2')}
-          />
-        )}
+          {activeStage === 'stage-1' && (
+            <Stage1View
+              guideBanner={renderStageGuideBanner('stage-1')}
+              isReviewMode={isTeacherMode || isJudgeMode}
+              unlockedTaskIds={unlockedTaskIds}
+              unlockTask={unlockTask}
+              lockTask={lockTask}
+              showPadletEmbed={showPadletEmbed}
+              setShowPadletEmbed={setShowPadletEmbed}
+              teamNameInput={teamNameInput}
+              setTeamNameInput={setTeamNameInput}
+              padletConfirmed={padletConfirmed}
+              setPadletConfirmed={setPadletConfirmed}
+              unlockedClueIds={unlockedClueIds}
+              setUnlockedClueIds={setUnlockedClueIds}
+              clueInputs={clueInputs}
+              setClueInputs={setClueInputs}
+              solvedClueIds={solvedClueIds}
+              clueFeedback={clueFeedback}
+              handleCheckClue={handleCheckClue}
+              placedKeywordSlots={placedKeywordSlots}
+              usedTileIndices={usedTileIndices}
+              activeKeywordSlot={activeKeywordSlot}
+              setActiveKeywordSlot={setActiveKeywordSlot}
+              draggedTileIdx={draggedTileIdx}
+              setDraggedTileIdx={setDraggedTileIdx}
+              dragOverSlotIdx={dragOverSlotIdx}
+              setDragOverSlotIdx={setDragOverSlotIdx}
+              unlockedPoolTileIndices={unlockedPoolTileIndices}
+              handlePlaceLetter={handlePlaceLetter}
+              isKeywordComplete={isKeywordComplete}
+              padletUrl={effectivePadletUrl}
+              isNextStageUnlocked={isStageUnlocked('stage-2')}
+              onNextStage={() => switchStage('stage-2')}
+            />
+          )}
 
-        {/* ============================================================
+          {/* ============================================================
             CHẶNG 2: KIẾN THỨC NỀN (TỰ HỌC TẠI NHÀ THEO THỨ TỰ BÀI HỌC I -> II -> III)
            ============================================================ */}
-        {activeStage === 'stage-2' && (
-          <Stage2View
-            guideBanner={renderStageGuideBanner('stage-2')}
-            isTeacherMode={isTeacherMode || isJudgeMode}
-            unlockedTaskIds={unlockedTaskIds}
-            unlockTask={unlockTask}
-            lockTask={lockTask}
-            isStage3Unlocked={isStageUnlocked('stage-3')}
-            onGoToStage3={() => switchStage('stage-3')}
-            jumpToStage2Section={jumpToStage2Section}
-            toggleSetItem={toggleSetItem}
-            setShowNewWordsModal={setShowNewWordsModal}
-            isPart1Done={isPart1Done}
-            isPart1DragComplete={isPart1DragComplete}
-            isPart2Done={isPart2Done}
-            isPart2aDone={isPart2aDone}
-            isPart2aQuizAllAnswered={isPart2aQuizAllAnswered}
-            isPart2bDone={isPart2bDone}
-            isPart2bQuizAllAnswered={isPart2bQuizAllAnswered}
-            isPart3Done={isPart3Done}
-            isPart4Done={isPart4Done}
-            isPart5Done={isPart5Done}
-            checkedHomeItems={checkedHomeItems}
-            setCheckedHomeItems={setCheckedHomeItems}
-            worksheetDownloaded={worksheetDownloaded}
-            setWorksheetDownloaded={setWorksheetDownloaded}
-            showWorksheetGuide={showWorksheetGuide}
-            setShowWorksheetGuide={setShowWorksheetGuide}
-            showWorksheetPreview={showWorksheetPreview}
-            setShowWorksheetPreview={setShowWorksheetPreview}
-            worksheetPreviewType={worksheetPreviewType}
-            setWorksheetPreviewType={setWorksheetPreviewType}
-            handleDownloadWorksheetDoc={handleDownloadWorksheetDoc}
-            video1Playing={video1Playing}
-            setVideo1Playing={setVideo1Playing}
-            video1Watched={video1Watched}
-            setVideo1Watched={setVideo1Watched}
-            shuffledDragItems={shuffledDragItems}
-            dragPlacements={dragPlacements}
-            setDragPlacements={setDragPlacements}
-            draggedPropId={draggedPropId}
-            setDraggedPropId={setDraggedPropId}
-            dragOverZone={dragOverZone}
-            setDragOverZone={setDragOverZone}
-            dragFeedback={dragFeedback}
-            setDragFeedback={setDragFeedback}
-            handleAssignDragProp={handleAssignDragProp}
-            iodineVideoUrl={iodineVideoUrl}
-            videoIodineWatched={videoIodineWatched}
-            setVideoIodineWatched={setVideoIodineWatched}
-            iodineTubeState={iodineTubeState}
-            hasAddedStarch={hasAddedStarch}
-            hasAddedIodine={hasAddedIodine}
-            iodineLabAnimating={iodineLabAnimating}
-            testTubeTrackRef={testTubeTrackRef}
-            clampPositionPct={clampPositionPct}
-            isDraggingClamp={isDraggingClamp}
-            setIsDraggingClamp={setIsDraggingClamp}
-            isClampAtOneThird={isClampAtOneThird}
-            updateClampPosition={updateClampPosition}
-            handleAddStarchToTube={handleAddStarchToTube}
-            handleAddIodineToTube={handleAddIodineToTube}
-            handleResetIodineLab={handleResetIodineLab}
-            iodineBlank1={iodineBlank1}
-            setIodineBlank1={setIodineBlank1}
-            iodineBlank2={iodineBlank2}
-            setIodineBlank2={setIodineBlank2}
-            iodineBlanksChecked={iodineBlanksChecked}
-            setIodineBlanksChecked={setIodineBlanksChecked}
-            isIodineBlank1Right={isIodineBlank1Right}
-            isIodineBlank2Right={isIodineBlank2Right}
-            isAllIodineBlanksRight={isAllIodineBlanksRight}
-            iodineQuizAnswers={iodineQuizAnswers}
-            setIodineQuizAnswers={setIodineQuizAnswers}
-            iodineQuizSubmitted={iodineQuizSubmitted}
-            setIodineQuizSubmitted={setIodineQuizSubmitted}
-            hydrolysisVideoUrl={hydrolysisVideoUrl}
-            videoHydroWatched={videoHydroWatched}
-            setVideoHydroWatched={setVideoHydroWatched}
-            hydrolysisDone={hydrolysisDone}
-            setHydrolysisDone={setHydrolysisDone}
-            hydroBlank1={hydroBlank1}
-            setHydroBlank1={setHydroBlank1}
-            hydroBlank2={hydroBlank2}
-            setHydroBlank2={setHydroBlank2}
-            hydroBlank3={hydroBlank3}
-            setHydroBlank3={setHydroBlank3}
-            hydroBlank4={hydroBlank4}
-            setHydroBlank4={setHydroBlank4}
-            hydroBlanksChecked={hydroBlanksChecked}
-            setHydroBlanksChecked={setHydroBlanksChecked}
-            isHydroBlank1Right={isHydroBlank1Right}
-            isHydroBlank2Right={isHydroBlank2Right}
-            isHydroBlank3Right={isHydroBlank3Right}
-            isHydroBlank4Right={isHydroBlank4Right}
-            isAllHydroBlanksRight={isAllHydroBlanksRight}
-            hydroQuizAnswers={hydroQuizAnswers}
-            setHydroQuizAnswers={setHydroQuizAnswers}
-            hydroQuizSubmitted={hydroQuizSubmitted}
-            setHydroQuizSubmitted={setHydroQuizSubmitted}
-            appVideoUrl={appVideoUrl}
-            video3Watched={video3Watched}
-            setVideo3Watched={setVideo3Watched}
-            hotspotMode={hotspotMode}
-            setHotspotMode={setHotspotMode}
-            hotspotSelections={hotspotSelections}
-            solvedHotspotIds={solvedHotspotIds}
-            hotspotFeedback={hotspotFeedback}
-            handleToggleHotspotCell={handleToggleHotspotCell}
-            handleRemoveHotspotSelection={handleRemoveHotspotSelection}
-            handleCheckHotspots={handleCheckHotspots}
-            handleResetHotspots={handleResetHotspots}
-            handleShowHotspotSolution={handleShowHotspotSolution}
-            testStudentName={testStudentName}
-            setTestStudentName={setTestStudentName}
-            testStudentClass={testStudentClass}
-            setTestStudentClass={setTestStudentClass}
-            testStudentSchool={testStudentSchool}
-            setTestStudentSchool={setTestStudentSchool}
-            testMcAnswers={testMcAnswers}
-            setTestMcAnswers={setTestMcAnswers}
-            testTfAnswers={testTfAnswers}
-            setTestTfAnswers={setTestTfAnswers}
-            testFillAnswers={testFillAnswers}
-            setTestFillAnswers={setTestFillAnswers}
-            testMatchingAnswers={testMatchingAnswers}
-            setTestMatchingAnswers={setTestMatchingAnswers}
-            isTestSubmitted={isTestSubmitted}
-            testScore={testScore}
-            testFeedbackMessage={testFeedbackMessage}
-            isSendingEmail={isSendingEmail}
-            handleSendTestToTeacherEmail={handleSendTestToTeacherEmail}
-            showProjectGuidePreview={showProjectGuidePreview}
-            setShowProjectGuidePreview={setShowProjectGuidePreview}
-            projectGuidePreviewType={projectGuidePreviewType}
-            setProjectGuidePreviewType={setProjectGuidePreviewType}
-            markProjectGuideDownloaded={markProjectGuideDownloaded}
-            teacherEmail={effectiveTeacherEmail}
-          />
-        )}
+          {activeStage === 'stage-2' && (
+            <Stage2View
+              guideBanner={renderStageGuideBanner('stage-2')}
+              isTeacherMode={isTeacherMode || isJudgeMode}
+              unlockedTaskIds={unlockedTaskIds}
+              unlockTask={unlockTask}
+              lockTask={lockTask}
+              isStage3Unlocked={isStageUnlocked('stage-3')}
+              onGoToStage3={() => switchStage('stage-3')}
+              jumpToStage2Section={jumpToStage2Section}
+              toggleSetItem={toggleSetItem}
+              setShowNewWordsModal={setShowNewWordsModal}
+              isPart1Done={isPart1Done}
+              isPart1DragComplete={isPart1DragComplete}
+              isPart2Done={isPart2Done}
+              isPart2aDone={isPart2aDone}
+              isPart2aQuizAllAnswered={isPart2aQuizAllAnswered}
+              isPart2bDone={isPart2bDone}
+              isPart2bQuizAllAnswered={isPart2bQuizAllAnswered}
+              isPart3Done={isPart3Done}
+              isPart4Done={isPart4Done}
+              isPart5Done={isPart5Done}
+              checkedHomeItems={checkedHomeItems}
+              setCheckedHomeItems={setCheckedHomeItems}
+              worksheetDownloaded={worksheetDownloaded}
+              setWorksheetDownloaded={setWorksheetDownloaded}
+              showWorksheetGuide={showWorksheetGuide}
+              setShowWorksheetGuide={setShowWorksheetGuide}
+              showWorksheetPreview={showWorksheetPreview}
+              setShowWorksheetPreview={setShowWorksheetPreview}
+              worksheetPreviewType={worksheetPreviewType}
+              setWorksheetPreviewType={setWorksheetPreviewType}
+              handleDownloadWorksheetDoc={handleDownloadWorksheetDoc}
+              video1Playing={video1Playing}
+              setVideo1Playing={setVideo1Playing}
+              video1Watched={video1Watched}
+              setVideo1Watched={setVideo1Watched}
+              shuffledDragItems={shuffledDragItems}
+              dragPlacements={dragPlacements}
+              setDragPlacements={setDragPlacements}
+              draggedPropId={draggedPropId}
+              setDraggedPropId={setDraggedPropId}
+              dragOverZone={dragOverZone}
+              setDragOverZone={setDragOverZone}
+              dragFeedback={dragFeedback}
+              setDragFeedback={setDragFeedback}
+              handleAssignDragProp={handleAssignDragProp}
+              iodineVideoUrl={iodineVideoUrl}
+              videoIodineWatched={videoIodineWatched}
+              setVideoIodineWatched={setVideoIodineWatched}
+              iodineTubeState={iodineTubeState}
+              hasAddedStarch={hasAddedStarch}
+              hasAddedIodine={hasAddedIodine}
+              iodineLabAnimating={iodineLabAnimating}
+              testTubeTrackRef={testTubeTrackRef}
+              clampPositionPct={clampPositionPct}
+              isDraggingClamp={isDraggingClamp}
+              setIsDraggingClamp={setIsDraggingClamp}
+              isClampAtOneThird={isClampAtOneThird}
+              updateClampPosition={updateClampPosition}
+              handleAddStarchToTube={handleAddStarchToTube}
+              handleAddIodineToTube={handleAddIodineToTube}
+              handleResetIodineLab={handleResetIodineLab}
+              iodineBlank1={iodineBlank1}
+              setIodineBlank1={setIodineBlank1}
+              iodineBlank2={iodineBlank2}
+              setIodineBlank2={setIodineBlank2}
+              iodineBlanksChecked={iodineBlanksChecked}
+              setIodineBlanksChecked={setIodineBlanksChecked}
+              isIodineBlank1Right={isIodineBlank1Right}
+              isIodineBlank2Right={isIodineBlank2Right}
+              isAllIodineBlanksRight={isAllIodineBlanksRight}
+              iodineQuizAnswers={iodineQuizAnswers}
+              setIodineQuizAnswers={setIodineQuizAnswers}
+              iodineQuizSubmitted={iodineQuizSubmitted}
+              setIodineQuizSubmitted={setIodineQuizSubmitted}
+              hydrolysisVideoUrl={hydrolysisVideoUrl}
+              videoHydroWatched={videoHydroWatched}
+              setVideoHydroWatched={setVideoHydroWatched}
+              hydrolysisDone={hydrolysisDone}
+              setHydrolysisDone={setHydrolysisDone}
+              hydroBlank1={hydroBlank1}
+              setHydroBlank1={setHydroBlank1}
+              hydroBlank2={hydroBlank2}
+              setHydroBlank2={setHydroBlank2}
+              hydroBlank3={hydroBlank3}
+              setHydroBlank3={setHydroBlank3}
+              hydroBlank4={hydroBlank4}
+              setHydroBlank4={setHydroBlank4}
+              hydroBlanksChecked={hydroBlanksChecked}
+              setHydroBlanksChecked={setHydroBlanksChecked}
+              isHydroBlank1Right={isHydroBlank1Right}
+              isHydroBlank2Right={isHydroBlank2Right}
+              isHydroBlank3Right={isHydroBlank3Right}
+              isHydroBlank4Right={isHydroBlank4Right}
+              isAllHydroBlanksRight={isAllHydroBlanksRight}
+              hydroQuizAnswers={hydroQuizAnswers}
+              setHydroQuizAnswers={setHydroQuizAnswers}
+              hydroQuizSubmitted={hydroQuizSubmitted}
+              setHydroQuizSubmitted={setHydroQuizSubmitted}
+              appVideoUrl={appVideoUrl}
+              video3Watched={video3Watched}
+              setVideo3Watched={setVideo3Watched}
+              hotspotMode={hotspotMode}
+              setHotspotMode={setHotspotMode}
+              hotspotSelections={hotspotSelections}
+              solvedHotspotIds={solvedHotspotIds}
+              hotspotFeedback={hotspotFeedback}
+              handleToggleHotspotCell={handleToggleHotspotCell}
+              handleRemoveHotspotSelection={handleRemoveHotspotSelection}
+              handleCheckHotspots={handleCheckHotspots}
+              handleResetHotspots={handleResetHotspots}
+              handleShowHotspotSolution={handleShowHotspotSolution}
+              testStudentName={testStudentName}
+              setTestStudentName={setTestStudentName}
+              testStudentClass={testStudentClass}
+              setTestStudentClass={setTestStudentClass}
+              testStudentSchool={testStudentSchool}
+              setTestStudentSchool={setTestStudentSchool}
+              testMcAnswers={testMcAnswers}
+              setTestMcAnswers={setTestMcAnswers}
+              testTfAnswers={testTfAnswers}
+              setTestTfAnswers={setTestTfAnswers}
+              testFillAnswers={testFillAnswers}
+              setTestFillAnswers={setTestFillAnswers}
+              testMatchingAnswers={testMatchingAnswers}
+              setTestMatchingAnswers={setTestMatchingAnswers}
+              isTestSubmitted={isTestSubmitted}
+              testScore={testScore}
+              testFeedbackMessage={testFeedbackMessage}
+              isSendingEmail={isSendingEmail}
+              handleSendTestToTeacherEmail={handleSendTestToTeacherEmail}
+              showProjectGuidePreview={showProjectGuidePreview}
+              setShowProjectGuidePreview={setShowProjectGuidePreview}
+              projectGuidePreviewType={projectGuidePreviewType}
+              setProjectGuidePreviewType={setProjectGuidePreviewType}
+              markProjectGuideDownloaded={markProjectGuideDownloaded}
+              teacherEmail={effectiveTeacherEmail}
+            />
+          )}
 
-        {activeStage === 'stage-3' && (
-          <Stage3View
-            guideBanner={renderStageGuideBanner('stage-3')}
-            unlockedTaskIds={unlockedTaskIds}
-            unlockTask={unlockTask}
-            lockTask={lockTask}
-            ideaDriveSubmitted={ideaDriveSubmitted}
-            setIdeaDriveSubmitted={setIdeaDriveSubmitted}
-            isStage31Done={isStage31Done}
-            presenterName={presenterName}
-            setPresenterName={setPresenterName}
-            isStage32Done={isStage32Done}
-            peerIdeaConfirmed={peerIdeaConfirmed}
-            setPeerIdeaConfirmed={setPeerIdeaConfirmed}
-            stage3RubricState={stage3RubricState}
-            setStage3RubricState={setStage3RubricState}
-            stage3RubricSummary={stage3RubricSummary}
-            submitRubricEvaluation={submitRubricEvaluation}
-            teacherEmail={effectiveTeacherEmail}
-            isNextStageUnlocked={isStageUnlocked('stage-4')}
-            onNextStage={() => switchStage('stage-4')}
-          />
-        )}
+          {activeStage === 'stage-3' && (
+            <Stage3View
+              guideBanner={renderStageGuideBanner('stage-3')}
+              unlockedTaskIds={unlockedTaskIds}
+              unlockTask={unlockTask}
+              lockTask={lockTask}
+              ideaDriveSubmitted={ideaDriveSubmitted}
+              setIdeaDriveSubmitted={setIdeaDriveSubmitted}
+              isStage31Done={isStage31Done}
+              presenterName={presenterName}
+              setPresenterName={setPresenterName}
+              isStage32Done={isStage32Done}
+              peerIdeaConfirmed={peerIdeaConfirmed}
+              setPeerIdeaConfirmed={setPeerIdeaConfirmed}
+              stage3RubricState={stage3RubricState}
+              setStage3RubricState={setStage3RubricState}
+              stage3RubricSummary={stage3RubricSummary}
+              submitRubricEvaluation={submitRubricEvaluation}
+              teacherEmail={effectiveTeacherEmail}
+              isNextStageUnlocked={isStageUnlocked('stage-4')}
+              onNextStage={() => switchStage('stage-4')}
+            />
+          )}
 
-        {activeStage === 'stage-4' && (
-          <Stage4View
-            guideBanner={renderStageGuideBanner('stage-4')}
-            unlockedTaskIds={unlockedTaskIds}
-            unlockTask={unlockTask}
-            lockTask={lockTask}
-            homeChecks={homeChecks}
-            setHomeChecks={setHomeChecks}
-            toggleSetItem={toggleSetItem}
-            productSubmitted={productSubmitted}
-            setProductSubmitted={setProductSubmitted}
-            productRubricState={stage4ProductRubricState}
-            setProductRubricState={setStage4ProductRubricState}
-            submitRubricEvaluation={submitRubricEvaluation}
-            teacherEmail={effectiveTeacherEmail}
-            padletUrl={effectivePadletUrl}
-            isNextStageUnlocked={isStageUnlocked('stage-5')}
-            onNextStage={() => switchStage('stage-5')}
-          />
-        )}
+          {activeStage === 'stage-4' && (
+            <Stage4View
+              guideBanner={renderStageGuideBanner('stage-4')}
+              unlockedTaskIds={unlockedTaskIds}
+              unlockTask={unlockTask}
+              lockTask={lockTask}
+              homeChecks={homeChecks}
+              setHomeChecks={setHomeChecks}
+              toggleSetItem={toggleSetItem}
+              productSubmitted={productSubmitted}
+              setProductSubmitted={setProductSubmitted}
+              productRubricState={stage4ProductRubricState}
+              setProductRubricState={setStage4ProductRubricState}
+              submitRubricEvaluation={submitRubricEvaluation}
+              teacherEmail={effectiveTeacherEmail}
+              padletUrl={effectivePadletUrl}
+              isNextStageUnlocked={isStageUnlocked('stage-5')}
+              onNextStage={() => switchStage('stage-5')}
+            />
+          )}
 
-        {activeStage === 'stage-5' && (
-          <Stage5View
-            guideBanner={renderStageGuideBanner('stage-5')}
-            unlockedTaskIds={unlockedTaskIds}
-            unlockTask={unlockTask}
-            lockTask={lockTask}
-            boothChecks={boothChecks}
-            setBoothChecks={setBoothChecks}
-            toggleSetItem={toggleSetItem}
-            stage5PresentationSubmitted={stage5PresentationSubmitted}
-            setStage5PresentationSubmitted={setStage5PresentationSubmitted}
-            voteConfirmed={voteConfirmed}
-            setVoteConfirmed={setVoteConfirmed}
-            stage5RubricState={stage5RubricState}
-            setStage5RubricState={setStage5RubricState}
-            stage5RubricSummary={stage5RubricSummary}
-            submitRubricEvaluation={submitRubricEvaluation}
-            teacherEmail={effectiveTeacherEmail}
-            isNextStageUnlocked={isStageUnlocked('stage-6')}
-            onNextStage={() => switchStage('stage-6')}
-          />
-        )}
+          {activeStage === 'stage-5' && (
+            <Stage5View
+              guideBanner={renderStageGuideBanner('stage-5')}
+              unlockedTaskIds={unlockedTaskIds}
+              unlockTask={unlockTask}
+              lockTask={lockTask}
+              boothChecks={boothChecks}
+              setBoothChecks={setBoothChecks}
+              toggleSetItem={toggleSetItem}
+              stage5PresentationSubmitted={stage5PresentationSubmitted}
+              setStage5PresentationSubmitted={setStage5PresentationSubmitted}
+              voteConfirmed={voteConfirmed}
+              setVoteConfirmed={setVoteConfirmed}
+              stage5RubricState={stage5RubricState}
+              setStage5RubricState={setStage5RubricState}
+              stage5RubricSummary={stage5RubricSummary}
+              submitRubricEvaluation={submitRubricEvaluation}
+              teacherEmail={effectiveTeacherEmail}
+              isNextStageUnlocked={isStageUnlocked('stage-6')}
+              onNextStage={() => switchStage('stage-6')}
+            />
+          )}
 
-        {/* ============================================================
+          {/* ============================================================
             CHẶNG 6: TỔNG KẾT DỰ ÁN
            ============================================================ */}
-        {activeStage === 'stage-6' && (
-          <Stage6View
-            guideBanner={renderStageGuideBanner('stage-6')}
-            isReviewMode={isTeacherMode || isJudgeMode}
-            unlockedTaskIds={unlockedTaskIds}
-            everUnlockedTaskIds={everUnlockedTaskIds}
-            unlockTask={unlockTask}
-            lockTask={lockTask}
-            unlockedQuizIds={unlockedQuizIds}
-            setUnlockedQuizIds={setUnlockedQuizIds}
-            stage6SummaryVideoConfirmed={stage6SummaryVideoConfirmed}
-            setStage6SummaryVideoConfirmed={setStage6SummaryVideoConfirmed}
-            quizAnswers={quizAnswers}
-            setQuizAnswers={setQuizAnswers}
-            quizSubmitted={quizSubmitted}
-            setQuizSubmitted={setQuizSubmitted}
-            handleQuizSubmit={handleQuizSubmit}
-            quizScore={quizScore}
-            stage6GameMode={stage6GameMode}
-            setStage6GameMode={setStage6GameMode}
-            poseGameKey={poseGameKey}
-            setPoseGameKey={setPoseGameKey}
-            isPoseGameUnlocked={isPoseGameUnlocked}
-            poseGamePassInput={poseGamePassInput}
-            setPoseGamePassInput={setPoseGamePassInput}
-            poseGamePassError={poseGamePassError}
-            setPoseGamePassError={setPoseGamePassError}
-            handleUnlockPoseGame={handleUnlockPoseGame}
-            stage6AssessTab={stage6AssessTab}
-            setStage6AssessTab={setStage6AssessTab}
-            stage6SelfStudentName={stage6SelfStudentName}
-            setStage6SelfStudentName={setStage6SelfStudentName}
-            stage6SelfClass={stage6SelfClass}
-            setStage6SelfClass={setStage6SelfClass}
-            stage6SelfGroup={stage6SelfGroup}
-            setStage6SelfGroup={setStage6SelfGroup}
-            stage6SelfDate={stage6SelfDate}
-            setStage6SelfDate={setStage6SelfDate}
-            stage6SelfScores={stage6SelfScores}
-            setStage6SelfScores={setStage6SelfScores}
-            stage6SelfReflections={stage6SelfReflections}
-            setStage6SelfReflections={setStage6SelfReflections}
-            stage6SelfSignature={stage6SelfSignature}
-            setStage6SelfSignature={setStage6SelfSignature}
-            stage6SelfSubmitted={stage6SelfSubmitted}
-            setStage6SelfSubmitted={setStage6SelfSubmitted}
-            stage6LeaderName={stage6LeaderName}
-            stage6LeaderClass={stage6LeaderClass}
-            stage6LeaderGroup={stage6LeaderGroup}
-            stage6Members={stage6Members}
-            setStage6Members={setStage6Members}
-            stage6SelectedMemberId={stage6SelectedMemberId}
-            setStage6SelectedMemberId={setStage6SelectedMemberId}
-            stage6LeaderSubmitted={stage6LeaderSubmitted}
-            setStage6LeaderSubmitted={setStage6LeaderSubmitted}
-            stage6TeacherGroup={stage6TeacherGroup}
-            setStage6TeacherGroup={setStage6TeacherGroup}
-            stage6TeacherClass={stage6TeacherClass}
-            setStage6TeacherClass={setStage6TeacherClass}
-            stage6TeacherProduct={stage6TeacherProduct}
-            setStage6TeacherProduct={setStage6TeacherProduct}
-            stage6TeacherName={stage6TeacherName}
-            setStage6TeacherName={setStage6TeacherName}
-            stage6TeacherScores={stage6TeacherScores}
-            setStage6TeacherScores={setStage6TeacherScores}
-            stage6TeacherStrengths={stage6TeacherStrengths}
-            setStage6TeacherStrengths={setStage6TeacherStrengths}
-            stage6TeacherIndividualAdjustments={stage6TeacherIndividualAdjustments}
-            setStage6TeacherIndividualAdjustments={setStage6TeacherIndividualAdjustments}
-            stage6TeacherSubmitted={stage6TeacherSubmitted}
-            setStage6TeacherSubmitted={setStage6TeacherSubmitted}
-            onSubmitStage6Self={handleSubmitStage6Self}
-            onSubmitStage6Leader={handleSubmitStage6Leader}
-            onSubmitStage6Teacher={handleSubmitStage6Teacher}
-            stage4ProductScore={stage4ProductRubricSummary.totalPoints}
-            stage4ProductAnsweredCount={stage4ProductRubricSummary.answeredCount}
-            showToast={showToast}
-          />
-        )}
+          {activeStage === 'stage-6' && (
+            <Stage6View
+              guideBanner={renderStageGuideBanner('stage-6')}
+              isReviewMode={isTeacherMode || isJudgeMode}
+              unlockedTaskIds={unlockedTaskIds}
+              everUnlockedTaskIds={everUnlockedTaskIds}
+              unlockTask={unlockTask}
+              lockTask={lockTask}
+              unlockedQuizIds={unlockedQuizIds}
+              setUnlockedQuizIds={setUnlockedQuizIds}
+              stage6SummaryVideoConfirmed={stage6SummaryVideoConfirmed}
+              setStage6SummaryVideoConfirmed={setStage6SummaryVideoConfirmed}
+              quizAnswers={quizAnswers}
+              setQuizAnswers={setQuizAnswers}
+              quizSubmitted={quizSubmitted}
+              setQuizSubmitted={setQuizSubmitted}
+              handleQuizSubmit={handleQuizSubmit}
+              quizScore={quizScore}
+              stage6GameMode={stage6GameMode}
+              setStage6GameMode={setStage6GameMode}
+              poseGameKey={poseGameKey}
+              setPoseGameKey={setPoseGameKey}
+              isPoseGameUnlocked={isPoseGameUnlocked}
+              poseGamePassInput={poseGamePassInput}
+              setPoseGamePassInput={setPoseGamePassInput}
+              poseGamePassError={poseGamePassError}
+              setPoseGamePassError={setPoseGamePassError}
+              handleUnlockPoseGame={handleUnlockPoseGame}
+              stage6AssessTab={stage6AssessTab}
+              setStage6AssessTab={setStage6AssessTab}
+              stage6SelfStudentName={stage6SelfStudentName}
+              setStage6SelfStudentName={setStage6SelfStudentName}
+              stage6SelfClass={stage6SelfClass}
+              setStage6SelfClass={setStage6SelfClass}
+              stage6SelfGroup={stage6SelfGroup}
+              setStage6SelfGroup={setStage6SelfGroup}
+              stage6SelfDate={stage6SelfDate}
+              setStage6SelfDate={setStage6SelfDate}
+              stage6SelfScores={stage6SelfScores}
+              setStage6SelfScores={setStage6SelfScores}
+              stage6SelfReflections={stage6SelfReflections}
+              setStage6SelfReflections={setStage6SelfReflections}
+              stage6SelfSignature={stage6SelfSignature}
+              setStage6SelfSignature={setStage6SelfSignature}
+              stage6SelfSubmitted={stage6SelfSubmitted}
+              setStage6SelfSubmitted={setStage6SelfSubmitted}
+              stage6LeaderName={stage6LeaderName}
+              stage6LeaderClass={stage6LeaderClass}
+              stage6LeaderGroup={stage6LeaderGroup}
+              stage6Members={stage6Members}
+              setStage6Members={setStage6Members}
+              stage6SelectedMemberId={stage6SelectedMemberId}
+              setStage6SelectedMemberId={setStage6SelectedMemberId}
+              stage6LeaderSubmitted={stage6LeaderSubmitted}
+              setStage6LeaderSubmitted={setStage6LeaderSubmitted}
+              stage6TeacherGroup={stage6TeacherGroup}
+              setStage6TeacherGroup={setStage6TeacherGroup}
+              stage6TeacherClass={stage6TeacherClass}
+              setStage6TeacherClass={setStage6TeacherClass}
+              stage6TeacherProduct={stage6TeacherProduct}
+              setStage6TeacherProduct={setStage6TeacherProduct}
+              stage6TeacherName={stage6TeacherName}
+              setStage6TeacherName={setStage6TeacherName}
+              stage6TeacherScores={stage6TeacherScores}
+              setStage6TeacherScores={setStage6TeacherScores}
+              stage6TeacherStrengths={stage6TeacherStrengths}
+              setStage6TeacherStrengths={setStage6TeacherStrengths}
+              stage6TeacherIndividualAdjustments={stage6TeacherIndividualAdjustments}
+              setStage6TeacherIndividualAdjustments={setStage6TeacherIndividualAdjustments}
+              stage6TeacherSubmitted={stage6TeacherSubmitted}
+              setStage6TeacherSubmitted={setStage6TeacherSubmitted}
+              onSubmitStage6Self={handleSubmitStage6Self}
+              onSubmitStage6Leader={handleSubmitStage6Leader}
+              onSubmitStage6Teacher={handleSubmitStage6Teacher}
+              stage4ProductScore={stage4ProductRubricSummary.totalPoints}
+              stage4ProductAnsweredCount={stage4ProductRubricSummary.answeredCount}
+              showToast={showToast}
+            />
+          )}
         </React.Suspense>
 
         {/* PHIẾU KHẢO SÁT Ý KIẾN HỌC SINH SAU CHỦ ĐỀ (CHỈ HIỆN SAU CHẶNG 6, KHÔNG TÍNH CHẶNG) */}
@@ -4476,6 +4486,10 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                   className="w-full px-3.5 py-2 rounded-xl border border-teal-200 bg-slate-50 text-xs font-bold text-indigo-950 outline-none focus:border-teal-500 focus:bg-white"
                 />
               </div>
+
+              <div className="px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-[11px] font-bold text-emerald-900">
+                ✓ Gói tải về tự động chạy ở <strong>chế độ Học sinh</strong> (ẩn hoàn toàn nút Giáo viên, Giám khảo &amp; Mở hết trên LMS).
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
@@ -4497,11 +4511,12 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                   const mod = await import('./tinh-bot-cellulose/exportScormPackage');
                   const baseUrl = mod.getDefaultPublicLessonUrl();
                   const params = new URLSearchParams();
+                  params.set('scorm', '1');
                   if (scormTeacherNameInput.trim()) params.set('gv', scormTeacherNameInput.trim());
                   if (scormEmailInput.trim()) params.set('email', scormEmailInput.trim());
                   if (rawPadlet) params.set('padlet', rawPadlet);
                   if (scormClassInput.trim()) params.set('lop', scormClassInput.trim());
-                  const finalUrl = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+                  const finalUrl = `${baseUrl}?${params.toString()}`;
 
                   if (scormExportModal === 'scorm') {
                     await mod.downloadScorm12Zip(finalUrl);
@@ -4553,11 +4568,10 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         <div
           role="status"
           aria-live="polite"
-          className={`fixed bottom-5 right-5 z-50 max-w-md px-4 py-3 rounded-2xl shadow-xl border-2 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200 ${
-            toastNotification.type === 'warning'
-              ? 'bg-amber-50 border-amber-400 text-amber-950'
-              : 'bg-emerald-600 border-emerald-400 text-white'
-          }`}
+          className={`fixed bottom-5 right-5 z-50 max-w-md px-4 py-3 rounded-2xl shadow-xl border-2 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200 ${toastNotification.type === 'warning'
+            ? 'bg-amber-50 border-amber-400 text-amber-950'
+            : 'bg-emerald-600 border-emerald-400 text-white'
+            }`}
         >
           <span className="text-xs sm:text-sm font-black leading-snug flex-1">
             {toastNotification.text}
@@ -4566,11 +4580,10 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             type="button"
             onClick={() => setToastNotification(null)}
             aria-label="Đóng thông báo"
-            className={`px-2 py-0.5 rounded-lg text-xs font-black cursor-pointer ${
-              toastNotification.type === 'warning'
-                ? 'bg-amber-200/80 hover:bg-amber-300 text-amber-950'
-                : 'bg-white/20 hover:bg-white/30 text-white'
-            }`}
+            className={`px-2 py-0.5 rounded-lg text-xs font-black cursor-pointer ${toastNotification.type === 'warning'
+              ? 'bg-amber-200/80 hover:bg-amber-300 text-amber-950'
+              : 'bg-white/20 hover:bg-white/30 text-white'
+              }`}
           >
             ✕
           </button>
