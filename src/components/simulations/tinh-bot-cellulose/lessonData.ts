@@ -6,7 +6,7 @@ export type StageId = 'stage-1' | 'stage-2' | 'stage-3' | 'stage-4' | 'stage-5' 
 export const PADLET_URL = 'https://padlet.com/tranvanl55/cellulose-bat-au-tu-su-ket-thuc-h0yekwetrfirtp9e';
 export const IDEA_DRIVE_URL = 'https://drive.google.com/drive/u/0/folders/1zxkC-W-mKio7gQ_qoW57xWSMO5Ng6I2C';
 export const STAGE5_POSTER_DRIVE_URL = 'https://drive.google.com/drive/folders/1B6YI-b5MInsnQqFjgVuA91Ow5o0nmM5o?usp=sharing';
-export const STAGE5_PRESENTATION_DRIVE_URL = 'https://drive.google.com/drive/u/0/folders/1zxkC-W-mKio7gQ_qoW57xWSMO5Ng6I2C';
+export const STAGE5_PRESENTATION_DRIVE_URL = 'https://drive.google.com/drive/folders/18WPanc-XRkQegBtzzwQhTU7vH9Jp26Dy?usp=sharing';
 export const STAGE6_SUMMARY_VIDEO_DRIVE_URL = 'https://drive.google.com/drive/folders/1il0bD0vZEj0D1WWe7ha6A74XSaXVD7y8';
 export const PROJECT_COVER_IMAGE_URL =
   'https://firebasestorage.googleapis.com/v0/b/giaovien40-b080f.firebasestorage.app/o/images%2F1(1).png?alt=media&token=36e8fb36-b5c6-4c47-879f-84020196df9a';

@@ -51,6 +51,7 @@ interface Stage1ViewProps {
   unlockedPoolTileIndices: number[];
   handlePlaceLetter: (tileIdx: number, slotIdx: number) => void;
   isKeywordComplete: boolean;
+  padletUrl?: string;
   isNextStageUnlocked: boolean;
   onNextStage: () => void;
 }
@@ -85,6 +86,7 @@ export function Stage1View({
   unlockedPoolTileIndices,
   handlePlaceLetter,
   isKeywordComplete,
+  padletUrl = PADLET_URL,
   isNextStageUnlocked,
   onNextStage,
 }: Stage1ViewProps) {
@@ -129,7 +131,7 @@ export function Stage1View({
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <a
-                    href={PADLET_URL}
+                    href={padletUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-5 py-2.5 rounded-full bg-linear-to-r from-orange-500 to-amber-500 text-white font-black text-xs flex items-center gap-2 shadow-sm"
@@ -172,7 +174,7 @@ export function Stage1View({
               {showPadletEmbed && (
                 <div className="w-full rounded-2xl overflow-hidden border border-indigo-200 bg-white">
                   <iframe
-                    src={PADLET_URL}
+                    src={padletUrl}
                     title="Padlet Cellulose - bắt đầu từ sự kết thúc"
                     className="w-full h-125 border-0 bg-white"
                     allow="camera;microphone;geolocation"

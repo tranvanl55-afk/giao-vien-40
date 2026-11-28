@@ -37,6 +37,8 @@ interface Stage4ViewProps {
     setState: React.Dispatch<React.SetStateAction<RubricFormState>>;
     onConfirmed: () => void;
   }) => Promise<void>;
+  teacherEmail?: string;
+  padletUrl?: string;
   isNextStageUnlocked: boolean;
   onNextStage: () => void;
 }
@@ -54,6 +56,8 @@ export function Stage4View({
   productRubricState,
   setProductRubricState,
   submitRubricEvaluation,
+  teacherEmail = TEACHER_EMAIL,
+  padletUrl = PADLET_URL,
   isNextStageUnlocked,
   onNextStage,
 }: Stage4ViewProps) {
@@ -119,7 +123,7 @@ export function Stage4View({
             >
               <div className="flex flex-wrap items-center justify-between gap-3 bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4">
                 <a
-                  href={PADLET_URL}
+                  href={padletUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-5 py-2.5 rounded-full bg-linear-to-r from-orange-500 to-amber-500 text-white font-black text-xs flex items-center gap-2 shadow-xs"
@@ -191,7 +195,7 @@ export function Stage4View({
                         onConfirmed: () => {},
                       })
                     }
-                    teacherEmail={TEACHER_EMAIL}
+                    teacherEmail={teacherEmail}
                   />
                 </div>
               )}

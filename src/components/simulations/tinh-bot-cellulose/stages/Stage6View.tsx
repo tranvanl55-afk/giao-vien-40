@@ -106,6 +106,13 @@ interface Stage6ViewProps {
   setStage6TeacherIndividualAdjustments: React.Dispatch<React.SetStateAction<string>>;
   stage6TeacherSubmitted: boolean;
   setStage6TeacherSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
+  onSubmitStage6Self: () => Promise<void>;
+  onSubmitStage6Leader: () => Promise<void>;
+  onSubmitStage6Teacher: (combinedInfo?: {
+    productScore?: number;
+    productWeightPct?: number;
+    projectFinalScore?: number;
+  }) => Promise<void>;
   stage4ProductScore: number;
   stage4ProductAnsweredCount: number;
   showToast: (text: string, type?: 'success' | 'warning') => void;
@@ -181,6 +188,9 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
   setStage6TeacherIndividualAdjustments,
   stage6TeacherSubmitted,
   setStage6TeacherSubmitted,
+  onSubmitStage6Self,
+  onSubmitStage6Leader,
+  onSubmitStage6Teacher,
   stage4ProductScore,
   stage4ProductAnsweredCount,
   showToast,
@@ -220,33 +230,13 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                   </p>
                 </div>
               </div>
-{/* THANH ĐIỀU HƯỚNG CHẾ ĐỘ & TIỆN ÍCH SMART TV */}
+{/* THANH TIỆN ÍCH GAME VẬN ĐỘNG SMART TV */}
               <div className="flex flex-wrap items-center justify-between gap-2 bg-indigo-50/70 p-2 rounded-2xl border border-indigo-100 mb-3">
                 <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setStage6GameMode('pose_game')}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
-                      stage6GameMode === 'pose_game'
-                        ? 'bg-linear-to-r from-orange-500 to-amber-500 text-white shadow-xs'
-                        : 'bg-white text-indigo-900 hover:bg-indigo-100'
-                    }`}
-                  >
+                  <span className="px-3.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 bg-linear-to-r from-orange-500 to-amber-500 text-white shadow-xs">
                     <span>🕺</span>
-                    <span>Game Vận động Smart TV (Khuyên dùng)</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStage6GameMode('quiz')}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
-                      stage6GameMode === 'quiz'
-                        ? 'bg-linear-to-r from-indigo-600 to-purple-600 text-white shadow-xs'
-                        : 'bg-white text-indigo-900 hover:bg-indigo-100'
-                    }`}
-                  >
-                    <span>📝</span>
-                    <span>Làm bài Trắc nghiệm cá nhân</span>
-                  </button>
+                    <span>Game Vận động Smart TV (Body Pose Quiz)</span>
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -280,9 +270,8 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                 </div>
               </div>
 
-              {/* NỘI DUNG 1: TRÒ CHƠI VẬN ĐỘNG BODY POSE QUIZ TRÊN SMART TV */}
-              {stage6GameMode === 'pose_game' ? (
-                !isPoseGameUnlocked ? (
+              {/* TRÒ CHƠI VẬN ĐỘNG BODY POSE QUIZ TRÊN SMART TV */}
+              {!isPoseGameUnlocked ? (
                   <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-6 flex flex-col items-center text-center gap-3">
                     <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shadow-xs">
                       <Lock className="w-6 h-6" />
@@ -291,7 +280,7 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                       Game Vận động Smart TV cần mật khẩu Giáo viên
                     </h4>
                     <p className="text-xs text-indigo-900/75 max-w-md font-medium">
-                      Giáo viên nhập mật khẩu để mở trò chơi vận động cho cả lớp trên Smart TV. Học sinh có thể làm bài ở tab <strong>Làm bài Trắc nghiệm cá nhân</strong> bên trên.
+                      Giáo viên nhập mật khẩu để mở trò chơi vận động cho cả lớp trên Smart TV.
                     </p>
                     <div className="px-3.5 py-2 rounded-xl bg-white/90 border border-amber-300 text-[11px] font-bold text-amber-900 shadow-xs">
                       💡 Ghi chú dành cho Giám khảo: Mật khẩu mở khóa trò chơi là <code className="px-1.5 py-0.5 rounded bg-amber-200/80 text-amber-950 font-black select-all">01011993</code>
@@ -351,118 +340,7 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                     </button>
                   </div>
                 </div>
-                )
-              ) : (
-                /* NỘI DUNG 2: BÀI TRẮC NGHIỆM TRUYỀN THỐNG CÁ NHÂN */
-                <div className="flex flex-col gap-3">
-                  {quizSubmitted && (
-                    <div className="flex items-center justify-between bg-emerald-50 border border-emerald-300 px-4 py-2.5 rounded-2xl">
-                      <div className="flex items-center gap-2">
-                        <Award className="w-5 h-5 text-orange-500" />
-                        <span className="text-xs md:text-sm font-black text-indigo-950">
-                          Hoàn thành Dự án! Đúng {quizScore}/{QUIZ_QUESTIONS.length} câu ({Math.round((quizScore / QUIZ_QUESTIONS.length) * 100)} điểm)
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setQuizAnswers({});
-                          setQuizSubmitted(false);
-                        }}
-                        className="px-3 py-1 rounded-full bg-white text-indigo-900 font-bold text-xs border border-indigo-200 cursor-pointer"
-                      >
-                        Làm lại
-                      </button>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {QUIZ_QUESTIONS.map((q, qIdx) => {
-                      const unlocked = unlockedQuizIds.has(q.id);
-                      const selected = quizAnswers[q.id];
-
-                      if (!unlocked) {
-                        return (
-                          <button
-                            key={q.id}
-                            type="button"
-                            onClick={() => setUnlockedQuizIds((prev) => new Set(prev).add(q.id))}
-                            className="rounded-2xl p-3.5 bg-indigo-50/50 hover:bg-white border-2 border-dashed border-indigo-200 hover:border-orange-400 flex items-center justify-between gap-3 cursor-pointer text-left"
-                          >
-                            <span className="text-xs font-black text-indigo-950">
-                              🔒 Câu {qIdx + 1} • {q.tag}
-                            </span>
-                            <span className="px-3 py-1 rounded-full bg-orange-500 text-white font-bold text-xs">
-                              Mở
-                            </span>
-                          </button>
-                        );
-                      }
-
-                      return (
-                        <div
-                          key={q.id}
-                          className="bg-indigo-50/30 border border-indigo-100 rounded-2xl p-3.5 flex flex-col justify-between gap-2.5"
-                        >
-                          <h4 className="font-bold text-indigo-950 text-xs">
-                            <span className="text-orange-600 font-black">Câu {qIdx + 1}: </span>
-                            {q.question}
-                          </h4>
-
-                          <div className="grid grid-cols-1 gap-1.5">
-                            {q.options.map((opt, oIdx) => {
-                              const isChosen = selected === oIdx;
-                              const isCorrect = q.correctIndex === oIdx;
-                              let style = 'bg-white border-indigo-100 text-indigo-950 hover:border-orange-300';
-                              if (quizSubmitted) {
-                                if (isCorrect) style = 'bg-emerald-50 border-emerald-500 text-emerald-950';
-                                else if (isChosen) style = 'bg-rose-50 border-rose-400 text-rose-950';
-                              } else if (isChosen) {
-                                style = 'bg-orange-50 border-orange-500 text-indigo-950';
-                              }
-
-                              return (
-                                <button
-                                  key={opt}
-                                  type="button"
-                                  disabled={quizSubmitted}
-                                  onClick={() => setQuizAnswers((prev) => ({ ...prev, [q.id]: oIdx }))}
-                                  className={`p-2 rounded-xl border text-left text-xs font-bold flex items-center gap-2 cursor-pointer ${style}`}
-                                >
-                                  <span className="font-black text-orange-600">
-                                    {['A.', 'B.', 'C.', 'D.'][oIdx]}
-                                  </span>
-                                  <span className="flex-1">{opt}</span>
-                                  {!quizSubmitted && isReviewMode && isCorrect && (
-                                    <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0">
-                                      ✓ Đáp án đúng
-                                    </span>
-                                  )}
-                                  {quizSubmitted && isCorrect && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
-                                  {quizSubmitted && isChosen && !isCorrect && <XCircle className="w-3.5 h-3.5 text-rose-600" />}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {!quizSubmitted && (
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={handleQuizSubmit}
-                        className="px-6 py-2.5 rounded-full bg-linear-to-r from-orange-500 to-amber-500 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
-                      >
-                                                <Play className="w-3.5 h-3.5 fill-white" />
-                        <span>NỘP BÀI &amp; HOÀN THÀNH DỰ ÁN</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+                )}
             </LockedTaskBox>
 
             {/* ============================================================
@@ -822,9 +700,7 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                             <button
                               type="button"
                               onClick={() => {
-                                setStage6SelfSubmitted(true);
-                                confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
-                                showToast('✓ Em đã hoàn thành và lưu phiếu Tự đánh giá cá nhân thành công!', 'success');
+                                void onSubmitStage6Self();
                               }}
                               className="px-5 py-2.5 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer transition-all"
                             >
@@ -1138,9 +1014,7 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                             <button
                               type="button"
                               onClick={() => {
-                                setStage6LeaderSubmitted(true);
-                                confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
-                                showToast('✓ Nhóm trưởng đã nộp bảng đánh giá các thành viên thành công!', 'success');
+                                void onSubmitStage6Leader();
                               }}
                               className="px-5 py-2.5 rounded-xl bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer transition-all"
                             >
@@ -1556,9 +1430,11 @@ export const Stage6View: React.FC<Stage6ViewProps> = ({
                             <button
                               type="button"
                               onClick={() => {
-                                setStage6TeacherSubmitted(true);
-                                confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-                                showToast('✓ Thầy/Cô đã hoàn tất và nộp Phiếu đánh giá dự án STEAM thành công!', 'success');
+                                void onSubmitStage6Teacher({
+                                  productScore: effectiveProductScore ?? undefined,
+                                  productWeightPct: effectiveProductScore !== null ? productWeightPct : undefined,
+                                  projectFinalScore: projectFinalScore ?? undefined,
+                                });
                               }}
                               className="px-5 py-2.5 rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer transition-all"
                             >

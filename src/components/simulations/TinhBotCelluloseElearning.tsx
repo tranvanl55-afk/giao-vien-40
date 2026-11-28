@@ -51,12 +51,24 @@ import {
 import confetti from 'canvas-confetti';
 import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { Stage1View } from './tinh-bot-cellulose/stages/Stage1View';
-import { Stage2View } from './tinh-bot-cellulose/stages/Stage2View';
-import { Stage3View } from './tinh-bot-cellulose/stages/Stage3View';
-import { Stage4View } from './tinh-bot-cellulose/stages/Stage4View';
-import { Stage5View } from './tinh-bot-cellulose/stages/Stage5View';
-import { Stage6View } from './tinh-bot-cellulose/stages/Stage6View';
+const Stage1View = React.lazy(() =>
+  import('./tinh-bot-cellulose/stages/Stage1View').then((m) => ({ default: m.Stage1View }))
+);
+const Stage2View = React.lazy(() =>
+  import('./tinh-bot-cellulose/stages/Stage2View').then((m) => ({ default: m.Stage2View }))
+);
+const Stage3View = React.lazy(() =>
+  import('./tinh-bot-cellulose/stages/Stage3View').then((m) => ({ default: m.Stage3View }))
+);
+const Stage4View = React.lazy(() =>
+  import('./tinh-bot-cellulose/stages/Stage4View').then((m) => ({ default: m.Stage4View }))
+);
+const Stage5View = React.lazy(() =>
+  import('./tinh-bot-cellulose/stages/Stage5View').then((m) => ({ default: m.Stage5View }))
+);
+const Stage6View = React.lazy(() =>
+  import('./tinh-bot-cellulose/stages/Stage6View').then((m) => ({ default: m.Stage6View }))
+);
 import {
   Stage6SurveyBox,
   SURVEY_SECTIONS,
@@ -192,8 +204,68 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const [showStandaloneSurvey, setShowStandaloneSurvey] = useState<boolean>(false);
   const [isLoadingDashboard, setIsLoadingDashboard] = useState<boolean>(false);
   const [dashboardLoadWarning, setDashboardLoadWarning] = useState<string | null>(null);
+  // Cấu hình lớp học riêng cho Giáo viên khác (đọc từ URL ?lop=...&gv=...&truong=...&email=... hoặc localStorage)
+  const initialClassParams = (() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      const lop = sp.get('lop')?.trim() || '';
+      const gv = sp.get('gv')?.trim() || '';
+      const truong = sp.get('truong')?.trim() || '';
+      const email = sp.get('email')?.trim() || '';
+      const rawPadlet = sp.get('padlet')?.trim() || '';
+      const padlet = rawPadlet.startsWith('https://') || rawPadlet.startsWith('http://') ? rawPadlet : '';
+      if (lop) window.localStorage.setItem('KHTN9_BAI30_CUSTOM_CLASS_V1', lop);
+      if (gv) window.localStorage.setItem('KHTN9_BAI30_CUSTOM_TEACHER_NAME_V1', gv);
+      if (truong) window.localStorage.setItem('KHTN9_BAI30_CUSTOM_SCHOOL_V1', truong);
+      if (email) window.localStorage.setItem('KHTN9_BAI30_CUSTOM_TEACHER_EMAIL_V1', email);
+      if (padlet) window.localStorage.setItem('KHTN9_BAI30_CUSTOM_PADLET_V1', padlet);
+      return {
+        lop: lop || window.localStorage.getItem('KHTN9_BAI30_CUSTOM_CLASS_V1') || '',
+        gv: gv || window.localStorage.getItem('KHTN9_BAI30_CUSTOM_TEACHER_NAME_V1') || '',
+        truong: truong || window.localStorage.getItem('KHTN9_BAI30_CUSTOM_SCHOOL_V1') || '',
+        email: email || window.localStorage.getItem('KHTN9_BAI30_CUSTOM_TEACHER_EMAIL_V1') || '',
+        padlet: padlet || window.localStorage.getItem('KHTN9_BAI30_CUSTOM_PADLET_V1') || '',
+        fromUrlLop: Boolean(lop),
+      };
+    } catch {
+      return { lop: '', gv: '', truong: '', email: '', padlet: '', fromUrlLop: false };
+    }
+  })();
+
+  const [customClassCode] = useState<string>(initialClassParams.lop);
+  const [customTeacherName] = useState<string>(initialClassParams.gv);
+  const [customTeacherEmail] = useState<string>(initialClassParams.email);
+  const [customPadletUrl] = useState<string>(initialClassParams.padlet);
+  const [scormExportModal, setScormExportModal] = useState<'scorm' | 'html5' | null>(null);
+  const [scormTeacherNameInput, setScormTeacherNameInput] = useState<string>(initialClassParams.gv);
+  const [scormEmailInput, setScormEmailInput] = useState<string>(initialClassParams.email);
+  const [scormPadletInput, setScormPadletInput] = useState<string>(initialClassParams.padlet);
+  const [scormClassInput, setScormClassInput] = useState<string>(initialClassParams.lop);
+
+  const effectiveTeacherEmail = customTeacherEmail.trim() || TEACHER_EMAIL;
+  const effectivePadletUrl = customPadletUrl.trim() || PADLET_URL;
+
+  // Khi mở bằng link lớp học riêng (?lop=...&gv=...&truong=...), tự động điền sẵn thông tin lớp/trường/GV
+  useEffect(() => {
+    if (initialClassParams.fromUrlLop && initialClassParams.lop) {
+      setTestStudentClass(initialClassParams.lop);
+      setStage6SelfClass(initialClassParams.lop);
+      setStage6LeaderClass(initialClassParams.lop);
+      setStage6TeacherClass(initialClassParams.lop);
+    }
+    if (initialClassParams.truong) {
+      setTestStudentSchool(initialClassParams.truong);
+    }
+    if (initialClassParams.gv) {
+      setStage6TeacherName(initialClassParams.gv);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [dashboardSearchQuery, setDashboardSearchQuery] = useState<string>('');
-  const [dashboardClassFilter, setDashboardClassFilter] = useState<string>('ALL');
+  const [dashboardClassFilter, setDashboardClassFilter] = useState<string>(
+    initialClassParams.fromUrlLop ? initialClassParams.lop : 'ALL'
+  );
   const [googleSheetWebhookUrl, setGoogleSheetWebhookUrl] = useState<string>(() => {
     try {
       const urlParam = new URLSearchParams(window.location.search).get('webhook')?.trim();
@@ -640,6 +712,8 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     [googleSheetWebhookUrl, readLocalRecords]
   );
 
+  const shouldSendTeacherEmail = sendIndividualEmails || Boolean(customTeacherEmail.trim());
+
   const buildSubmissionFeedbackMessage = useCallback(
     (
       itemLabel: string,
@@ -654,7 +728,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
       const remoteChannels = [
         hubResult.cloudSaved ? 'Bảng Tổng hợp GV (Cloud)' : null,
         hubResult.sheetSent ? 'Google Sheets' : null,
-        emailOk ? `Email ${TEACHER_EMAIL}` : null,
+        emailOk ? `Email ${effectiveTeacherEmail}` : null,
       ].filter(Boolean);
 
       if (remoteChannels.length > 0) {
@@ -666,31 +740,34 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
 
       const missingReasons = [
         hubResult.cloudError || 'Cloud Firestore chưa ghi được (kiểm tra kết nối mạng / Firestore Rules)',
-        sendIndividualEmails ? 'Email FormSubmit chưa xác nhận/lỗi mạng' : 'Gửi Email lẻ đang TẮT',
+        shouldSendTeacherEmail ? `Email (${effectiveTeacherEmail}) chưa xác nhận/lỗi mạng` : 'Gửi Email lẻ đang TẮT',
       ];
       return {
         ok: false,
-        text: `⚠️ Mới chỉ lưu ${itemLabel} trên máy này, CHƯA đồng bộ Cloud được vì: ${missingReasons.join(' • ')}. Em có thể bấm "Mailto dự phòng" để gửi trực tiếp cho Thầy!`,
+        text: `⚠️ Mới chỉ lưu ${itemLabel} trên máy này, CHƯA đồng bộ Cloud được vì: ${missingReasons.join(' • ')}. Em có thể bấm "Mailto dự phòng" để gửi trực tiếp cho Giáo viên!`,
       };
     },
-    [sendIndividualEmails]
+    [effectiveTeacherEmail, shouldSendTeacherEmail]
   );
 
-  const sendOptionalTeacherEmail = useCallback(async (emailPayload: Record<string, unknown>): Promise<boolean> => {
-    try {
-      const response = await fetch(`https://formsubmit.co/ajax/${TEACHER_EMAIL}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify(emailPayload),
-      });
-      return response.ok;
-    } catch {
-      return false;
-    }
-  }, []);
+  const sendOptionalTeacherEmail = useCallback(
+    async (emailPayload: Record<string, unknown>): Promise<boolean> => {
+      try {
+        const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(effectiveTeacherEmail)}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify(emailPayload),
+        });
+        return response.ok;
+      } catch {
+        return false;
+      }
+    },
+    [effectiveTeacherEmail]
+  );
 
   const fetchTeacherDashboardData = useCallback(async () => {
     setIsLoadingDashboard(true);
@@ -932,9 +1009,9 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     );
 
     let emailOk = false;
-    if (sendIndividualEmails) {
+    if (shouldSendTeacherEmail) {
       const emailPayload = {
-        _subject: `[KHTN 9] Bài kiểm tra Chặng 2 (Tinh bột & Cellulose) - HS: ${testStudentName} - Lớp ${testStudentClass || 'KHTN 9'}`,
+        _subject: `[KHTN 9] Bài kiểm tra Chặng 2 (Tinh bột & Cellulose) - HS: ${testStudentName} - Lớp ${testStudentClass || customClassCode || 'KHTN 9'}`,
         'Họ và tên học sinh': testStudentName,
         Lớp: testStudentClass || 'Chưa ghi',
         Trường: testStudentSchool || 'THCS',
@@ -1012,7 +1089,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
   const [stage4ProductRubricState, setStage4ProductRubricState] = useState<RubricFormState>(() => ({
     ...createInitialRubricFormState(),
     evaluatorMode: 'self',
-    evaluatorGroup: 'GV Trần Văn Lĩnh',
+    evaluatorGroup: initialClassParams.gv || 'GV Trần Văn Lĩnh',
   }));
   const stage4ProductRubricSummary = getRubricSummary(
     STAGE5_TEACHER_PRODUCT_RUBRIC_CRITERIA,
@@ -1044,6 +1121,33 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
       }
     };
   }, []);
+
+  // Phím tắt lớp học thông minh (Remote / Bàn phím không dây): 1-6 chuyển chặng, Esc đóng modal
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (scormExportModal) setScormExportModal(null);
+        else if (showTeacherDashboard) setShowTeacherDashboard(false);
+        else if (showNewWordsModal) setShowNewWordsModal(false);
+        else if (showReferencesModal) setShowReferencesModal(false);
+        else if (showComplianceModal) setShowComplianceModal(false);
+        else if (showStageGuideModal) setShowStageGuideModal(false);
+        else if (isNarratorExpanded) setIsNarratorExpanded(false);
+        return;
+      }
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target as HTMLElement | null)?.isContentEditable) {
+        return;
+      }
+      if (e.ctrlKey || e.metaKey || e.altKey || showCover || introVideoStep !== null) return;
+      if (e.key >= '1' && e.key <= '6') {
+        const targetStage = `stage-${e.key}` as StageId;
+        switchStage(targetStage);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
 
   // Chặng 5: Ngày hội xanh & Đánh giá Rubric (3 Tiêu chí × 5 Mức) (Báo cáo tại lớp)
   const [boothChecks, setBoothChecks] = useState<Set<string>>(() => new Set(savedProgress.boothChecks || []));
@@ -1262,12 +1366,28 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
       }
     );
 
+    let emailOk = false;
+    if (shouldSendTeacherEmail) {
+      emailOk = await sendOptionalTeacherEmail({
+        _subject: `[KHTN 9] Tự đánh giá Chặng 6 - HS: ${stage6SelfStudentName} (${stage6SelfGroup}) - ${selfTotal}/10đ`,
+        'Loại phiếu': 'Học sinh Tự đánh giá (Chặng 6)',
+        'Học sinh': stage6SelfStudentName,
+        'Nhóm': stage6SelfGroup,
+        'Lớp': stage6SelfClass || customClassCode || '9A',
+        'Điểm tổng': `${selfTotal} / 10 điểm (${selfRank.label})`,
+        'Chi tiết tiêu chí': summaryText,
+        'Nhật ký suy ngẫm': reflectionSummary || '—',
+        'Thời gian nộp': submittedAtStr,
+      });
+    }
+
     const feedback = buildSubmissionFeedbackMessage(
       `Phiếu Tự đánh giá & Nhật ký học tập của ${stage6SelfStudentName} (${selfTotal}/10đ)`,
       hubResult,
-      false
+      emailOk
     );
     setStage6SubmitFeedback((prev) => ({ ...prev, self: feedback }));
+    showToast(feedback.text, feedback.ok ? 'success' : 'warning');
   };
 
   // Nộp Bảng Nhóm trưởng chấm thành viên (Chặng 6.2 - Tab 2) lên Cloud Firestore & Bảng Tổng hợp GV
@@ -1327,16 +1447,36 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
       }
     );
 
+    let emailOk = false;
+    if (shouldSendTeacherEmail) {
+      emailOk = await sendOptionalTeacherEmail({
+        _subject: `[KHTN 9] Nhóm trưởng chấm thành viên Chặng 6 - ${stage6LeaderGroup} (TB: ${teamAvg}/10đ)`,
+        'Loại phiếu': 'Nhóm trưởng đánh giá thành viên (Chặng 6)',
+        'Nhóm trưởng': stage6LeaderName,
+        'Nhóm': stage6LeaderGroup,
+        'Lớp': stage6LeaderClass || customClassCode || '9A',
+        'Điểm TB nhóm': `${teamAvg} / 10 điểm (${teamRank.label})`,
+        'Chi tiết thành viên': summaryText,
+        'Nhận xét': commentsText || '—',
+        'Thời gian nộp': submittedAtStr,
+      });
+    }
+
     const feedback = buildSubmissionFeedbackMessage(
       `Bảng điểm thành viên của ${stage6LeaderGroup} (TB: ${teamAvg}/10đ)`,
       hubResult,
-      false
+      emailOk
     );
     setStage6SubmitFeedback((prev) => ({ ...prev, leader: feedback }));
+    showToast(feedback.text, feedback.ok ? 'success' : 'warning');
   };
 
   // Nộp Phiếu Giáo viên chấm nhóm (Chặng 6.2 - Tab 3) lên Cloud Firestore & Bảng Tổng hợp GV
-  const handleSubmitStage6Teacher = async () => {
+  const handleSubmitStage6Teacher = async (combinedInfo?: {
+    productScore?: number;
+    productWeightPct?: number;
+    projectFinalScore?: number;
+  }) => {
     setStage6TeacherSubmitted(true);
     confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
 
@@ -1350,7 +1490,14 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     const summaryText = STAGE6_TEACHER_RUBRIC_CRITERIA.map(
       (c, idx) => `TC${idx + 1}: ${stage6TeacherScores[c.id] ?? 0}/${c.maxPoints}`
     ).join(' | ');
+    const combinedSummary =
+      typeof combinedInfo?.projectFinalScore === 'number' &&
+      typeof combinedInfo?.productScore === 'number' &&
+      typeof combinedInfo?.productWeightPct === 'number'
+        ? `[Tổng điểm dự án: ${combinedInfo.projectFinalScore}/10đ (${combinedInfo.productWeightPct}% SP ${combinedInfo.productScore}đ + ${100 - combinedInfo.productWeightPct}% Nhóm ${teacherTotal}đ)]`
+        : '';
     const teacherFeedbackText = [
+      combinedSummary,
       stage6TeacherProduct ? `[SP]: ${stage6TeacherProduct}` : '',
       stage6TeacherStrengths ? `[Nhận xét]: ${stage6TeacherStrengths}` : '',
       stage6TeacherIndividualAdjustments ? `[Điều chỉnh]: ${stage6TeacherIndividualAdjustments}` : '',
@@ -1367,11 +1514,11 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         mode: 'peer',
         evaluatorGroup: stage6TeacherName.trim() || 'Giáo viên',
         targetGroup: stage6TeacherGroup.trim() || 'Nhóm dự án',
-        className: stage6TeacherClass.trim() || '9A',
+        className: stage6TeacherClass.trim() || customClassCode || '9A',
         criteriaScores: { ...stage6TeacherScores },
         criteriaSummary: summaryText,
-        totalPoints: teacherTotal,
-        rank: teacherRank.label,
+        totalPoints: combinedInfo?.projectFinalScore ?? teacherTotal,
+        rank: getStage6RankInfo(combinedInfo?.projectFinalScore ?? teacherTotal).label,
         feedbackNote: teacherFeedbackText,
         submittedAt: submittedAtStr,
         createdAtMs: nowMs,
@@ -1382,20 +1529,38 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
         submittedAt: submittedAtStr,
         evaluatorGroup: stage6TeacherName.trim() || 'Giáo viên',
         targetGroup: stage6TeacherGroup.trim(),
-        className: stage6TeacherClass.trim() || '9A',
+        className: stage6TeacherClass.trim() || customClassCode || '9A',
         criteriaSummary: summaryText,
-        totalPoints: teacherTotal,
-        rank: teacherRank.label,
+        totalPoints: combinedInfo?.projectFinalScore ?? teacherTotal,
+        rank: getStage6RankInfo(combinedInfo?.projectFinalScore ?? teacherTotal).label,
         feedbackNote: teacherFeedbackText,
       }
     );
 
+    let emailOk = false;
+    if (shouldSendTeacherEmail) {
+      emailOk = await sendOptionalTeacherEmail({
+        _subject: `[KHTN 9] GV tổng kết Chặng 6 - ${stage6TeacherGroup} (${combinedInfo?.projectFinalScore ?? teacherTotal}/10đ)`,
+        'Loại phiếu': 'Giáo viên đánh giá Quá trình & Báo cáo (Chặng 6)',
+        'Giáo viên': stage6TeacherName,
+        'Nhóm': stage6TeacherGroup,
+        'Lớp': stage6TeacherClass || customClassCode || '9A',
+        'Sản phẩm': stage6TeacherProduct,
+        'Điểm Chặng 6': `${teacherTotal} / 10 điểm (${teacherRank.label})`,
+        'Tổng điểm dự án': combinedSummary || `${teacherTotal}/10đ`,
+        'Chi tiết tiêu chí': summaryText,
+        'Nhận xét & Điều chỉnh': teacherFeedbackText,
+        'Thời gian nộp': submittedAtStr,
+      });
+    }
+
     const feedback = buildSubmissionFeedbackMessage(
-      `Phiếu Giáo viên đánh giá ${stage6TeacherGroup} (${teacherTotal}/10đ)`,
+      `Phiếu Giáo viên đánh giá ${stage6TeacherGroup} (${combinedInfo?.projectFinalScore ?? teacherTotal}/10đ)`,
       hubResult,
-      false
+      emailOk
     );
     setStage6SubmitFeedback((prev) => ({ ...prev, teacher: feedback }));
+    showToast(feedback.text, feedback.ok ? 'success' : 'warning');
   };
 
   // Tự động lưu tiến trình học tập vào localStorage để HS không mất bài khi F5 / tải lại trang
@@ -2065,7 +2230,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
     );
 
     let emailOk = false;
-    if (sendIndividualEmails) {
+    if (shouldSendTeacherEmail) {
       const emailPayload = {
         _subject: `[KHTN 9] Rubric ${stageLabel} - Nhóm chấm: ${state.evaluatorGroup.trim()} → Nhóm được chấm: ${state.targetGroup.trim()} (${summary.totalPoints}/10đ)`,
         'Chặng dự án': stageLabel,
@@ -2876,11 +3041,9 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
 
           <button
             type="button"
-            onClick={() => {
-              import('./tinh-bot-cellulose/exportScormPackage').then((m) => m.downloadScorm12Zip());
-            }}
+            onClick={() => setScormExportModal('scorm')}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 font-extrabold text-xs cursor-pointer transition-colors"
-            title="Tải gói chuẩn SCORM 1.2 (.zip) để upload trực tiếp lên LMS"
+            title="Cài đặt Email, Padlet riêng và tải gói chuẩn SCORM 1.2 (.zip) để upload lên LMS"
           >
             <Download className="w-3.5 h-3.5 text-teal-700" />
             <span>SCORM 1.2</span>
@@ -2888,11 +3051,9 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
 
           <button
             type="button"
-            onClick={() => {
-              import('./tinh-bot-cellulose/exportScormPackage').then((m) => m.downloadHtml5File());
-            }}
+            onClick={() => setScormExportModal('html5')}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 font-extrabold text-xs cursor-pointer transition-colors"
-            title="Tải tệp HTML5 độc lập (.html) theo chuẩn Điều 3.9 QĐ 791"
+            title="Cài đặt Email, Padlet riêng và tải tệp HTML5 độc lập (.html) theo chuẩn Điều 3.9 QĐ 791"
           >
             <Download className="w-3.5 h-3.5 text-indigo-700" />
             <span>HTML5</span>
@@ -3131,7 +3292,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                   </div>
                   <div>
                     <h2 className="text-sm md:text-base font-black">
-                      Bảng Tổng Hợp Kết Quả &amp; Thống Kê Lớp Học (Thầy Trần Văn Lĩnh)
+                      Bảng Tổng Hợp Kết Quả &amp; Thống Kê Lớp Học ({customTeacherName.trim() || 'Thầy Trần Văn Lĩnh'})
                     </h2>
                     <p className="text-[11px] text-indigo-200 font-medium">
                       Gom tự động 50+ bài làm học sinh và phiếu Rubric về 1 bảng duy nhất — Hỗ trợ xuất file Excel (.CSV) chỉ với 1 chạm
@@ -3173,7 +3334,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                   <label className="flex items-center gap-2 text-xs font-bold text-indigo-950 cursor-pointer select-none">
                     <input
                       type="checkbox"
-                      checked={sendIndividualEmails}
+                      checked={shouldSendTeacherEmail}
                       onChange={(e) => {
                         const checked = e.target.checked;
                         setSendIndividualEmails(checked);
@@ -3187,7 +3348,8 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
                     />
                     <Mail className="w-3.5 h-3.5 text-indigo-600" />
                     <span>
-                      Gửi kèm Email lẻ từng bài về <code>{TEACHER_EMAIL}</code>
+                      Gửi kèm Email từng bài về <code>{effectiveTeacherEmail}</code>
+                      {customTeacherEmail.trim() ? ' (Email GV riêng — tự động bật)' : ' (Mặc định)'}
                     </span>
                   </label>
 
@@ -3803,6 +3965,13 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
           </div>
         )}
 
+        <React.Suspense
+          fallback={
+            <div className="bg-white/90 border border-indigo-100 rounded-3xl p-10 text-center text-sm font-black text-indigo-900 shadow-xs">
+              ⏳ Đang tải nội dung chặng học...
+            </div>
+          }
+        >
         {activeStage === 'stage-1' && (
           <Stage1View
             guideBanner={renderStageGuideBanner('stage-1')}
@@ -3834,6 +4003,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             unlockedPoolTileIndices={unlockedPoolTileIndices}
             handlePlaceLetter={handlePlaceLetter}
             isKeywordComplete={isKeywordComplete}
+            padletUrl={effectivePadletUrl}
             isNextStageUnlocked={isStageUnlocked('stage-2')}
             onNextStage={() => switchStage('stage-2')}
           />
@@ -3979,6 +4149,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             projectGuidePreviewType={projectGuidePreviewType}
             setProjectGuidePreviewType={setProjectGuidePreviewType}
             markProjectGuideDownloaded={markProjectGuideDownloaded}
+            teacherEmail={effectiveTeacherEmail}
           />
         )}
 
@@ -4000,6 +4171,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             setStage3RubricState={setStage3RubricState}
             stage3RubricSummary={stage3RubricSummary}
             submitRubricEvaluation={submitRubricEvaluation}
+            teacherEmail={effectiveTeacherEmail}
             isNextStageUnlocked={isStageUnlocked('stage-4')}
             onNextStage={() => switchStage('stage-4')}
           />
@@ -4019,6 +4191,8 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             productRubricState={stage4ProductRubricState}
             setProductRubricState={setStage4ProductRubricState}
             submitRubricEvaluation={submitRubricEvaluation}
+            teacherEmail={effectiveTeacherEmail}
+            padletUrl={effectivePadletUrl}
             isNextStageUnlocked={isStageUnlocked('stage-5')}
             onNextStage={() => switchStage('stage-5')}
           />
@@ -4041,6 +4215,7 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             setStage5RubricState={setStage5RubricState}
             stage5RubricSummary={stage5RubricSummary}
             submitRubricEvaluation={submitRubricEvaluation}
+            teacherEmail={effectiveTeacherEmail}
             isNextStageUnlocked={isStageUnlocked('stage-6')}
             onNextStage={() => switchStage('stage-6')}
           />
@@ -4120,11 +4295,15 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
             setStage6TeacherIndividualAdjustments={setStage6TeacherIndividualAdjustments}
             stage6TeacherSubmitted={stage6TeacherSubmitted}
             setStage6TeacherSubmitted={setStage6TeacherSubmitted}
+            onSubmitStage6Self={handleSubmitStage6Self}
+            onSubmitStage6Leader={handleSubmitStage6Leader}
+            onSubmitStage6Teacher={handleSubmitStage6Teacher}
             stage4ProductScore={stage4ProductRubricSummary.totalPoints}
             stage4ProductAnsweredCount={stage4ProductRubricSummary.answeredCount}
             showToast={showToast}
           />
         )}
+        </React.Suspense>
 
         {/* PHIẾU KHẢO SÁT Ý KIẾN HỌC SINH SAU CHỦ ĐỀ (CHỈ HIỆN SAU CHẶNG 6, KHÔNG TÍNH CHẶNG) */}
         {activeStage === 'stage-6' && (
@@ -4212,6 +4391,136 @@ export function TinhBotCelluloseElearning({ onBack }: TinhBotCelluloseElearningP
       <ReferencesModal isOpen={showReferencesModal} onClose={() => setShowReferencesModal(false)} />
 
       <ComplianceProfileModal isOpen={showComplianceModal} onClose={() => setShowComplianceModal(false)} />
+
+      {/* MODAL CÀI ĐẶT EMAIL & PADLET RIÊNG KHI TẢI GÓI SCORM 1.2 / HTML5 */}
+      {scormExportModal && (
+        <div
+          onClick={() => setScormExportModal(null)}
+          className="fixed inset-0 z-50 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border-2 border-teal-200 text-indigo-950 flex flex-col gap-4"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-base font-black text-indigo-950">
+                  📦 Cài đặt gói {scormExportModal === 'scorm' ? 'SCORM 1.2 (.zip)' : 'HTML5 (.html)'}
+                </h3>
+                <p className="text-xs text-slate-600 font-medium mt-0.5">
+                  Dành cho Giáo viên tải về đưa lên LMS trường mình. Có thể để trống nếu muốn dùng cấu hình mặc định.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setScormExportModal(null)}
+                className="p-1.5 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-600 cursor-pointer"
+                aria-label="Đóng"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <div>
+                <label className="text-xs font-black text-indigo-950 block mb-1">
+                  1. Tên Giáo viên (tùy chọn):
+                </label>
+                <input
+                  type="text"
+                  value={scormTeacherNameInput}
+                  onChange={(e) => setScormTeacherNameInput(e.target.value)}
+                  placeholder="VD: Cô Nguyễn Thị Lan (Để trống = Thầy Trần Văn Lĩnh)"
+                  className="w-full px-3.5 py-2 rounded-xl border border-teal-200 bg-slate-50 text-xs font-bold text-indigo-950 outline-none focus:border-teal-500 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-black text-indigo-950 block mb-1">
+                  2. Email Giáo viên nhận bài nộp (tùy chọn):
+                </label>
+                <input
+                  type="email"
+                  value={scormEmailInput}
+                  onChange={(e) => setScormEmailInput(e.target.value)}
+                  placeholder={`Để trống = gửi về ${TEACHER_EMAIL}`}
+                  className="w-full px-3.5 py-2 rounded-xl border border-teal-200 bg-slate-50 text-xs font-bold text-indigo-950 outline-none focus:border-teal-500 focus:bg-white"
+                />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Nếu nhập Email của thầy/cô, bài kiểm tra &amp; Rubric của học sinh sẽ gửi thẳng về hộp thư đó.
+                </p>
+              </div>
+
+              <div>
+                <label className="text-xs font-black text-indigo-950 block mb-1">
+                  3. Link Padlet lớp học của Giáo viên (tùy chọn):
+                </label>
+                <input
+                  type="url"
+                  value={scormPadletInput}
+                  onChange={(e) => setScormPadletInput(e.target.value)}
+                  placeholder="https://padlet.com/... (Để trống = dùng Padlet mặc định)"
+                  className="w-full px-3.5 py-2 rounded-xl border border-teal-200 bg-slate-50 text-xs font-bold text-indigo-950 outline-none focus:border-teal-500 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-black text-indigo-950 block mb-1">
+                  4. Mã lớp học (tùy chọn, dùng lọc kết quả riêng):
+                </label>
+                <input
+                  type="text"
+                  value={scormClassInput}
+                  onChange={(e) => setScormClassInput(e.target.value)}
+                  placeholder="VD: 9B-NGUYENDU"
+                  className="w-full px-3.5 py-2 rounded-xl border border-teal-200 bg-slate-50 text-xs font-bold text-indigo-950 outline-none focus:border-teal-500 focus:bg-white"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setScormExportModal(null)}
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const rawPadlet = scormPadletInput.trim();
+                  if (rawPadlet && !rawPadlet.startsWith('https://') && !rawPadlet.startsWith('http://')) {
+                    showToast('⚠️ Link Padlet cần bắt đầu bằng https:// (hoặc để trống).', 'warning');
+                    return;
+                  }
+                  const mod = await import('./tinh-bot-cellulose/exportScormPackage');
+                  const baseUrl = mod.getDefaultPublicLessonUrl();
+                  const params = new URLSearchParams();
+                  if (scormTeacherNameInput.trim()) params.set('gv', scormTeacherNameInput.trim());
+                  if (scormEmailInput.trim()) params.set('email', scormEmailInput.trim());
+                  if (rawPadlet) params.set('padlet', rawPadlet);
+                  if (scormClassInput.trim()) params.set('lop', scormClassInput.trim());
+                  const finalUrl = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+
+                  if (scormExportModal === 'scorm') {
+                    await mod.downloadScorm12Zip(finalUrl);
+                    showToast('✓ Đã đóng gói & tải file SCORM 1.2 (.zip) theo cấu hình của thầy/cô!', 'success');
+                  } else {
+                    mod.downloadHtml5File(finalUrl);
+                    showToast('✓ Đã tạo & tải tệp HTML5 (.html) theo cấu hình của thầy/cô!', 'success');
+                  }
+                  setScormExportModal(null);
+                }}
+                className="px-5 py-2 rounded-xl bg-linear-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white text-xs font-black shadow-sm cursor-pointer flex items-center gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Tải {scormExportModal === 'scorm' ? 'SCORM 1.2 (.zip)' : 'HTML5 (.html)'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <NarratorOverlay
         isExpanded={isNarratorExpanded}

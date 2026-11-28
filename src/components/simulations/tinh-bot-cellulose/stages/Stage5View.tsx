@@ -44,6 +44,7 @@ interface Stage5ViewProps {
     setState: React.Dispatch<React.SetStateAction<RubricFormState>>;
     onConfirmed: () => void;
   }) => Promise<void>;
+  teacherEmail?: string;
   isNextStageUnlocked: boolean;
   onNextStage: () => void;
 }
@@ -64,6 +65,7 @@ export function Stage5View({
   setStage5RubricState,
   stage5RubricSummary,
   submitRubricEvaluation,
+  teacherEmail = TEACHER_EMAIL,
   isNextStageUnlocked,
   onNextStage,
 }: Stage5ViewProps) {
@@ -262,7 +264,7 @@ export function Stage5View({
                       onConfirmed: () => setVoteConfirmed(true),
                     })
                   }
-                  teacherEmail={TEACHER_EMAIL}
+                  teacherEmail={teacherEmail}
                 />
               </div>
             </LockedTaskBox>

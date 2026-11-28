@@ -35,6 +35,25 @@ export default defineConfig(({mode}) => {
               if (id.includes('recharts')) {
                 return 'vendor-charts';
               }
+              if (id.includes('three') || id.includes('@react-three') || id.includes('postprocessing')) {
+                return 'vendor-3d';
+              }
+              if (id.includes('@mediapipe')) {
+                return 'vendor-mediapipe';
+              }
+              if (
+                id.includes('docx') ||
+                id.includes('jszip') ||
+                id.includes('mammoth') ||
+                id.includes('jspdf') ||
+                id.includes('html2canvas') ||
+                id.includes('html-to-image')
+              ) {
+                return 'vendor-export';
+              }
+              if (id.includes('framer-motion') || id.includes('gsap')) {
+                return 'vendor-motion';
+              }
             }
           },
         },

@@ -183,6 +183,7 @@ interface Stage2ViewProps {
   projectGuidePreviewType: 'pdf' | 'doc';
   setProjectGuidePreviewType: React.Dispatch<React.SetStateAction<'pdf' | 'doc'>>;
   markProjectGuideDownloaded: () => void;
+  teacherEmail?: string;
 }
 
 export const Stage2View: React.FC<Stage2ViewProps> = ({
@@ -321,6 +322,7 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
   projectGuidePreviewType,
   setProjectGuidePreviewType,
   markProjectGuideDownloaded,
+  teacherEmail = TEACHER_EMAIL,
 }) => {
   return (
     <div className="flex flex-col gap-4 animate-in fade-in duration-200">
@@ -3121,7 +3123,7 @@ export const Stage2View: React.FC<Stage2ViewProps> = ({
 
                     <div className="flex items-center gap-2">
                       <a
-                        href={`mailto:${TEACHER_EMAIL}?subject=[KHTN 9] Điểm kiểm tra Chặng 2: ${testStudentName} - Lớp ${testStudentClass}&body=Họ tên: ${testStudentName}%0D%0ALớp: ${testStudentClass}%0D%0AĐiểm số: ${testScore}/10 điểm`}
+                        href={`mailto:${teacherEmail}?subject=[KHTN 9] Điểm kiểm tra Chặng 2: ${testStudentName} - Lớp ${testStudentClass}&body=Họ tên: ${testStudentName}%0D%0ALớp: ${testStudentClass}%0D%0AĐiểm số: ${testScore}/10 điểm`}
                         className="px-3.5 py-1.5 rounded-full bg-white border border-indigo-200 text-indigo-900 font-bold text-xs flex items-center gap-1.5 hover:bg-indigo-50 cursor-pointer"
                       >
                         <Mail className="w-3.5 h-3.5 text-indigo-600" />

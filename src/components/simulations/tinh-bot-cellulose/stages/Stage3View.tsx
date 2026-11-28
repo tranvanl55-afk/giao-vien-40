@@ -42,6 +42,7 @@ interface Stage3ViewProps {
     setState: React.Dispatch<React.SetStateAction<RubricFormState>>;
     onConfirmed: () => void;
   }) => Promise<void>;
+  teacherEmail?: string;
   isNextStageUnlocked: boolean;
   onNextStage: () => void;
 }
@@ -63,6 +64,7 @@ export function Stage3View({
   setStage3RubricState,
   stage3RubricSummary,
   submitRubricEvaluation,
+  teacherEmail = TEACHER_EMAIL,
   isNextStageUnlocked,
   onNextStage,
 }: Stage3ViewProps) {
@@ -229,7 +231,7 @@ export function Stage3View({
                 onConfirmed: () => setPeerIdeaConfirmed(true),
               })
             }
-            teacherEmail={TEACHER_EMAIL}
+            teacherEmail={teacherEmail}
           />
         </div>
       </LockedTaskBox>
